@@ -1,0 +1,28 @@
+.aural-info
+{
+	display: none;
+}
+
+table.threewp_activity_monitor
+{
+	border: solid gray 1px;
+	border-collapse: collapse;
+	background-color: #f6f6f6;
+	-moz-border-radius: 1em;
+}
+
+table.threewp_activity_monitor th
+{
+	background-color: #8a8a8a;
+	color: white;
+}
+
+table.threewp_activity_monitor th, table.threewp_activity_monitor td
+{
+	padding: 0.2em 2em;
+}
+
+table.threewp_activity_monitor tr:hover
+{
+	background-color: #e3ffdd;
+}
