@@ -1,5 +1,5 @@
 === ThreeWP Activity Monitor ===
-Tags: wp, wpmu, threewp, activity, monitor, activity monitor, blog activity 
+Tags: wp, wpmu, threewp, activity, monitor, activity monitor, blog activity, user, comments
 Requires at least: 2.9.1.1
 Tested up to: 2.9.1.1
 Stable tag: trunk
@@ -28,5 +28,8 @@ Has an uninstall option to completely remove it from the database.
 
 == Changelog ==
 
+= 0.0.2 =
+* Backend link to each blog
+* Code cleanup (new base class, etc)
 = 0.0.1 =
 * Initial public release

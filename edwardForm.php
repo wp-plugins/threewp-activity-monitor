@@ -79,7 +79,8 @@
 		'type' => 'checkbox',
 		'name'=>'checkboxexample',
 		'label' => 'Almost done?',
-		'value' => '1',					// Checked or unchecked?
+		'value' => 'on',				
+		'checked' => false,					// Checked or unchecked?
 		'description' => 'Are we almost done with the examples? Yes, almost...',
 	));
 	$form->addSectionInput('TestSection', array(
@@ -286,9 +287,14 @@ class edwardForm
 		if (!isset($options['label']))
 			return null;
 			
+		$extra = '';
+		
+		if ($options['title'] != '')
+			$extra .= ' title="'.$options['title'].'"';
+			
 		$requiredField = $this->makeRequiredField($options);
 			
-		return '<label for="'.$this->makeID($options).'">'.$options['label'].$requiredField.'</label>';
+		return '<label for="'.$this->makeID($options).'"'.$extra.'>'.$options['label'].$requiredField.'</label>';
 	}
 	
 	/**
@@ -436,7 +442,10 @@ class edwardForm
 				$returnValue = '<input class="'.$classes.'" type="'.$options['type'].'" name="'.self::makeName($options).'" value="'.$options['value'].'"'.$extraOptions.' />';
 			break;
 			case 'checkbox':
-				$returnValue = '<input class="'.$classes.'" type="'.$options['type'].'" name="'.self::makeName($options).'" id="'.$this->makeID($options).'" value="1" '.($options['value'] == 1 ? 'checked="checked"' : '').''.$extraOptions.' />';
+				if (!isset($options['checked']))
+					$options['checked'] = (intval($options['value']) == 1);
+				$checked = ($options['checked'] ? ' checked="checked" ' : '');
+				$returnValue = '<input class="'.$classes.'" type="'.$options['type'].'" name="'.self::makeName($options).'" id="'.$this->makeID($options).'" value="'.$options['value'].'" '.$checked.' '.$extraOptions.' />';
 			break;
 			case 'submit':
 				$returnValue = '<input class="'.$classes.'" type="'.$options['type'].'" name="'.self::makeName($options).'" id="'.$this->makeID($options).'" value="'.$options['value'].'" '.$extraOptions.' />';

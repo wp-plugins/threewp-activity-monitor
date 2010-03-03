@@ -3,7 +3,7 @@
 Plugin Name: ThreeWP Activity Monitor
 Plugin URI: http://mindreantre.se/threewp-activity-monitor/
 Description: WPMU sitewide plugin to display sitewide blog activity.
-Version: 0.0.1
+Version: 0.0.2
 Author: Edward Hevlund
 Author URI: http://www.mindreantre.se
 Author Email: edward@mindreantre.se
@@ -11,16 +11,18 @@ Author Email: edward@mindreantre.se
 
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
 
-require_once('ThreeWP_Base.php');
-class ThreeWP_Activity_Monitor extends ThreeWP_Base
+require_once('ThreeWP_Base_Activity_Monitor.php');
+class ThreeWP_Activity_Monitor extends ThreeWP_Base_Activity_Monitor
 {
 	private $cache = array('user' => array(), 'blog' => array(), 'post' => array());
+	
+	protected $options = array(
+		'limit' => 1000,
+	);
 
 	public function __construct()
 	{
-		parent::__construct();
-		$this->pluginPath = basename(dirname(__FILE__)) . '/' . basename(__FILE__);
-		$this->pluginURL = WP_PLUGIN_URL . '/' . basename(dirname(__FILE__));
+		parent::__construct(__FILE__);
 		register_activation_hook(__FILE__, array(&$this, 'activate') );
 		if ($this->isWPMU)
 		{
@@ -40,7 +42,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Base
 		if (!$this->isWPMU)
 			wp_die("This plugin requires WPMU.");
 			
-		$this->update_option('limit', 100);
+		$this->register_options();
 			
 		$this->query("CREATE TABLE IF NOT EXISTS `".$this->wpdb->base_prefix."activity_monitor` (
 		  `am_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -63,7 +65,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Base
 	public function load_styles()
 	{
 		if ($_GET['page'] == get_class())
-			wp_enqueue_style('3wp_activity_monitor', $this->pluginURL . '/css/ThreeWP_Activity_Monitor.css', false, '0.0.1', 'screen' );
+			wp_enqueue_style('3wp_activity_monitor', '/' . $this->paths['path_from_base_directory'] . '/css/ThreeWP_Activity_Monitor.css', false, '0.0.1', 'screen' );
 	}
 	
 	public function admin()
@@ -75,10 +77,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Base
 	}
 	
 	protected function adminActivityMonitor()
-	{
-		require_once('ThreeWP_Form.php');
-		$form = new threewp_form();
-		
+	{	
 		$dateFormat = get_option('date_format') . ' ' . get_option('time_format');
 		
 		$activities = $this->sqlActivities();
@@ -105,7 +104,6 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Base
 		}
 
 		echo '
-			'.$form->start().'
 			<table class="threewp_activity_monitor">
 				<thead>
 					<tr>
@@ -117,14 +115,12 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Base
 					'.$tBody.'
 				</tbody>
 			</table>
-			'.$form->stop().'
 		';
 	}
 	
 	public function adminSettings()
 	{
-		require_once('ThreeWP_Form.php');
-		$form = new threewp_form();
+		$form = $this->form();
 		
 		$limit = $this->get_option('limit');
 		
@@ -168,7 +164,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Base
 	protected function uninstall()
 	{
 		$this->query("DROP TABLE `".$this->wpdb->base_prefix."activity_monitor`");
-		$this->delete_option('limit');
+		$this->deregister_options();
 	}
 	
 	/**
@@ -184,7 +180,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Base
 			$this->cache['blog'][$blog_id] = get_blog_details($blog_id, true);
 		$blog = $this->cache['blog'][$blog_id];
 		
-		$blogLink = '<a href="'.$blog->siteurl.'">'.$blog->blogname.'</a>';
+		$blogLink = '<a href="'.$blog->siteurl.'">'.$blog->blogname.'</a> [<a title="Backend" href="'.$blog->siteurl.'/wp-admin/">B</a>]';
 		
 		if ($user_id !== null)
 			$userLink = '<a href="user-edit.php?user_id='.$user_id.'">'.$this->cache['user'][$user_id]->user_nicename.'</a>';
