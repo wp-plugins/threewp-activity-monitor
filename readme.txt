@@ -1,14 +1,14 @@
 === ThreeWP Activity Monitor ===
-Tags: wp, wpmu, threewp, activity, monitor, activity monitor, blog activity, user, comments
-Requires at least: 2.9.1.1
-Tested up to: 2.9.1.1
+Tags: wp, wpms, network, threewp, activity, monitor, activity monitor, blog activity, user, comments
+Requires at least: 3.0
+Tested up to: 3.0
 Stable tag: trunk
 
-WPMU sitewide plugin to display sitewide blog activity. Displays user logins, new comments and new posts as links.
+Network plugin to display sitewide blog activity. Displays user logins, new comments and new posts as links.
 
 == Description ==
 
-WPMU sitewide plugin to display sitewide blog activity. Displays user logins, new comments and new posts as links.
+Network plugin to display sitewide blog activity. Displays user logins, new comments and new posts as links.
 
 Since this plugin allows you to monitor all activity sitewide, it will be very easy to quickly locate spam blogs and their activities.
 
@@ -27,7 +27,8 @@ Has an uninstall option to completely remove it from the database.
 2. Settings tab
 
 == Changelog ==
-
+= 0.3 =
+* WP3.0 compatability
 = 0.0.2 =
 * Backend link to each blog
 * Code cleanup (new base class, etc)

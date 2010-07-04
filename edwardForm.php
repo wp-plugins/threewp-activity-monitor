@@ -343,12 +343,12 @@ class edwardForm
 			if ( isset($validationArray['datetime']) )
 			{
 				$formatString = $validationArray['datetime'];
-				$formatString = str_replace('Y', $this->l('YYYY'), $formatString);
 				$formatString = str_replace('m', $this->l('MM'), $formatString);
 				$formatString = str_replace('d', $this->l('DD'), $formatString);
 				$formatString = str_replace('H', $this->l('HH'), $formatString);
 				$formatString = str_replace('i', $this->l('MM'), $formatString);
 				$formatString = str_replace('s', $this->l('SS'), $formatString);
+				$formatString = str_replace('Y', $this->l('YYYY'), $formatString);
 				$validation[] = $this->l('Date format') . ': ' . $formatString;
 			} 
 			if ( isset($validationArray['datemaximum']) )
@@ -443,7 +443,11 @@ class edwardForm
 			break;
 			case 'checkbox':
 				if (!isset($options['checked']))
+				{
 					$options['checked'] = (intval($options['value']) == 1);
+					if ($options['value'] == '')
+						$options['value'] = 1; 
+				}
 				$checked = ($options['checked'] ? ' checked="checked" ' : '');
 				$returnValue = '<input class="'.$classes.'" type="'.$options['type'].'" name="'.self::makeName($options).'" id="'.$this->makeID($options).'" value="'.$options['value'].'" '.$checked.' '.$extraOptions.' />';
 			break;
@@ -856,7 +860,7 @@ class edwardForm
 						if ($oldValues[$key] == '1' && !isset($newValues[$key]))
 							$sets .= "$key = '0', ";
 						if ($oldValues[$key] == '0' && isset($newValues[$key]))
-							if ($newValues[$key] == '1')
+							if ($newValues[$key] !== null)
 								$sets .= "$key = '1', ";
 					}
 					break;
@@ -1117,7 +1121,7 @@ class edwardFormLanguage
 			'sv' => 'Giltiga v&auml;rden',
 		),
 		'YYYY' => array(
-			'sv' => '&aring;&aring;&aring;&aring;',
+			'sv' => '&Aring;&Aring;&Aring;&Aring;',
 		),
 		'characters' => array(
 			'sv' => 'tecken',

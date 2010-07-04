@@ -2,8 +2,8 @@
 /*                                                                                                                                                                                                                                                             
 Plugin Name: ThreeWP Activity Monitor
 Plugin URI: http://mindreantre.se/threewp-activity-monitor/
-Description: WPMU sitewide plugin to display sitewide blog activity.
-Version: 0.0.2
+Description: Network plugin to display sitewide blog activity.
+Version: 0.3
 Author: Edward Hevlund
 Author URI: http://www.mindreantre.se
 Author Email: edward@mindreantre.se
@@ -24,7 +24,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Base_Activity_Monitor
 	{
 		parent::__construct(__FILE__);
 		register_activation_hook(__FILE__, array(&$this, 'activate') );
-		if ($this->isWPMU)
+		if ($this->isNetwork)
 		{
 			add_action('admin_menu', array(&$this, 'add_menu') );
 			add_action('wp_login', array(&$this, 'wp_login') );
@@ -39,8 +39,11 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Base_Activity_Monitor
 	{
 		parent::activate();
 		
-		if (!$this->isWPMU)
-			wp_die("This plugin requires WPMU.");
+		if (!$this->isNetwork)
+		{
+			$this->deactivate();
+			wp_die("This plugin requires a Network installation.");
+		}
 			
 		$this->register_options();
 			
@@ -59,7 +62,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Base_Activity_Monitor
 	public function add_menu()
 	{
 		if (is_site_admin())
-			add_submenu_page('wpmu-admin.php', 'ThreeWP Activity Monitor', 'Activity Monitor', 'administrator', 'ThreeWP_Activity_Monitor', array (&$this, 'admin'));
+			add_submenu_page('ms-admin.php', 'ThreeWP Activity Monitor', 'Activity Monitor', 'administrator', 'ThreeWP_Activity_Monitor', array (&$this, 'admin'));
 	}
 	
 	public function load_styles()
@@ -228,16 +231,18 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Base_Activity_Monitor
 	 * George W Bush function: should this comment activity be logged?
 	 */
 	public function comment_post($comment_id, $state)
-	{		
-		// Only approved comments are interesting.
-		if ($state !== 'approve')
+	{
+		$approved = ($state == 1 || $state == 'approve');
+		// Only approved and user-logged-in (1) comments are interesting.
+		if (!$approved)
 			return;
-
-		$comment = get_comment($comment_id);		
+		
+		$comment = get_comment($comment_id);
 		$post_id = $comment->comment_post_ID;
 		$user_id = ($comment->user_id == 0 ? null : $comment->user_id);
+		error_reporting(E_ALL);
 		global $blog_id;
-		$this->sqlActivityAdd($user_id, $blog_id, $post_id, $comment_id, var_export($comment, true));
+		$this->sqlActivityAdd($user_id, $blog_id, $post_id, $comment_id);
 	}
 	
 	public function wp_login($login)
