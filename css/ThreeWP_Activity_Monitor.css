@@ -3,26 +3,58 @@
 	display: none;
 }
 
-table.threewp_activity_monitor
+.threewp_activity_monitor_overview_backend_link,
+.threewp_activity_monitor_activity_info_key
 {
-	border: solid gray 1px;
-	border-collapse: collapse;
-	background-color: #f6f6f6;
-	-moz-border-radius: 1em;
+	font-size: 80%;
+	color: gray;
 }
 
-table.threewp_activity_monitor th
+.threewp_activity_monitor_sep
 {
-	background-color: #8a8a8a;
-	color: white;
+	color: gray;
 }
 
-table.threewp_activity_monitor th, table.threewp_activity_monitor td
+table.threewp_activity_monitor li
 {
-	padding: 0.2em 2em;
+	margin: 0;
 }
 
-table.threewp_activity_monitor tr:hover
+tr.action_login_failure
 {
-	background-color: #e3ffdd;
+	background-color: #ffecec;
 }
+
+tr.activity_monitor_action
+{
+	height: 42px;
+	min-height: 42px;
+}
+
+td.activity_monitor_action
+{
+	padding-left: 42px;
+	background-position: center left;
+	background-repeat: no-repeat;
+}
+
+tr.activity_monitor_action:hover
+{
+	background-color: #eee;
+}
+
+.sep
+{
+	color: gray;
+}
+
+td.action_post_publish					{	background-image: url("../images/icons/post_publish.png");		}
+
+td.action_comment_approve					{	background-image: url("../images/icons/comment_approve.png");		}
+
+td.action_trash_post					{	background-image: url("../images/icons/trash.png");		}
+
+td.action_password_reset				{	background-image: url("../images/icons/password_reset.png");		}
+
+td.action_login_success					{	background-image: url("../images/icons/login_success.png");		}
+td.action_login_failure					{	background-image: url("../images/icons/login_failure.png");		}

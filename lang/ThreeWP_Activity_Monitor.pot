@@ -1,0 +1,215 @@
+# Translation of the WordPress plugin   by .
+# Copyright (C) 2010 
+# This file is distributed under the same license as the  package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version:  \n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/threewp-activity-monitor\n"
+"POT-Creation-Date: 2010-11-27 18:56+0100\n"
+"PO-Revision-Date: 2010-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ThreeWP_Activity_Monitor.php:168 ThreeWP_Activity_Monitor.php:170
+msgid "Activity Monitor"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:183
+msgid "Overview"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:188
+msgid "Settings"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:191
+msgid "Uninstall"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:469
+msgid "Keep at most this amount of activities in the database"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:480
+msgid "Display this amount of activities per page"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:521
+msgid "Apply"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:576
+msgid "User activity"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:584 ThreeWP_Activity_Monitor.php:691
+msgid "Latest login"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:585
+msgid "Successful logins"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:586
+msgid "Failed logins"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:587
+msgid "Retrieved passwords"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:588
+msgid "Reset passwords"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:617
+msgid "Crop the activity list down to this amount of rows"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:629
+msgid "Clear the user's activity list"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:651
+msgid "Various login statistics about the user"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:651
+msgid "Login statistics"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:680
+msgid "No login data available"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:790
+msgid "Go directly to the blog's backend"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:792
+msgid "B"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:837 ThreeWP_Activity_Monitor.php:866
+msgid "on"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:860
+msgid "comment #"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:862
+msgid "for the post"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:915
+msgid "Address:"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:921
+msgid "Web browser:"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:950
+msgid "Time"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:951
+msgid "Activity"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:966
+msgid "logged in to"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:968
+msgid "tried to log in to"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:970
+msgid "logged out from"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:972
+msgid "retrieved a password reset link from"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:974
+msgid "reset his password on"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:977
+msgid "posted"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:980
+msgid "updated"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:983 ThreeWP_Activity_Monitor.php:1011
+msgid "trashed"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:986 ThreeWP_Activity_Monitor.php:1014
+msgid "restored"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:989 ThreeWP_Activity_Monitor.php:1017
+msgid "deleted"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:993
+msgid "requeued"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:996
+msgid "approved"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:999
+msgid "reapproved"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:1002
+msgid "held back"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:1005
+msgid "spam marked"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:1008
+msgid "unspammed"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:1021
+msgid "has created the user"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:1024
+msgid "has updated the profile of"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:1027
+msgid "has deleted the user"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:1037
+msgid "Password changed"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:1040
+#, php-format
+msgid "First name changed from <em>\"%s\"</em> to <em>\"%s\"</em>"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:1046
+#, php-format
+msgid "Last name changed from <em>\"%s\"</em> to <em>\"%s\"</em>"
+msgstr ""

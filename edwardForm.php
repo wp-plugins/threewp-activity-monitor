@@ -268,7 +268,7 @@ class edwardForm
 						$needed = false;
 				}
 				if ($needed)
-					$returnValue .= '<sup><span class="aural-info"> ('.$this->l('Required field').')</span><span title="'.$this->l('Required field').'">*</span></sup>';
+					$returnValue .= '<sup><span class="screen-reader-text aural-info"> ('.$this->l('Required field').')</span><span title="'.$this->l('Required field').'">*</span></sup>';
 			break;
 			default:
 			break;
@@ -307,7 +307,7 @@ class edwardForm
 		
 		$returnValue = '
 			<div>
-				<div class="aural-info">
+				<div class="screen-reader-text aural-info">
 					'.$this->l('Description').':
 				</div>
 				'.$options['description'].'
@@ -445,10 +445,10 @@ class edwardForm
 				if (!isset($options['checked']))
 				{
 					$options['checked'] = (intval($options['value']) == 1);
-					if ($options['value'] == '')
-						$options['value'] = 1; 
+					if ($options['value'] == '' || $options['value'] == '0')
+						$options['value'] = 1;
 				}
-				$checked = ($options['checked'] ? ' checked="checked" ' : '');
+				$checked = ($options['checked'] == true ? ' checked="checked" ' : '');
 				$returnValue = '<input class="'.$classes.'" type="'.$options['type'].'" name="'.self::makeName($options).'" id="'.$this->makeID($options).'" value="'.$options['value'].'" '.$checked.' '.$extraOptions.' />';
 			break;
 			case 'submit':
@@ -498,7 +498,7 @@ class edwardForm
 		$this->sections[ $section['name'] ] = $section;
 	}
 	
-	private function implodeArray($data, $strings, $glueBefore, $glueAfter, $stringPrefix = null, $currentString = null)
+	private function implodeArray($data, &$strings, $glueBefore, $glueAfter, $stringPrefix = null, $currentString = null)
 	{
 		foreach($data as $key=>$value)
 		{
@@ -508,11 +508,11 @@ class edwardForm
 				$strings[$stringToAdd] = $value;
 			}
 			else
-				$this->implodeArray($value, &$strings, $glueBefore, $glueAfter,  $stringPrefix, $currentString . $glueBefore.$key.$glueAfter);
+				$this->implodeArray($value, $strings, $glueBefore, $glueAfter,  $stringPrefix, $currentString . $glueBefore.$key.$glueAfter);
 		}
 	}
 	
-	private function usePostValue($input, $settings, $postData, $key)
+	private function usePostValue(&$input, $settings, $postData, $key)
 	{
 		if ($input['type']=='submit')		// Submits don't get their values posted, so return the value.
 			return $input['value'];
@@ -536,7 +536,7 @@ class edwardForm
 		if ($input['nameprefix'] != '')
 		{
 			$strings = '';
-			$this->implodeArray($postData, &$strings, '__', '', $this->options['class'] . '');
+			$this->implodeArray($postData, $strings, '__', '', $this->options['class'] . '');
 		}
 		else
 		{
@@ -573,7 +573,7 @@ class edwardForm
 			$input = array_merge($this->options, $input);
 			if ($input['type'] == 'rawtext')
 				$input['name'] = rand(0, time());
-			$this->usePostValue(&$input, $settings, $postData, $input['name']);
+			$this->usePostValue($input, $settings, $postData, $input['name']);
 		}
 		else
 			$input = array(

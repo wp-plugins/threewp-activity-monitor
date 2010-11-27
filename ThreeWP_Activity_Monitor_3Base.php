@@ -2,9 +2,9 @@
 /**
  * Base class with some common functions.
  * 
- * Version 2010-07-04 15:55
+ * Version 2010-11-25 13:19
  */
-class ThreeWP_Base_Activity_Monitor
+class ThreeWP_Activity_Monitor_3Base
 {
 	protected $wpdb;							// Link to Wordpress' database class.
 	protected $isNetwork;						// Stores whether this blog is a network blog.
@@ -41,7 +41,8 @@ class ThreeWP_Base_Activity_Monitor
 	{
 		global $wpdb;
 		$this->wpdb = $wpdb;
-		$this->isNetwork = function_exists('is_site_admin');
+		$this->is_network = MULTISITE;
+		$this->isNetwork = $this->is_network;
 		
 		$this->paths = array(
 			'name' => get_class($this),
@@ -51,6 +52,8 @@ class ThreeWP_Base_Activity_Monitor
 			'path_from_base_directory' => PLUGINDIR . '/' . basename(dirname($filename)),
 			'url' => WP_PLUGIN_URL . '/' . basename(dirname($filename)),
 		);
+		
+		add_action( 'admin_init', array(&$this, 'adminUninstall_post') );
 	}
 	
 	/**
@@ -67,7 +70,13 @@ class ThreeWP_Base_Activity_Monitor
 	 */
 	protected function deactivate()
 	{
-		deactivate_plugins($this->paths['filename_from_plugin_directory']);
+	}
+	
+	protected function deactivate_me()
+	{
+		deactivate_plugins(array(
+			$this->paths['filename_from_plugin_directory']
+		));
 	}
 	
 	/**
@@ -78,32 +87,48 @@ class ThreeWP_Base_Activity_Monitor
 	}
 	
 	/**
+	 * Handles post data
+	 */
+	public function adminUninstall_post()
+	{
+		$class_name = get_class($this);
+		if ( isset($_POST[ $class_name ]['uninstall']) )
+		{
+			if ( isset($_POST[ $class_name ]['sure']) )
+			{
+				$this->uninstall();
+				$this->deactivate_me();
+				if ($this->is_network)
+					wp_redirect( 'ms-admin.php' );
+				else
+					wp_redirect( 'index.php' );
+				exit;
+			}
+		}
+	}
+
+	/**
 	 * Shows uninstall form.
 	 */
 	protected function adminUninstall()
 	{
 		$form = $this->form();
 		
-		if (isset($_POST['uninstall']))
-		{
+		if (isset($_POST[ get_class($this) ]['uninstall']))
 			if (!isset($_POST['sure']))
 				$this->error('You have to check the checkbox in order to uninstall the plugin.');
-			else
-			{
-				$this->uninstall();
-				$this->message('Plugin has been uninstalled and deactivated.');
-				$this->deactivate();
-			}
-		}
 		
+		$nameprefix = '['.get_class($this).']';
 		$inputs = array(
 			'sure' => array(
 				'name' => 'sure',
+				'nameprefix' => $nameprefix,
 				'type' => 'checkbox',
 				'label' => "Yes, I'm sure I want to remove all the plugin tables and settings.",
 			),
 			'uninstall' => array(
 				'name' => 'uninstall',
+				'nameprefix' => $nameprefix,
 				'type' => 'submit',
 				'cssClass' => 'button-primary',
 				'value' => 'Uninstall plugin',
@@ -151,7 +176,7 @@ class ThreeWP_Base_Activity_Monitor
 	/**
 	 * Fire an SQL query and return the row ID of the inserted row.
 	 */
-	protected function queryInsertID($query)
+	protected function query_insert_id($query)
 	{
 		$this->wpdb->query($query);
 		return $this->wpdb->insert_id;
@@ -172,14 +197,18 @@ class ThreeWP_Base_Activity_Monitor
 	}
 	
 	/**
-	 * Is the user's role at least 'site_admin', 'administrator', etc...
+	 * Is the user's role at least 'super_admin', 'administrator', etc...
 	 */
 	protected function role_at_least($role)
 	{
-		if (is_site_admin())
-			return true;
-		if ($role == 'site_admin')
-			return false;
+		if ($role == 'super_admin')
+			if (function_exists('is_super_admin'))
+			{
+				if (is_super_admin())
+					return true;
+			}
+			else
+				return false;
 		return current_user_can($this->roles[$role]['current_user_can']);
 	}
 	
@@ -259,7 +288,8 @@ class ThreeWP_Base_Activity_Monitor
 	protected function register_options()
 	{
 		foreach($this->options as $option=>$value)
-			$this->update_option($option, $value);
+			if ($this->get_option($option) === false)
+				$this->update_option($option, $value);
 	}
 	
 	/**
@@ -430,6 +460,7 @@ class ThreeWP_Base_Activity_Monitor
 		
 		if ($options['display'])
 		{
+			ob_start();
 			if ($options['displayTabName'])
 				echo $options['displayBeforeTabName'] . $options['tabs'][$selectedIndex] . $options['displayAfterTabName'];
 			echo $returnValue;
@@ -439,6 +470,7 @@ class ThreeWP_Base_Activity_Monitor
 				$functionName = $options['functions'][$selectedIndex];
 				$this->$functionName();
 			}
+			ob_end_flush();
 		}
 		else
 			return $returnValue;
@@ -466,6 +498,22 @@ class ThreeWP_Base_Activity_Monitor
 		}
 		else
 			return get_object_vars($object);
+	}
+	
+	protected function ago($time_string)
+	{
+		if ($time_string == '')
+			return '';
+		$diff = human_time_diff( strtotime($time_string), current_time('timestamp') );
+		return sprintf( __('%s ago'), $diff);
+	}
+	
+	/**
+		Returns WP's current timestamp (corrected for UTC)
+	*/
+	protected function now()
+	{
+		return date('Y-m-d H:i:s', current_time('timestamp'));
 	}
 }
 ?>
