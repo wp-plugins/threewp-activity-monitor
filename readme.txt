@@ -38,6 +38,7 @@ Available in English and Swedish.
 
 1. Main activity monitor tab
 1. User list with "last login" column
+1. Password tried info
 1. Settings tab
 1. Uninstall settings
 
@@ -47,6 +48,10 @@ Available in English and Swedish.
 The old activity table is removed.
 
 == Changelog ==
+= 1.1 =
+* Wordpress deleting posts and comments isn't logged anymore.
+* Pagination added
+* Password tried info added for login failures
 = 1.0 =
 * Major overhaul.
 * Settings are kept when activating the plugin.

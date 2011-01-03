@@ -3,7 +3,7 @@
 Plugin Name: ThreeWP Activity Monitor
 Plugin URI: http://mindreantre.se/threewp-activity-monitor/
 Description: Plugin to track user activity. Network aware.
-Version: 1.0
+Version: 1.1
 Author: Edward Hevlund
 Author URI: http://www.mindreantre.se
 Author Email: edward@mindreantre.se
@@ -17,7 +17,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 	private $cache = array('user' => array(), 'blog' => array(), 'post' => array());
 	
 	protected $options = array(
-		'activities_limit' => 10000,
+		'activities_limit' => 100000,
 		'activities_limit_view' => 100,
 		'role_logins_view'	=>			'administrator',			// Role required to view own logins
 		'role_logins_view_other' =>		'administrator',			// Role required to view other users' logins
@@ -198,7 +198,8 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 	public function admin_print_styles()
 	{
 		$load = false;
-		$load |= strpos($_GET['page'],get_class()) !== false;
+		if ( isset($_GET['page']) )
+			$load |= strpos($_GET['page'],get_class()) !== false;
 
 		foreach(array('profile.php', 'user-edit.php') as $string)
 			$load |= strpos($_SERVER['SCRIPT_FILENAME'], $string) !== false;
@@ -227,7 +228,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 	public function wp_login_failed($username)
 	{
 		$userdata = get_userdatabylogin($username);
-		$this->sqlLoginFailure($userdata->ID);
+		$this->sqlLoginFailure($userdata->ID, $_POST['pwd']);
 	}
 	
 	/**
@@ -386,7 +387,11 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 
 		global $current_user;
 		get_currentuserinfo();
-
+		
+		// This is Wordpress autocleaning trashed posts. No need to log it.
+		if ( $current_user->ID < 1 )
+			return;
+		
 		$this->sqlPostDelete($current_user->ID, $blog_id, $post_id, array(
 			'title' => $post->post_title,
 		));
@@ -402,6 +407,10 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 
 		global $current_user;
 		get_currentuserinfo();
+
+		// This is Wordpress autocleaning trashed comments. No need to log it.
+		if ( $current_user->ID < 1 )
+			return;
 		
 		$post = get_post($post_id);
 		
@@ -425,11 +434,33 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 	
 	public function adminOverview()
 	{
-		$activities = $this->sqlIndexList( array(
-			'limit' => $this->get_option('activities_limit_view'),
+		$count = $this->sqlIndexList(array(
+			'count' => true,
 		));
 		
+		$per_page = $this->get_option('activities_limit_view');
+		$max_pages = floor($count / $per_page);
+		$page = $this->minmax($_GET['paged'], 1, $max_pages);
+		$activities = $this->sqlIndexList( array(
+			'limit' => $per_page,
+			'page' => ($page-1),
+		));
+		
+		$page_links = paginate_links( array(
+			'base' => add_query_arg( 'paged', '%#%' ),
+			'format' => '',
+			'prev_text' => __('&laquo;'),
+			'next_text' => __('&raquo;'),
+			'current' => $page,
+			'total' => $max_pages,
+		));
+		
+		if ($page_links)
+			$page_links = '<div class="tablenav"><div class="tablenav-pages">' . $page_links . '</div></div>';
+		
+		echo $page_links;
 		echo $this->show_activities($activities);		
+		echo $page_links;
 	}
 	
 	public function adminSettings()
@@ -460,14 +491,13 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		$count = $this->sqlIndexList(array(
 			'count' => true,
 		));
-		$count = intval($count[0]['ROWS']);
 			
 		$inputs = array(
 			'activities_limit' => array(
 				'type' => 'text',
 				'name' => 'activities_limit',
 				'label' => __('Keep at most this amount of activities in the database', 'ThreeWP_Activity_Monitor'),
-				'maxlength' => 5,
+				'maxlength' => 10,
 				'size' => 5,
 				'value' => $this->get_option('activities_limit'),
 				'validation' => array(
@@ -478,7 +508,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 				'type' => 'text',
 				'name' => 'activities_limit_view',
 				'label' => __('Display this amount of activities per page', 'ThreeWP_Activity_Monitor'),
-				'maxlength' => 5,
+				'maxlength' => 10,
 				'size' => 5,
 				'value' => $this->get_option('activities_limit_view'),
 				'validation' => array(
@@ -648,7 +678,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 
 	public function manage_users_columns($defaults)
 	{
-		$defaults['3wp_activity_monitor'] = '<span title="'.__('Various login statistics about the user', _3LT).'">'.__('Login statistics', _3LT).'</span>';
+		$defaults['3wp_activity_monitor'] = '<span title="'.__('Various login statistics about the user', 'ThreeWP_Activity_Monitor').'">'.__('Login statistics', 'ThreeWP_Activity_Monitor').'</span>';
 		return $defaults;
 	}
 	
@@ -677,7 +707,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 
 		if (count($login_stats) < 1)
 		{
-			$message = __('No login data available', _3LT);
+			$message = __('No login data available', 'ThreeWP_Activity_Monitor');
 			if ($echo)
 				echo $message;
 			return $message;
@@ -688,7 +718,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		// Translate the latest login date/time to the user's locale.
 		if ($login_stats['latest_login'] != '')
 			$stats[] = sprintf('<span title="%s: '.$login_stats['latest_login']['value'].'">' . $this->ago($login_stats['latest_login']['value']) . '</span>',
-			__('Latest login', _3LT)
+			__('Latest login', 'ThreeWP_Activity_Monitor')
 			);
 		
 		$returnValue .= implode(' | ', $stats);
@@ -808,8 +838,8 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 			switch($activity['index_action'])
 			{
 				// The login table has a lot of common info, so we bunch together as many login-actions as possible.
-				case 'login_success':
 				case 'login_failure':
+				case 'login_success':
 				case 'password_retrieve':
 				case 'password_reset':
 					$show['addr'] = true;
@@ -820,6 +850,11 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 						$strings['activity_message'],
 						$strings['blog'],
 						$backend
+						);
+					if ( $activity['index_action'] == 'login_failure' && isset($data['password']) ) 
+						$activity_strings[] = sprintf('<span class="threewp_activity_monitor_activity_info_key">%s</span> <span class="activity_info_data">%s</span>',
+							__('Password tried:', 'ThreeWP_Activity_Monitor'),
+							$data['password']
 						);
 				break;
 				
@@ -942,7 +977,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 				</tr>
 			';
 		}
-
+		
 		return '
 			<table class="widefat threewp_activity_monitor">
 				<thead>
@@ -1071,9 +1106,11 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		$this->sqlLoginLog($user_id, 'login_success');
 	}
 	
-	private function sqlLoginFailure($user_id)
+	private function sqlLoginFailure($user_id, $password)
 	{
-		$this->sqlLoginLog($user_id, 'login_failure');
+		$this->sqlLoginLog($user_id, 'login_failure', array(
+			'password' => $password,
+		));
 	}
 
 	private function sqlLogout($user_idd)
@@ -1185,6 +1222,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 	private function sqlIndexList($options)
 	{
 		$options = array_merge(array(
+			'limit' => 1000,
 			'count' => false,
 			'page' => 0,
 			'select' => '*',
@@ -1192,6 +1230,11 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		), $options);
 
 		$select = ($options['count'] ? 'count(*) as ROWS' : $options['select']);
+		
+		if ($options['page'] > 0)
+		{
+			$options['page'] = $options['page'] * $options['limit'];
+		}
 
 		$query = ("SELECT ".$select." FROM `".$this->wpdb->base_prefix."_3wp_activity_monitor_index`
 			LEFT OUTER JOIN `".$this->wpdb->base_prefix."_3wp_activity_monitor_logins` USING (l_id)
@@ -1202,7 +1245,12 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 			".(isset($options['limit']) ? "LIMIT ".$options['page'].",".$options['limit']."" : '')."
 		 ");
 		 
-		 return $this->query($query);
+		 $result = $this->query($query);
+		 
+		 if ($options['count'])
+		 	$result = $result[0]['ROWS'];
+		 
+		 return $result;
 	}
 	
 	private function sqlPostPublish($user_id, $blog_id, $post_id, $data)

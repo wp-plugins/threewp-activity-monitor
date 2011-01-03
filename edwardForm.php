@@ -401,7 +401,7 @@ class edwardForm
 				else
 					$nameSuffix = '';
 				
-				// Convert the option text to an array
+				// Convert the value text to an array
 				if (!is_array($options['value']))
 					$options['value'] = array($options['value']);
 					
@@ -409,7 +409,7 @@ class edwardForm
 				$optionsText = '';
 				foreach($options['options'] as $option)
 				{
-					$selected = in_array($option['value'],$options['value']) ? 'selected="selected"' : '';
+					$selected = in_array($option['value'], $options['value'], true) ? 'selected="selected"' : '';
 					$optionsText .= '
 						<option value="'.$option['value'].'" '.$selected.'>'.$option['text'].'</option>
 					';
@@ -512,7 +512,7 @@ class edwardForm
 		}
 	}
 	
-	private function usePostValue(&$input, $settings, $postData, $key)
+	public function usePostValue(&$input, $settings, $postData, $key)
 	{
 		if ($input['type']=='submit')		// Submits don't get their values posted, so return the value.
 			return $input['value'];
@@ -867,7 +867,7 @@ class edwardForm
 					default:
 						if ($oldValues[$key] !== $newValues[$key])
 						{
-							if ($newValues[$key] == '')
+							if ($newValues[$key] === '' | $newValues[$key] === null)
 								$sets .= "$key = NULL, " ;
 							else
 							{

@@ -164,7 +164,7 @@ msgstr "återställde"
 #: ThreeWP_Activity_Monitor.php:989
 #: ThreeWP_Activity_Monitor.php:1017
 msgid "deleted"
-msgstr "tog bort permanent"
+msgstr "tog permanent bort"
 
 #: ThreeWP_Activity_Monitor.php:993
 msgid "requeued"

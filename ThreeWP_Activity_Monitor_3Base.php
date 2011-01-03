@@ -225,9 +225,9 @@ class ThreeWP_Activity_Monitor_3Base
 	/**
 	 * Creats a new edwardForm.
 	 */
-	protected function form()
+	protected function form($options = array())
 	{
-		$options = array('language' => preg_replace('/_.*/', '', get_locale()));
+		$options = array_merge($options, array('language' => preg_replace('/_.*/', '', get_locale())) );
 		if (class_exists('edwardForm'))
 			return new edwardForm($options);
 		require_once('edwardForm.php');
@@ -461,6 +461,7 @@ class ThreeWP_Activity_Monitor_3Base
 		if ($options['display'])
 		{
 			ob_start();
+			echo '<div class="wrap">';
 			if ($options['displayTabName'])
 				echo $options['displayBeforeTabName'] . $options['tabs'][$selectedIndex] . $options['displayAfterTabName'];
 			echo $returnValue;
@@ -470,6 +471,7 @@ class ThreeWP_Activity_Monitor_3Base
 				$functionName = $options['functions'][$selectedIndex];
 				$this->$functionName();
 			}
+			echo '</div>';
 			ob_end_flush();
 		}
 		else
@@ -505,7 +507,7 @@ class ThreeWP_Activity_Monitor_3Base
 		if ($time_string == '')
 			return '';
 		$diff = human_time_diff( strtotime($time_string), current_time('timestamp') );
-		return sprintf( __('%s ago'), $diff);
+		return '<span title="'.$time_string.'">' . sprintf( __('%s ago'), $diff) . '</span>';
 	}
 	
 	/**
@@ -514,6 +516,16 @@ class ThreeWP_Activity_Monitor_3Base
 	protected function now()
 	{
 		return date('Y-m-d H:i:s', current_time('timestamp'));
+	}
+	
+	/**
+		Returns the number corrected into the min and max values.
+	*/
+	protected function minmax($number, $min, $max)
+	{
+		$number = min($max, $number);
+		$number = max($min, $number);
+		return $number;
 	}
 }
 ?>
