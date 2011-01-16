@@ -3,7 +3,7 @@ Tags: wp, wpms, network, threewp, activity, monitor, activity monitor, blog acti
 Requires at least: 3.0
 Tested up to: 3.0
 Stable tag: trunk
-
+Contributors: edward mindreantre
 Track and display site or network-wide user activity.
 
 == Description ==
