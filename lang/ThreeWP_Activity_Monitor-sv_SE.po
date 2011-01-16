@@ -1,217 +1,235 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"Report-Msgid-Bugs-To: http://wordpress.org/tag/threewp-activity-monitor\n"
-"POT-Creation-Date: 2010-11-27 18:56+0100\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/ThreeWP_Activity_Monitor.php\n"
+"POT-Creation-Date: 2011-01-16 09:04+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Edward <edward@edwardh.se>\n"
 "Language-Team: \n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Swedish\n"
 "X-Poedit-Country: SWEDEN\n"
 
-#: ThreeWP_Activity_Monitor.php:168
-#: ThreeWP_Activity_Monitor.php:170
+#: ThreeWP_Activity_Monitor_3Base.php:610
+#, php-format
+msgid "%s ago"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:183
+#: ThreeWP_Activity_Monitor.php:185
 msgid "Activity Monitor"
 msgstr "Aktivitetsövervakaren"
 
-#: ThreeWP_Activity_Monitor.php:183
+#: ThreeWP_Activity_Monitor.php:198
 msgid "Overview"
 msgstr "Översikt"
 
-#: ThreeWP_Activity_Monitor.php:188
+#: ThreeWP_Activity_Monitor.php:203
 msgid "Settings"
 msgstr "Inställningar"
 
-#: ThreeWP_Activity_Monitor.php:191
+#: ThreeWP_Activity_Monitor.php:206
 msgid "Uninstall"
 msgstr "Avinstallation"
 
+#: ThreeWP_Activity_Monitor.php:468
+msgid "&laquo;"
+msgstr ""
+
 #: ThreeWP_Activity_Monitor.php:469
+msgid "&raquo;"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:515
 msgid "Keep at most this amount of activities in the database"
 msgstr "Behåll maximalt så här många aktiviteter i databasen"
 
-#: ThreeWP_Activity_Monitor.php:480
+#: ThreeWP_Activity_Monitor.php:526
 msgid "Display this amount of activities per page"
 msgstr "Visa så här många aktiviteter per sida"
 
-#: ThreeWP_Activity_Monitor.php:521
+#: ThreeWP_Activity_Monitor.php:567
 msgid "Apply"
 msgstr "Verkställ"
 
-#: ThreeWP_Activity_Monitor.php:576
+#: ThreeWP_Activity_Monitor.php:622
 msgid "User activity"
 msgstr "Användaraktivitet"
 
-#: ThreeWP_Activity_Monitor.php:584
-#: ThreeWP_Activity_Monitor.php:691
+#: ThreeWP_Activity_Monitor.php:630
+#: ThreeWP_Activity_Monitor.php:737
 msgid "Latest login"
 msgstr "Senaste inloggning"
 
-#: ThreeWP_Activity_Monitor.php:585
+#: ThreeWP_Activity_Monitor.php:631
 msgid "Successful logins"
 msgstr "Lyckade inloggningar"
 
-#: ThreeWP_Activity_Monitor.php:586
+#: ThreeWP_Activity_Monitor.php:632
 msgid "Failed logins"
 msgstr "Misslyckade inloggningar"
 
-#: ThreeWP_Activity_Monitor.php:587
+#: ThreeWP_Activity_Monitor.php:633
 msgid "Retrieved passwords"
 msgstr "Lösenordbegäran"
 
-#: ThreeWP_Activity_Monitor.php:588
+#: ThreeWP_Activity_Monitor.php:634
 msgid "Reset passwords"
 msgstr "Återställda lösenord"
 
-#: ThreeWP_Activity_Monitor.php:617
+#: ThreeWP_Activity_Monitor.php:663
 msgid "Crop the activity list down to this amount of rows"
 msgstr "Beskär aktivitetslistan ner till det här antalet rader"
 
-#: ThreeWP_Activity_Monitor.php:629
+#: ThreeWP_Activity_Monitor.php:675
 msgid "Clear the user's activity list"
 msgstr "Töm användarens aktivitetslista"
 
-#: ThreeWP_Activity_Monitor.php:651
+#: ThreeWP_Activity_Monitor.php:697
 msgid "Various login statistics about the user"
 msgstr "Användarens inloggningsstatistik"
 
-#: ThreeWP_Activity_Monitor.php:651
+#: ThreeWP_Activity_Monitor.php:697
 msgid "Login statistics"
 msgstr "Inloggningsstatistik"
 
-#: ThreeWP_Activity_Monitor.php:680
+#: ThreeWP_Activity_Monitor.php:726
 msgid "No login data available"
 msgstr "Ingen data tillgänglig"
 
-#: ThreeWP_Activity_Monitor.php:790
+#: ThreeWP_Activity_Monitor.php:876
 msgid "Go directly to the blog's backend"
 msgstr "Besök bloggens administrationspanel"
 
-#: ThreeWP_Activity_Monitor.php:792
+#: ThreeWP_Activity_Monitor.php:878
 msgid "B"
 msgstr "P"
 
-#: ThreeWP_Activity_Monitor.php:837
-#: ThreeWP_Activity_Monitor.php:866
+#: ThreeWP_Activity_Monitor.php:913
+msgid "Password tried:"
+msgstr "Försökte med lösenord:"
+
+#: ThreeWP_Activity_Monitor.php:929
+#: ThreeWP_Activity_Monitor.php:958
 msgid "on"
 msgstr "på"
 
-#: ThreeWP_Activity_Monitor.php:860
+#: ThreeWP_Activity_Monitor.php:952
 msgid "comment #"
 msgstr "kommentar #"
 
-#: ThreeWP_Activity_Monitor.php:862
+#: ThreeWP_Activity_Monitor.php:954
 msgid "for the post"
 msgstr "för inlägget"
 
-#: ThreeWP_Activity_Monitor.php:915
+#: ThreeWP_Activity_Monitor.php:1013
 msgid "Address:"
 msgstr "Adress:"
 
-#: ThreeWP_Activity_Monitor.php:921
+#: ThreeWP_Activity_Monitor.php:1019
 msgid "Web browser:"
 msgstr "Webläsare:"
 
-#: ThreeWP_Activity_Monitor.php:950
+#: ThreeWP_Activity_Monitor.php:1048
 msgid "Time"
 msgstr "Tid"
 
-#: ThreeWP_Activity_Monitor.php:951
+#: ThreeWP_Activity_Monitor.php:1049
 msgid "Activity"
 msgstr "Aktivitet"
 
-#: ThreeWP_Activity_Monitor.php:966
+#: ThreeWP_Activity_Monitor.php:1064
 msgid "logged in to"
 msgstr "loggade in på"
 
-#: ThreeWP_Activity_Monitor.php:968
+#: ThreeWP_Activity_Monitor.php:1066
 msgid "tried to log in to"
 msgstr "försökte logga in på"
 
-#: ThreeWP_Activity_Monitor.php:970
+#: ThreeWP_Activity_Monitor.php:1068
 msgid "logged out from"
 msgstr "loggade ut från"
 
-#: ThreeWP_Activity_Monitor.php:972
+#: ThreeWP_Activity_Monitor.php:1070
 msgid "retrieved a password reset link from"
 msgstr "bad om ett nytt lösenord från"
 
-#: ThreeWP_Activity_Monitor.php:974
+#: ThreeWP_Activity_Monitor.php:1072
 msgid "reset his password on"
 msgstr "återställde lösenordet på"
 
-#: ThreeWP_Activity_Monitor.php:977
+#: ThreeWP_Activity_Monitor.php:1075
 msgid "posted"
 msgstr "skrev"
 
-#: ThreeWP_Activity_Monitor.php:980
+#: ThreeWP_Activity_Monitor.php:1078
 msgid "updated"
 msgstr "uppdaterade"
 
-#: ThreeWP_Activity_Monitor.php:983
-#: ThreeWP_Activity_Monitor.php:1011
+#: ThreeWP_Activity_Monitor.php:1081
+#: ThreeWP_Activity_Monitor.php:1109
 msgid "trashed"
 msgstr "tog bort"
 
-#: ThreeWP_Activity_Monitor.php:986
-#: ThreeWP_Activity_Monitor.php:1014
+#: ThreeWP_Activity_Monitor.php:1084
+#: ThreeWP_Activity_Monitor.php:1112
 msgid "restored"
 msgstr "återställde"
 
-#: ThreeWP_Activity_Monitor.php:989
-#: ThreeWP_Activity_Monitor.php:1017
+#: ThreeWP_Activity_Monitor.php:1087
+#: ThreeWP_Activity_Monitor.php:1115
 msgid "deleted"
 msgstr "tog permanent bort"
 
-#: ThreeWP_Activity_Monitor.php:993
+#: ThreeWP_Activity_Monitor.php:1091
 msgid "requeued"
 msgstr "återställde"
 
-#: ThreeWP_Activity_Monitor.php:996
+#: ThreeWP_Activity_Monitor.php:1094
 msgid "approved"
 msgstr "godkände"
 
-#: ThreeWP_Activity_Monitor.php:999
+#: ThreeWP_Activity_Monitor.php:1097
 msgid "reapproved"
 msgstr "återgodkände"
 
-#: ThreeWP_Activity_Monitor.php:1002
+#: ThreeWP_Activity_Monitor.php:1100
 msgid "held back"
 msgstr "förkastade"
 
-#: ThreeWP_Activity_Monitor.php:1005
+#: ThreeWP_Activity_Monitor.php:1103
 msgid "spam marked"
 msgstr "skräpmarkerade"
 
-#: ThreeWP_Activity_Monitor.php:1008
+#: ThreeWP_Activity_Monitor.php:1106
 msgid "unspammed"
 msgstr "tog bort skräpmarkeringen"
 
-#: ThreeWP_Activity_Monitor.php:1021
+#: ThreeWP_Activity_Monitor.php:1119
 msgid "has created the user"
 msgstr "skapade användaren"
 
-#: ThreeWP_Activity_Monitor.php:1024
+#: ThreeWP_Activity_Monitor.php:1122
 msgid "has updated the profile of"
 msgstr "har uppdaterat användarprofilen på"
 
-#: ThreeWP_Activity_Monitor.php:1027
+#: ThreeWP_Activity_Monitor.php:1125
 msgid "has deleted the user"
 msgstr "har tagit bort användaren"
 
-#: ThreeWP_Activity_Monitor.php:1037
+#: ThreeWP_Activity_Monitor.php:1135
 msgid "Password changed"
 msgstr "Lösenord bytt"
 
-#: ThreeWP_Activity_Monitor.php:1040
+#: ThreeWP_Activity_Monitor.php:1138
 #, php-format
 msgid "First name changed from <em>\"%s\"</em> to <em>\"%s\"</em>"
 msgstr "Förnamnet ändrades från <em>\"%s\"</em> till <em>\"%s\"</em>"
 
-#: ThreeWP_Activity_Monitor.php:1046
+#: ThreeWP_Activity_Monitor.php:1144
 #, php-format
 msgid "Last name changed from <em>\"%s\"</em> to <em>\"%s\"</em>"
 msgstr "Efternamnet ändrades från <em>\"%s\"</em> till <em>\"%s\"</em>"

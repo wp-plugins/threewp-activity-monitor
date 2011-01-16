@@ -18,6 +18,7 @@ Displays a multitude of user actions to keep the site administrator informed tha
 * Changed user info
 * User registrations
 * User deletions
+* Custom activities from other plugins
 
 Keeps track of latest login times and displays a column in the user overview(s).
 
@@ -28,6 +29,48 @@ Unlike the wpmu.org "premium" plugins, Blog Activity and User Activity, this plu
 Has an uninstall option to completely remove itself from the database.
 
 Available in English and Swedish.
+
+Since v1.2 other plugins can add new activities.
+
+== Custom activities ==
+
+If you're the author of a plugin and want a custom action added to the list, use the following code.
+
+`<?php
+	do_action('threewp_activity_monitor_new_activity', array(
+		'tr_class' => 'first_action_class second_action_class',
+		'activity' => array(
+			"" => "%user_display_name_with_link% removed a category on %blog_name_with_panel_link%",
+			"Action key 1" => "The key is displayed as small, grey text in front of the other text. Something interesting happened and user # %user_id% caused it!",
+			"  " => "%user_login% didnt want any header here so %user_login_with_link% left it blank with two spaces",
+			"Another key!" => "This time I wanted a key on %blog_name% (%blog_id%).",
+		),
+	));
+?>`
+
+*tr_class* is an optional value that signifies which extra css classes to give the action's row.
+*activity* is the activity itself, that is an array of header => text.
+
+The *key* is the small, gray text. It can be left empty. If you want several empty keys, use a different amount of spaces for each one. The spaces are trimmed off.
+The *value* is the black text to be displayed to the right of the key or by itself on a line.
+
+Both the *key* and *value* can be normal HTML and are both capable of *keywords*.
+
+The following keywords are automatically replaced by Activity Monitor.
+
+* %user_id% ID of user.
+* %user_login% User's login name.
+* %user_login_with_link% User's login name in link format (link goes to the user edit page).
+* %user_display_name% User's display name.
+* %user_display_name_with_link% User's display name in link format (link goes to the user edit page).
+* %user_display_name% User's login name.
+* %user_display_name_with_link% User's login name in link format (link goes to the user edit page).
+* %blog_id% ID of blog.
+* %blog_name% Name of blog.
+* %blog_link% Link to front page of blog.
+* %blog_panel_link% Link to blog's admin panel.
+* %blog_name_with_link% Blog's name with link to front page.
+* %blog_name_with_panel_link% Blog's name with link to admin panel.
 
 == Installation ==
 
@@ -44,10 +87,14 @@ Available in English and Swedish.
 
 == Upgrade Notice ==
 
+= 1.2 =
+Converts the data column to a base64encoded serialized string.
 = 1.0 =
 The old activity table is removed.
 
 == Changelog ==
+= 1.2 =
+* threewp_activity_monitor_new_activity action added.
 = 1.1 =
 * Wordpress deleting posts and comments isn't logged anymore.
 * Pagination added

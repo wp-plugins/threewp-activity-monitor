@@ -756,6 +756,7 @@ class edwardForm
 					else
 					{
 						$inputData =
+							'<div class="container_for_'.$input['type'].'">' .
 							$style['labelContainerStart'] . "\n".
 								$style['labelStart'] . "\n".
 									'					' . $this->makeLabel($input) . "\n".
@@ -767,7 +768,7 @@ class edwardForm
 									'					' . $this->makeInput($input) . "\n".
 								$style['inputStop'] . "\n".
 							$style['inputContainerStop'] . "\n".
-							
+							"</div>" .
 							$description;
 					}
 				}

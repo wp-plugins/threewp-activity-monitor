@@ -3,7 +3,7 @@
 Plugin Name: ThreeWP Activity Monitor
 Plugin URI: http://mindreantre.se/threewp-activity-monitor/
 Description: Plugin to track user activity. Network aware.
-Version: 1.1
+Version: 1.2
 Author: Edward Hevlund
 Author URI: http://www.mindreantre.se
 Author Email: edward@mindreantre.se
@@ -23,6 +23,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		'role_logins_view_other' =>		'administrator',			// Role required to view other users' logins
 		'role_logins_delete' =>			'administrator',			// Role required to delete own logins 
 		'role_logins_delete_other' =>	'administrator',			// Role required to delete other users' logins
+		'database_version' => 110,									// Version of database
 	);
 	
 	public function __construct()
@@ -32,7 +33,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		register_deactivation_hook(__FILE__, array(&$this, 'deactivate') );
 		
 		add_action('admin_print_styles', array(&$this, 'admin_print_styles') );
-		add_action('admin_menu', array(&$this, 'add_menu') );
+		add_action('admin_menu', array(&$this, 'admin_menu') );
 		
 		add_action('threewp_activity_monitor_cron', array(&$this, 'cron') );
 
@@ -57,7 +58,8 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		
 		// Comments
 		add_action('wp_set_comment_status', array(&$this, 'wp_set_comment_status'), 10, 3);
-
+		
+		add_action('threewp_activity_monitor_new_activity', array(&$this, 'action_new_activity'), 1, 1);		
 	}
 	
 	// --------------------------------------------------------------------------------------------
@@ -79,7 +81,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		// v0.3 has an activity_monitor table. Not necessary anymore.		
 		$this->query("DROP TABLE `".$this->wpdb->base_prefix."activity_monitor`");
 
-		wp_schedule_event(time() + 60, 'daily', 'threewp_activity_monitor_cron');
+		wp_schedule_event(time() + 600, 'daily', 'threewp_activity_monitor_cron');
 		
 		$this->query("CREATE TABLE IF NOT EXISTS `".$this->wpdb->base_prefix."_3wp_activity_monitor_index` (
 				  `i_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Index ID',
@@ -121,6 +123,19 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 			  KEY `user_id` (`user_id`)
 			) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 		");
+		
+		if ($this->get_option('database_version') < 120)
+		{
+			// v1.2 serializes AND base64_encodes the data. So go through all the rows and encode what is necessary.
+			$rows = $this->sql_index_list(array('limit' => 100000000));
+			foreach($rows as $row)
+			{
+				$data = @unserialize($row['data']);
+				if ( $data !== false)
+					$this->query("UPDATE `".$this->wpdb->base_prefix."_3wp_activity_monitor_index` SET data = '". base64_encode(serialize($data))."' WHERE i_id = '".$row['i_id']."'");
+			}
+			$this->update_option('database_version', 120);
+		}
 	}
 	
 	public function deactivate()
@@ -145,7 +160,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		$this->query("DROP TABLE `".$this->wpdb->base_prefix."_3wp_activity_monitor_user_statistics`");
 	}
 	
-	public function add_menu()
+	public function admin_menu()
 	{
 		if ($this->role_at_least( $this->get_option('role_logins_view') ))
 			add_filter('show_user_profile', array(&$this, 'show_user_profile'));
@@ -165,9 +180,9 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 			add_filter('manage_users_custom_column', array(&$this, 'manage_users_custom_column'), 10, 3);
 
 			if ($this->is_network)
-				add_submenu_page('ms-admin.php', __('Activity Monitor', 'ThreeWP_Activity_Monitor'), __('Activity Monitor', 'ThreeWP_Activity_Monitor'), $this->get_user_role(), 'ThreeWP_Activity_Monitor', array (&$this, 'admin'));
+				add_submenu_page('ms-admin.php', __('Activity Monitor', 'ThreeWP_Activity_Monitor'), __('Activity Monitor', 'ThreeWP_Activity_Monitor'), 'read', 'ThreeWP_Activity_Monitor', array (&$this, 'admin'));
 			else
-				add_submenu_page('index.php', __('Activity Monitor', 'ThreeWP_Activity_Monitor'), __('Activity Monitor', 'ThreeWP_Activity_Monitor'), $this->get_user_role(), 'ThreeWP_Activity_Monitor', array (&$this, 'admin'));
+				add_submenu_page('index.php', __('Activity Monitor', 'ThreeWP_Activity_Monitor'), __('Activity Monitor', 'ThreeWP_Activity_Monitor'), 'read', 'ThreeWP_Activity_Monitor', array (&$this, 'admin'));
 		}
 	}
 	
@@ -175,24 +190,24 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 	{
 		$this->loadLanguages('ThreeWP_Activity_Monitor');
 		
-		$tabData = array(
+		$tab_data = array(
 			'tabs'		=>	array(),
 			'functions' =>	array(),
 		);
 		
-		$tabData['tabs'][] = __('Overview', 'ThreeWP_Activity_Monitor');
-		$tabData['functions'][] = 'adminOverview';
+		$tab_data['tabs'][] = __('Overview', 'ThreeWP_Activity_Monitor');
+		$tab_data['functions'][] = 'adminOverview';
 
 		if ($this->role_at_least( $this->get_option('role_logins_delete_other') ))
 		{
-			$tabData['tabs'][] = __('Settings', 'ThreeWP_Activity_Monitor');
-			$tabData['functions'][] = 'adminSettings';
+			$tab_data['tabs'][] = __('Settings', 'ThreeWP_Activity_Monitor');
+			$tab_data['functions'][] = 'adminSettings';
 	
-			$tabData['tabs'][] = __('Uninstall', 'ThreeWP_Activity_Monitor');
-			$tabData['functions'][] = 'adminUninstall';
+			$tab_data['tabs'][] = __('Uninstall', 'ThreeWP_Activity_Monitor');
+			$tab_data['functions'][] = 'admin_uninstall';
 		}
 		
-		$this->tabs($tabData);
+		$this->tabs($tab_data);
 	}
 	
 	public function admin_print_styles()
@@ -434,14 +449,15 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 	
 	public function adminOverview()
 	{
-		$count = $this->sqlIndexList(array(
+		$count = $this->sql_index_list(array(
 			'count' => true,
 		));
 		
 		$per_page = $this->get_option('activities_limit_view');
 		$max_pages = floor($count / $per_page);
-		$page = $this->minmax($_GET['paged'], 1, $max_pages);
-		$activities = $this->sqlIndexList( array(
+		$page = (isset($_GET['paged']) ? $_GET['paged'] : 1);
+		$page = $this->minmax($page, 1, $max_pages);
+		$activities = $this->sql_index_list( array(
 			'limit' => $per_page,
 			'page' => ($page-1),
 		));
@@ -488,7 +504,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		}
 		
 		$form = $this->form();
-		$count = $this->sqlIndexList(array(
+		$count = $this->sql_index_list(array(
 			'count' => true,
 		));
 			
@@ -631,7 +647,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 			<br />
 		';
 		
-		$logins = $this->sqlIndexList(array(
+		$logins = $this->sql_index_list(array(
 			'user_id' => $userdata->ID
 		));
 		$returnValue .= $this->show_activities($logins);
@@ -727,6 +743,43 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 			echo $returnValue;
 		return $returnValue;
 	}
+	
+	public function action_new_activity($data)
+	{
+		global $current_user;
+		global $blog_id;
+		get_currentuserinfo();
+		$user_id = $current_user->ID;				// Convenience
+		$bloginfo_name = get_bloginfo('name');		// Convenience
+		$bloginfo_url = get_bloginfo('url');		// Convenience
+		$new_data = array();
+		// Replace the keywords in the activity.
+		foreach($data as $index => $text)
+		{
+			$replacements = array(
+				'%user_id%' => $user_id,
+				'%user_login%' => $current_user->user_login,
+				'%user_login_with_link%' => $this->make_profile_link($user_id),
+				'%user_display_name%' => $current_user->display_name,
+				'%user_display_name_with_link%' => $this->make_profile_link($user_id, $current_user->display_name),
+				'%blog_id%' => $blog_id,
+				'%blog_name%' => $bloginfo_name,
+				'%blog_link%' => $bloginfo_url,
+				'%blog_panel_link%' => $bloginfo_url . '/wp-admin',
+				'%blog_name_with_link%' => sprintf('<a href="%s">%s</a>', $bloginfo_url, $bloginfo_name),
+				'%blog_name_with_panel_link%' => sprintf('<a href="%s">%s</a>', $bloginfo_url . '/wp-admin', $bloginfo_name),
+			);
+			foreach($replacements as $replace_this => $with_this)
+			{
+				$index = str_replace($replace_this, $with_this, $index);
+				$text = str_replace($replace_this, $with_this, $text);
+			}
+			$new_data[$index] = $text;
+		}
+		$this->sqlLogIndex('action_new_activity', array(
+			'data' => $new_data,
+		));
+	}
 
 	// --------------------------------------------------------------------------------------------
 	// ----------------------------------------- Misc functions
@@ -808,7 +861,10 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 			$user_id = ($activity['user_id'] == '' ? $activity['l_user_id'] : $activity['user_id']);
 			$blog_id = ($activity['blog_id'] == '' ? $activity['l_blog_id'] : $activity['blog_id']);
 			
-			if ( $blog_id != '' )
+			if ($blog_id === null)
+				$blog_id = 1;
+			
+			if ( $blog_id !== null )
 				$this->cache_blog( $blog_id );
 			if ( $user_id != '' )
 				$this->cache_user( $user_id );
@@ -830,10 +886,11 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 				'activity_message' => $this->activity_message($activity['index_action']),
 			);
 			
+			$tr_class = array('activity_monitor_action action_' . $activity['index_action']);
 			$activity_strings = array();
 			
 			// Unserialize the data.
-			$data = unserialize($activity['data']);
+			$data = unserialize( base64_decode($activity['data']) );
 			
 			switch($activity['index_action'])
 			{
@@ -936,6 +993,12 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 						$data['user_login'] . ' <span class="sep">/</span> ' . '<a href="mailto:'.$data['user_email'].'">' . $data['user_email'] . '</a>'
 					);
 				break;
+				case 'action_new_activity':
+					foreach ($data['activity'] as $data_key => $data_value)
+						$activity_strings[] = sprintf('<span class="threewp_activity_monitor_activity_info_key">%s</span> <span class="activity_info_data">%s</span>', trim($data_key), $data_value);
+					if (isset($data['tr_class']))
+						$tr_class[] = $data['tr_class'];
+				break;
 			}
 			
 			foreach($show as $key => $value)
@@ -971,9 +1034,9 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 				$time = $activity['i_datetime'];
 
 			$tBody .= '
-				<tr class="activity_monitor_action action_'.$activity['index_action'].'">
-					<td>'.$time.'</td>
-					<td class="activity_monitor_action action_'.$activity['index_action'].'"><div>'.implode('</div><div>', $activity_strings).'</div></td>
+				<tr class="'.implode(' ', $tr_class).'">
+					<td class="activity_monitor_action_time">'.$time.'</td>
+					<td class="activity_monitor_action"><div>'.implode('</div><div>', $activity_strings).'</div></td>
 				</tr>
 			';
 		}
@@ -1092,10 +1155,13 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		return $post->post_status == 'publish' && $post->post_parent == 0;
 	}
 	
-	private function make_profile_link($user_id)
+	private function make_profile_link($user_id, $text = "")
 	{
 		$this->cache_user($user_id);
-		return '<a href="user-edit.php?user_id='.$user_id.'">'.($this->cache['user'][$user_id]->user_login).'</a>';
+		if ($text == "")
+			$text = $this->cache['user'][$user_id]->user_login;
+		
+		return '<a href="user-edit.php?user_id='.$user_id.'">'. $text .'</a>';
 	}
 	
 	// --------------------------------------------------------------------------------------------
@@ -1208,7 +1274,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		if ( count($data) < 1 )
 			$data = null;
 		else
-			$data = serialize($data);
+			$data = base64_encode( serialize( $data) );
 		$options['data'] = $data;
 		
 		foreach(array('l_id', 'p_id', 'data') as $key)
@@ -1219,7 +1285,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		 ");
 	}
 	
-	private function sqlIndexList($options)
+	private function sql_index_list($options)
 	{
 		$options = array_merge(array(
 			'limit' => 1000,
@@ -1349,7 +1415,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 			'user_id' => null,
 		), $options);
 		
-		$rows = $this->sqlIndexList(array(
+		$rows = $this->sql_index_list(array(
 			'user_id' => $options['user_id'],
 			'limit' => ($options['user_id'] !== null ? null : $options['limit']),
 			'select' => 'i_id, l_id, p_id',

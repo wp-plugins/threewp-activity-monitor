@@ -48,13 +48,13 @@ tr.activity_monitor_action:hover
 	color: gray;
 }
 
-td.action_post_publish					{	background-image: url("../images/icons/post_publish.png");		}
+tr.action_post_publish		td.activity_monitor_action		{	background-image: url("../images/icons/post_publish.png");		}
 
-td.action_comment_approve					{	background-image: url("../images/icons/comment_approve.png");		}
+tr.action_comment_approve	td.activity_monitor_action		{	background-image: url("../images/icons/comment_approve.png");		}
 
-td.action_trash_post					{	background-image: url("../images/icons/trash.png");		}
+tr.action_trash_post		td.activity_monitor_action		{	background-image: url("../images/icons/trash.png");		}
 
-td.action_password_reset				{	background-image: url("../images/icons/password_reset.png");		}
+tr.action_password_reset	td.activity_monitor_action		{	background-image: url("../images/icons/password_reset.png");		}
 
-td.action_login_success					{	background-image: url("../images/icons/login_success.png");		}
-td.action_login_failure					{	background-image: url("../images/icons/login_failure.png");		}
+tr.action_login_success		td.activity_monitor_action		{	background-image: url("../images/icons/login_success.png");		}
+tr.action_login_failure		td.activity_monitor_action		{	background-image: url("../images/icons/login_failure.png");		}

@@ -2,14 +2,16 @@
 /**
  * Base class with some common functions.
  * 
- * Version 2010-11-25 13:19
+ * Version 2011-01-06 22:16
  */
 class ThreeWP_Activity_Monitor_3Base
 {
 	protected $wpdb;							// Link to Wordpress' database class.
 	protected $isNetwork;						// Stores whether this blog is a network blog.
 	protected $paths = array();					// Contains paths to the plugin and such. 
-	protected $options = array();				// The options this module uses. (optionName => defaultValue)
+	protected $options = array();				// The options this module uses. (optionName => defaultValue). Deprecated
+	protected $site_options = array();			// Site options (sitewide)
+	protected $local_options = array();			// Local options
 
 	/**
 	 * List of wordpress user roles.
@@ -84,6 +86,7 @@ class ThreeWP_Activity_Monitor_3Base
 	 */
 	protected function uninstall()
 	{
+		$this->deregister_options();
 	}
 	
 	/**
@@ -110,7 +113,7 @@ class ThreeWP_Activity_Monitor_3Base
 	/**
 	 * Shows uninstall form.
 	 */
-	protected function adminUninstall()
+	protected function admin_uninstall()
 	{
 		$form = $this->form();
 		
@@ -171,6 +174,17 @@ class ThreeWP_Activity_Monitor_3Base
 	{
 		$results = $this->wpdb->get_results($query, 'ARRAY_A');
 		return (is_array($results) ? $results : array());
+	}
+	
+	/**
+	 * Fire an SQL query and return the results only if there is one row result.
+	 */
+	protected function query_single($query)
+	{
+		$results = $this->wpdb->get_results($query, 'ARRAY_A');
+		if ( count($results) != 1)
+			return false;
+		return $results[0];
 	}
 	
 	/**
@@ -241,7 +255,7 @@ class ThreeWP_Activity_Monitor_3Base
 	/**
 	 * Normalizes the name of an option.
 	 */
-	protected function fixOptionName($option)
+	protected function fix_option_name($option)
 	{
 		return $this->paths['name'] . '_' . $option;
 	}
@@ -251,7 +265,7 @@ class ThreeWP_Activity_Monitor_3Base
 	 */
 	protected function get_option($option)
 	{
-		$option = $this->fixOptionName($option);
+		$option = $this->fix_option_name($option);
 		if ($this->isNetwork)
 			return get_site_option($option);
 		else
@@ -263,7 +277,7 @@ class ThreeWP_Activity_Monitor_3Base
 	 */
 	protected function update_option($option, $value)
 	{
-		$option = $this->fixOptionName($option);
+		$option = $this->fix_option_name($option);
 		if ($this->isNetwork)
 			update_site_option($option, $value);
 		else
@@ -275,11 +289,65 @@ class ThreeWP_Activity_Monitor_3Base
 	 */
 	protected function delete_option($option)
 	{
-		$option = $this->fixOptionName($option);
+		$option = $this->fix_option_name($option);
 		if ($this->isNetwork)
 			delete_site_option($option);
 		else
 			delete_option($option);
+	}
+	
+	/**
+	 * Gets a local option.
+	 */
+	protected function get_local_option($option)
+	{
+		$option = $this->fix_option_name($option);
+		return get_option($option);
+	}
+	
+	/**
+	 * Updates a local option.
+	 */
+	protected function update_local_option($option, $value)
+	{
+		$option = $this->fix_option_name($option);
+		update_option($option, $value);
+	}
+	
+	/**
+	 * Deletes a local option.
+	 */
+	protected function delete_local_option($option)
+	{
+		$option = $this->fix_option_name($option);
+		delete_option($option);
+	}
+	
+	/**
+	 * Gets a site option.
+	 */
+	protected function get_site_option($option)
+	{
+		$option = $this->fix_option_name($option);
+		return get_site_option($option);
+	}
+	
+	/**
+	 * Updates a site option.
+	 */
+	protected function update_site_option($option, $value)
+	{
+		$option = $this->fix_option_name($option);
+		update_site_option($option, $value);
+	}
+	
+	/**
+	 * Deletes a site option.
+	 */
+	protected function delete_site_option($option)
+	{
+		$option = $this->fix_option_name($option);
+		delete_site_option($option);
 	}
 	
 	/**
@@ -288,8 +356,25 @@ class ThreeWP_Activity_Monitor_3Base
 	protected function register_options()
 	{
 		foreach($this->options as $option=>$value)
+		{
 			if ($this->get_option($option) === false)
 				$this->update_option($option, $value);
+		}
+
+		foreach($this->local_options as $option=>$value)
+		{
+			$option = $this->fix_option_name($option);
+			if (get_option($option) === false)
+				update_option($option, $value);
+		}
+
+		if ($this->isNetwork)
+			foreach($this->site_options as $option=>$value)
+			{
+				$option = $this->fix_option_name($option);
+				if (get_site_option($option) === false)
+					update_site_option($option, $value);
+			}
 	}
 	
 	/**
@@ -298,7 +383,22 @@ class ThreeWP_Activity_Monitor_3Base
 	protected function deregister_options()
 	{
 		foreach($this->options as $option=>$value)
+		{
 			$this->delete_option($option);
+		}
+
+		foreach($this->local_options as $option=>$value)
+		{
+			$option = $this->fix_option_name($option);
+			delete_option($option);
+		}
+
+		if ($this->isNetwork)
+			foreach($this->site_options as $option=>$value)
+			{
+				$option = $this->fix_option_name($option);
+				delete_site_option($option);
+			}
 	}
 	
 	// -------------------------------------------------------------------------------------------------
@@ -310,7 +410,7 @@ class ThreeWP_Activity_Monitor_3Base
 	 * 
 	 * Autodetects HTML.
 	 */
-	protected function displayMessage($type, $string)
+	public function displayMessage($type, $string)
 	{
 		// If this string has html codes, then output it as it.
 		$stripped = strip_tags($string);
@@ -327,7 +427,7 @@ class ThreeWP_Activity_Monitor_3Base
 	 * 
 	 * Text or HTML is autodetected.
 	 */
-	protected function error($string)
+	public function error($string)
 	{
 		$this->displayMessage('error', $string);
 	}
@@ -337,7 +437,7 @@ class ThreeWP_Activity_Monitor_3Base
 	 * 
 	 * Text or HTML is autodetected.
 	 */
-	protected function message($string)
+	public function message($string)
 	{
 		$this->displayMessage('updated', $string);
 	}
@@ -489,7 +589,7 @@ class ThreeWP_Activity_Monitor_3Base
 		return $returnArray;
 	}
 	
-	protected function objectToArray($object)
+	protected function object_to_array($object)
 	{
 		if (is_array($object))
 		{
@@ -526,6 +626,107 @@ class ThreeWP_Activity_Monitor_3Base
 		$number = min($max, $number);
 		$number = max($min, $number);
 		return $number;
+	}
+	
+	/**
+		See send_mail
+	**/
+	public function sendMail($mailData)
+	{
+		$this->send_mail($mailData);
+	}
+
+	/**
+	 * Sends mail via SMTP.
+	 * 
+	*/
+	public function send_mail($mail_data)
+	{
+		require_once ABSPATH . WPINC . '/class-phpmailer.php';
+		$mail = new PHPMailer();
+		
+		// Mandatory
+		$mail->From		= key($mail_data['from']);
+		$mail->FromName	= current($mail_data['from']);
+		
+		$mail->Subject  = $mail_data['subject'];
+		
+		// Optional
+		
+		// Often used settings...
+	
+		if (isset($mail_data['to']))
+			foreach($mail_data['to'] as $email=>$name)
+			{
+				if (is_int($email))
+					$email = $name;
+				$mail->AddAddress($email, $name);
+			}
+			
+		if (isset($mail_data['cc']))
+			foreach($mail_data['cc'] as $email=>$name)
+			{
+				if (is_int($email))
+					$email = $name;
+				$mail->AddCC($email, $name);
+			}
+	
+		if (isset($mail_data['bcc']))
+			foreach($mail_data['bcc'] as $email=>$name)
+			{
+				if (is_int($email))
+					$email = $name;
+				$mail->AddBCC($email, $name);
+			}
+			
+		if (isset($mail_data['bodyhtml']))
+			$mail->MsgHTML($mail_data['bodyhtml'] );
+	
+		if (isset($mail_data['body']))
+			$mail->Body = $mail_data['body'];
+		
+		if (isset($mail_data['attachments']))
+			foreach($mail_data['attachments'] as $attachment=>$filename)
+				if (is_numeric($attachment))
+					$mail->AddAttachment($filename);
+				else
+					$mail->AddAttachment($attachment, $filename);
+				
+		// Seldom used settings...
+		
+		if (isset($mail_data['wordwrap']))
+			$mail->WordWrap = $mail_data[wordwrap];
+	
+		if (isset($mail_data['ConfirmReadingTo']))
+			$mail->ConfirmReadingTo = true;
+		
+		if (isset($mail_data['SingleTo']))
+		{
+			$mail->SingleTo = true;
+			$mail->SMTPKeepAlive = true;
+		}
+		
+		if (isset($mail_data['SMTP']))									// SMTP? Or just plain old mail()
+		{
+			$mail->IsSMTP();
+			$mail->Host	= $mail_data['smtpserver'];
+			$mail->Port = $mail_data['smtpport'];
+		}
+		else
+			$mail->IsMail();
+			
+		$mail->CharSet = 'UTF-8';
+		
+		// Done setting up.
+				
+		if(!$mail->Send())
+			$returnValue = $mail->ErrorInfo;
+		else 
+			$returnValue = true;
+			
+		$mail->SmtpClose();
+		
+		return $returnValue;		
 	}
 }
 ?>
