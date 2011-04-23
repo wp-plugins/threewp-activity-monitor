@@ -2,7 +2,10 @@
 /**
  * Base class with some common functions.
  * 
- * Version 2011-01-06 22:16
+ * Version 2011-04-11 19:08
+ 
+ 2011-01-25	13:14	load_language assumes filename as domain.
+ 2011-01-25	13:14	loadLanguages -> load_language.
  */
 class ThreeWP_Activity_Monitor_3Base
 {
@@ -12,6 +15,8 @@ class ThreeWP_Activity_Monitor_3Base
 	protected $options = array();				// The options this module uses. (optionName => defaultValue). Deprecated
 	protected $site_options = array();			// Site options (sitewide)
 	protected $local_options = array();			// Local options
+
+	protected $language_domain = '';			// The domain of the loaded languages. If left unset will be set to the base filename minus the .php
 
 	/**
 	 * List of wordpress user roles.
@@ -156,11 +161,21 @@ class ThreeWP_Activity_Monitor_3Base
 	}
 	
 	/**
-	 * Loads this plugin's language files.;
+	 * Loads this plugin's language files.
 	 */
-	protected function loadLanguages($domain)
+	protected function load_language($domain = '')
 	{
-		load_plugin_textdomain($domain, false, $this->paths['path_from_plugin_directory'] . '/lang');
+		if ( $domain != '')
+			$this->language_domain = $domain;
+		
+		if ($this->language_domain == '')
+			$this->language_domain = str_replace( '.php', '', $this->paths['filename'] );
+		load_plugin_textdomain($this->language_domain, false, $this->paths['path_from_plugin_directory'] . '/lang');
+	}
+	
+	protected function _($string)
+	{
+		return __( $string, $this->language_domain );
 	}
 	
 	// -------------------------------------------------------------------------------------------------
@@ -196,6 +211,22 @@ class ThreeWP_Activity_Monitor_3Base
 		return $this->wpdb->insert_id;
 	}
 	
+	/**
+		Converts an object to a base64 encoded, serialized string, ready to be inserted into sql.
+	**/
+	protected function sql_encode( $object )
+	{
+		return base64_encode( serialize($object) );
+	}
+	
+	/**
+		Converts a base64 encoded, serialized string back into an object.
+	**/
+	protected function sql_decode( $string )
+	{
+		return unserialize( base64_decode($string) );
+	}
+	
 	// -------------------------------------------------------------------------------------------------
 	// ----------------------------------------- USER
 	// -------------------------------------------------------------------------------------------------
@@ -215,12 +246,12 @@ class ThreeWP_Activity_Monitor_3Base
 	 */
 	protected function role_at_least($role)
 	{
+		if ($role == '')
+			return true;
+
 		if ($role == 'super_admin')
 			if (function_exists('is_super_admin'))
-			{
-				if (is_super_admin())
-					return true;
-			}
+				return is_super_admin();
 			else
 				return false;
 		return current_user_can($this->roles[$role]['current_user_can']);
@@ -524,6 +555,7 @@ class ThreeWP_Activity_Monitor_3Base
 			'displayBeforeTabName' => '<h2>',		// If displayTabName==true, what to display before the tab name.
 			'displayAfterTabName' => '</h2>',		// If displayTabName==true, what to display after the tab name.
 			'getKey' =>	'tab',						// $_GET key to get the tab value from.
+			'valid_get_keys' => array(),			// Display only these _GET keys.
 			'default' => 0,							// Default tab index.
 		), $options);
 		
@@ -532,14 +564,23 @@ class ThreeWP_Activity_Monitor_3Base
 			$_GET[$getKey] = sanitize_title( $options['tabs'][$options['default']] );
 		$selected = $_GET[$getKey];
 		
+		$options['valid_get_keys']['page'] = 'page';
+		
 		$returnValue = '';
 		if (count($options['tabs'])>1)
 		{
 			$returnValue .= '<ul class="subsubsub">';
+			$link = $_SERVER['REQUEST_URI'];
+
+			foreach($_GET as $key => $value)
+				if ( !in_array($key, $options['valid_get_keys']) )
+					$link = remove_query_arg($key, $link);
+			
 			foreach($options['tabs'] as $index=>$tab)
 			{
-				$slug = sanitize_title($tab);
-				$link = ($index == $options['default'] ? self::urlMake($getKey, null) : self::urlMake($getKey, $slug));
+				$slug = $this->tab_slug($tab);
+				$link = ($index == $options['default'] ? self::urlMake($getKey, null, $link) : self::urlMake($getKey, $slug, $link));
+				
 				$text = $tab;
 				if (isset($options['count'][$index]))
 					$text .= ' <span class="count">(' . $options['count'][$index] . ')</span>';
@@ -557,6 +598,9 @@ class ThreeWP_Activity_Monitor_3Base
 		}
 		else
 			$selectedIndex = 0;
+		
+		if ( !isset($selectedIndex) )
+			$selectedIndex = $options['default'];
 		
 		if ($options['display'])
 		{
@@ -579,9 +623,17 @@ class ThreeWP_Activity_Monitor_3Base
 	}
 	
 	/**
+		Sanitizes the name of a tab.
+	**/
+	protected function tab_slug($name)
+	{
+		return sanitize_title($name);
+	}
+	
+	/**
 	 * Make a value a key.
 	 */
-	protected function array_moveKey($array, $key)
+	public function array_moveKey($array, $key)
 	{
 		$returnArray = array();
 		foreach($array as $value)
@@ -589,7 +641,7 @@ class ThreeWP_Activity_Monitor_3Base
 		return $returnArray;
 	}
 	
-	protected function object_to_array($object)
+	public function object_to_array($object)
 	{
 		if (is_array($object))
 		{
@@ -629,6 +681,14 @@ class ThreeWP_Activity_Monitor_3Base
 	}
 	
 	/**
+		Returns a hash value of a string. The standard hash type is sha512 (64 chars).
+	**/
+	protected function hash($string, $type = 'sha512')
+	{
+		return hash($type, $string);
+	}
+	
+	/**
 		See send_mail
 	**/
 	public function sendMail($mailData)
@@ -642,12 +702,16 @@ class ThreeWP_Activity_Monitor_3Base
 	*/
 	public function send_mail($mail_data)
 	{
+		// backwards compatability
+		if (isset($mail_data['bodyhtml']))
+			$mail_data['body_html'] = $mail_data['bodyhtml'];
+		
 		require_once ABSPATH . WPINC . '/class-phpmailer.php';
 		$mail = new PHPMailer();
 		
 		// Mandatory
 		$mail->From		= key($mail_data['from']);
-		$mail->FromName	= current($mail_data['from']);
+		$mail->FromName	= reset($mail_data['from']);
 		
 		$mail->Subject  = $mail_data['subject'];
 		
@@ -679,8 +743,8 @@ class ThreeWP_Activity_Monitor_3Base
 				$mail->AddBCC($email, $name);
 			}
 			
-		if (isset($mail_data['bodyhtml']))
-			$mail->MsgHTML($mail_data['bodyhtml'] );
+		if (isset($mail_data['body_html']))
+			$mail->MsgHTML($mail_data['body_html'] );
 	
 		if (isset($mail_data['body']))
 			$mail->Body = $mail_data['body'];
@@ -691,6 +755,16 @@ class ThreeWP_Activity_Monitor_3Base
 					$mail->AddAttachment($filename);
 				else
 					$mail->AddAttachment($attachment, $filename);
+
+		if ( isset( $mail_data['reply_to'] ) )
+		{
+			foreach($mail_data['reply_to'] as $email=>$name)
+			{
+				if (is_int($email))
+					$email = $name;
+				$mail->AddReplyTo($email, $name);
+			}
+		}
 				
 		// Seldom used settings...
 		
@@ -714,11 +788,19 @@ class ThreeWP_Activity_Monitor_3Base
 		}
 		else
 			$mail->IsMail();
-			
-		$mail->CharSet = 'UTF-8';
+		
+		if ( isset($mail_data['charset']) )
+			$mail->CharSet = $mail_data['charset'];
+		else
+			$mail->CharSet = 'UTF-8';
+		
+		if ( isset($mail_data['content_type']) )
+			$mail->ContentType  = $mail_data['content_type'];
+		
+		if ( isset($mail_data['encoding']) )
+			$mail->Encoding  = $mail_data['encoding'];
 		
 		// Done setting up.
-				
 		if(!$mail->Send())
 			$returnValue = $mail->ErrorInfo;
 		else 

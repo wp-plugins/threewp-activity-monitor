@@ -1,7 +1,7 @@
 === ThreeWP Activity Monitor ===
 Tags: wp, wpms, network, threewp, activity, monitor, activity monitor, blog activity, user, comments, logins,
-Requires at least: 3.0
-Tested up to: 3.0
+Requires at least: 3.1
+Tested up to: 3.1.1
 Stable tag: trunk
 Contributors: edward mindreantre
 Track and display site or network-wide user activity.
@@ -34,20 +34,22 @@ Since v1.2 other plugins can add new activities.
 
 == Custom activities ==
 
+= action: threewp_activity_monitor_new_activity =
+
 If you're the author of a plugin and want a custom action added to the list, use the following code.
 
-`<?php
-	do_action('threewp_activity_monitor_new_activity', array(
-		'tr_class' => 'first_action_class second_action_class',
-		'activity' => array(
-			"" => "%user_display_name_with_link% removed a category on %blog_name_with_panel_link%",
-			"Action key 1" => "The key is displayed as small, grey text in front of the other text. Something interesting happened and user # %user_id% caused it!",
-			"  " => "%user_login% didnt want any header here so %user_login_with_link% left it blank with two spaces",
-			"Another key!" => "This time I wanted a key on %blog_name% (%blog_id%).",
-		),
-	));
-?>`
+`do_action('threewp_activity_monitor_new_activity', array(
+	'activity_type' => '25char_description',
+	'tr_class' => 'first_action_class second_action_class',
+	'activity' => array(
+		"" => "%user_display_name_with_link% removed a category on %blog_name_with_panel_link%",
+		"Action key 1" => "The key is displayed as small, grey text in front of the other text. Something interesting happened and user # %user_id% caused it!",
+		"  " => "%user_login% didnt want any header here so %user_login_with_link% left it blank with two spaces",
+		"Another key!" => "This time I wanted a key on %blog_name% (%blog_id%).",
+	),
+));`
 
+*activity_type* is an optional string to use as an index. See the _index table for the existing index_action strings which you should avoid (comment_approve, login_success, etc). 25 chars max.
 *tr_class* is an optional value that signifies which extra css classes to give the action's row.
 *activity* is the activity itself, that is an array of header => text.
 
@@ -72,6 +74,39 @@ The following keywords are automatically replaced by Activity Monitor.
 * %blog_name_with_link% Blog's name with link to front page.
 * %blog_name_with_panel_link% Blog's name with link to admin panel.
 
+= filter: threewp_activity_monitor_list_activities =
+
+List all of the activities that your plugin creates.
+
+`
+add_filter( 'threewp_activity_monitor_list_activities', array(&$this, 'list_activities') 10, 1);
+
+public function list_activities($activities)
+{
+	$activities = array_merge(array(
+		'post_publish' => array(						// The activity name as per the database
+			'name' => 'Post published',					// Human readable activity name
+		),
+		'comment_approve' => array(
+			'name' => 'Comment approved',
+			'description => 'A comment has been approved by an administrator and is now visible to blog visitors.',		// Optional description.
+			'sensitive_information' => false,			// Optional value to tell the other plugins that this activity contains information that shouldn't be shown to just anyone. Default is false. 
+		),
+	), $activities);
+	return $activities;
+}
+`
+Since the Activity Monitor itself adds default values then only the array key and name values are necessary.
+
+If you decide that more keys are necessary, <a href="edward@mindreantre.se">send me a patch</a>.
+
+= filter: threewp_activity_monitor_convert_activity_to_post =
+
+If your plugin creates activities that can be displayed to the user in the form of posts (eg: new posts, updated posts, new comments) then add a filter.
+
+Return a complete post. The guid should be used as a link to the post or comment in question.
+
+
 == Installation ==
 
 1. Unzip and copy the zip contents (including directory) into the `/wp-content/plugins/` directory
@@ -93,6 +128,9 @@ Converts the data column to a base64encoded serialized string.
 The old activity table is removed.
 
 == Changelog ==
+= 1.3 =
+* WP 3.1 support
+* User's activities shown in profile (fixed)
 = 1.2 =
 * threewp_activity_monitor_new_activity action added.
 = 1.1 =

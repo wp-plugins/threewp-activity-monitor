@@ -3,7 +3,7 @@
 Plugin Name: ThreeWP Activity Monitor
 Plugin URI: http://mindreantre.se/threewp-activity-monitor/
 Description: Plugin to track user activity. Network aware.
-Version: 1.2
+Version: 1.3
 Author: Edward Hevlund
 Author URI: http://www.mindreantre.se
 Author Email: edward@mindreantre.se
@@ -32,34 +32,37 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		register_activation_hook(__FILE__, array(&$this, 'activate') );
 		register_deactivation_hook(__FILE__, array(&$this, 'deactivate') );
 		
-		add_action('admin_print_styles', array(&$this, 'admin_print_styles') );
-		add_action('admin_menu', array(&$this, 'admin_menu') );
+		add_action( 'admin_print_styles', array(&$this, 'admin_print_styles') );
+		add_action( 'admin_menu', array(&$this, 'admin_menu') );
+		add_action( 'network_admin_menu', array(&$this, 'network_admin_menu') );
 		
-		add_action('threewp_activity_monitor_cron', array(&$this, 'cron') );
+		add_action( 'threewp_activity_monitor_cron', array(&$this, 'cron') );
 
-		add_filter('wp_login', array(&$this, 'wp_login'), 10, 3);						// Successful logins
-		add_filter('wp_login_failed', array(&$this, 'wp_login_failed'), 10, 3);			// Login failures
-		add_filter('wp_logout', array(&$this, 'wp_logout'), 10, 3);						// Logouts
+		add_filter( 'wp_login', array(&$this, 'wp_login'), 10, 3 );							// Successful logins
+		add_filter( 'wp_login_failed', array(&$this, 'wp_login_failed'), 10, 3 );			// Login failures
+		add_filter( 'wp_logout', array(&$this, 'wp_logout'), 10, 3 );						// Logouts
 		
-		add_filter('user_register', array(&$this, 'user_register'), 10, 3);
-		add_filter('profile_update', array(&$this, 'profile_update'), 10, 3);
-		add_filter('wpmu_delete_user', array(&$this, 'delete_user'), 10, 3); 
-		add_filter('delete_user', array(&$this, 'delete_user'), 10, 3); 
+		add_filter( 'user_register', array(&$this, 'user_register'), 10, 3 );
+		add_filter( 'profile_update', array(&$this, 'profile_update'), 10, 3 );
+		add_filter( 'wpmu_delete_user', array(&$this, 'delete_user'), 10, 3 ); 
+		add_filter( 'delete_user', array(&$this, 'delete_user'), 10, 3 ); 
 		
-		add_filter('retrieve_password', array(&$this, 'retrieve_password'), 10, 3);		// Send password
-		add_filter('password_reset', array(&$this, 'password_reset'), 10, 3);
+		add_filter( 'retrieve_password', array(&$this, 'retrieve_password'), 10, 3 );		// Send password
+		add_filter( 'password_reset', array(&$this, 'password_reset'), 10, 3 );
 		
 		// Posts (and pages)
-		add_action('transition_post_status', array(&$this, 'publish_post'), 10, 3);
-		add_action('post_updated', array(&$this, 'post_updated'), 10, 3);
-		add_action('trashed_post', array(&$this, 'trash_post'));
-		add_action('untrash_post', array(&$this, 'untrash_post'));
-		add_action('deleted_post', array(&$this, 'delete_post'));
+		add_action( 'transition_post_status', array(&$this, 'publish_post'), 10, 3 );
+		add_action( 'post_updated', array(&$this, 'post_updated'), 10, 3 );
+		add_action( 'trashed_post', array(&$this, 'trash_post'));
+		add_action( 'untrash_post', array(&$this, 'untrash_post'));
+		add_action( 'deleted_post', array(&$this, 'delete_post'));
 		
 		// Comments
-		add_action('wp_set_comment_status', array(&$this, 'wp_set_comment_status'), 10, 3);
+		add_action( 'wp_set_comment_status', array(&$this, 'wp_set_comment_status'), 10, 3 );
 		
-		add_action('threewp_activity_monitor_new_activity', array(&$this, 'action_new_activity'), 1, 1);		
+		add_action( 'threewp_activity_monitor_new_activity', array(&$this, 'action_new_activity'), 1, 1 );		
+		add_filter( 'threewp_activity_monitor_list_activities', array(&$this, 'list_activities'), -1, 1 );
+		add_filter( 'threewp_activity_monitor_convert_activity_to_post', array(&$this, 'convert_activity_to_post'), 1, 2 );		
 	}
 	
 	// --------------------------------------------------------------------------------------------
@@ -162,48 +165,57 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 	
 	public function admin_menu()
 	{
+		$this->common_admin_menu();
+	}
+	
+	public function network_admin_menu()
+	{
+		$this->common_admin_menu();
+		add_submenu_page('settings.php', $this->_('Activity Monitor'), $this->_('Activity Monitor'), 'read', 'ThreeWP_Activity_Monitor', array (&$this, 'admin'));
+	}
+	
+	public function common_admin_menu()
+	{
 		if ($this->role_at_least( $this->get_option('role_logins_view') ))
-			add_filter('show_user_profile', array(&$this, 'show_user_profile'));
+			add_filter( 'show_user_profile', array(&$this, 'show_user_profile'));
 		if ($this->role_at_least( $this->get_option('role_logins_delete') ))
-			add_filter('personal_options_update', array(&$this, 'personal_options_update'));
+			add_filter( 'personal_options_update', array(&$this, 'personal_options_update'));
 
 		if ($this->role_at_least( $this->get_option('role_logins_view_other') ))
-			add_filter('edit_user_profile', array(&$this, 'show_user_profile'));
+			add_filter( 'edit_user_profile', array(&$this, 'show_user_profile'));
 		if ($this->role_at_least( $this->get_option('role_logins_delete_other') ))
-			add_filter('edit_user_profile_update', array(&$this, 'personal_options_update'));
+			add_filter( 'edit_user_profile_update', array(&$this, 'personal_options_update'));
 
 		if ($this->role_at_least( $this->get_option('role_logins_view_other') ))
 		{
-			add_filter('manage_users_columns', array(&$this, 'manage_users_columns')); 
-			add_filter('wpmu_users_columns', array(&$this, 'manage_users_columns')); 
+			add_filter( 'manage_users_columns', array(&$this, 'manage_users_columns')); 
+			add_filter( 'wpmu_users_columns', array(&$this, 'manage_users_columns')); 
 
-			add_filter('manage_users_custom_column', array(&$this, 'manage_users_custom_column'), 10, 3);
-
-			if ($this->is_network)
-				add_submenu_page('ms-admin.php', __('Activity Monitor', 'ThreeWP_Activity_Monitor'), __('Activity Monitor', 'ThreeWP_Activity_Monitor'), 'read', 'ThreeWP_Activity_Monitor', array (&$this, 'admin'));
-			else
-				add_submenu_page('index.php', __('Activity Monitor', 'ThreeWP_Activity_Monitor'), __('Activity Monitor', 'ThreeWP_Activity_Monitor'), 'read', 'ThreeWP_Activity_Monitor', array (&$this, 'admin'));
+			add_filter( 'manage_users_custom_column', array(&$this, 'manage_users_custom_column'), 10, 3 );
+			
+			if ( ! $this->isNetwork )
+				add_submenu_page('index.php', $this->_('Activity Monitor'), $this->_('Activity Monitor'), 'read', 'ThreeWP_Activity_Monitor', array (&$this, 'admin'));
 		}
 	}
-	
+
 	public function admin()
 	{
-		$this->loadLanguages('ThreeWP_Activity_Monitor');
+		$this->load_language();
 		
 		$tab_data = array(
 			'tabs'		=>	array(),
 			'functions' =>	array(),
 		);
 		
-		$tab_data['tabs'][] = __('Overview', 'ThreeWP_Activity_Monitor');
+		$tab_data['tabs'][] = $this->_('Overview');
 		$tab_data['functions'][] = 'adminOverview';
 
 		if ($this->role_at_least( $this->get_option('role_logins_delete_other') ))
 		{
-			$tab_data['tabs'][] = __('Settings', 'ThreeWP_Activity_Monitor');
+			$tab_data['tabs'][] = $this->_('Settings');
 			$tab_data['functions'][] = 'adminSettings';
 	
-			$tab_data['tabs'][] = __('Uninstall', 'ThreeWP_Activity_Monitor');
+			$tab_data['tabs'][] = $this->_('Uninstall');
 			$tab_data['functions'][] = 'admin_uninstall';
 		}
 		
@@ -332,6 +344,11 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		
 		if ( !$this->post_is_for_real($post) )
 			return;
+			
+		global $threewp_broadcast;
+		if ( $threewp_broadcast !== null )
+			if ( $threewp_broadcast->is_broadcasting() )
+				return;
 
 		$post_id = $post->ID;
 		
@@ -465,8 +482,8 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		$page_links = paginate_links( array(
 			'base' => add_query_arg( 'paged', '%#%' ),
 			'format' => '',
-			'prev_text' => __('&laquo;'),
-			'next_text' => __('&raquo;'),
+			'prev_text' => $this->_('&laquo;'),
+			'next_text' => $this->_('&raquo;'),
 			'current' => $page,
 			'total' => $max_pages,
 		));
@@ -512,7 +529,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 			'activities_limit' => array(
 				'type' => 'text',
 				'name' => 'activities_limit',
-				'label' => __('Keep at most this amount of activities in the database', 'ThreeWP_Activity_Monitor'),
+				'label' => $this->_('Keep at most this amount of activities in the database'),
 				'maxlength' => 10,
 				'size' => 5,
 				'value' => $this->get_option('activities_limit'),
@@ -523,7 +540,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 			'activities_limit_view' => array(
 				'type' => 'text',
 				'name' => 'activities_limit_view',
-				'label' => __('Display this amount of activities per page', 'ThreeWP_Activity_Monitor'),
+				'label' => $this->_('Display this amount of activities per page'),
 				'maxlength' => 10,
 				'size' => 5,
 				'value' => $this->get_option('activities_limit_view'),
@@ -564,7 +581,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		$inputSubmit = array(
 			'type' => 'submit',
 			'name' => '3am_submit',
-			'value' => __('Apply', 'ThreeWP_Activity_Monitor'),
+			'value' => $this->_('Apply'),
 			'cssClass' => 'button-primary',
 		);
 			
@@ -619,19 +636,27 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 	
 	public function show_user_profile($userdata)
 	{
-		$returnValue = '<h3>'.__('User activity', 'ThreeWP_Activity_Monitor').'</h3>';
+		$default_login_stats = array(
+			'latest_login' => array( 'value' => '' ),
+			'login_success' => array( 'value' => '' ),
+			'login_failure' => array( 'value' => '' ),
+			'password_retrieve' => array( 'value' => '' ),
+			'password_reset' => array( 'value' => '' ),
+		);
+		$returnValue = '<h3>'.$this->_('User activity').'</h3>';
 		
 		$login_stats = $this->sqlStatsList($userdata->ID);
 		$login_stats = $this->array_moveKey($login_stats, 'key');
+		$login_stats = array_merge($default_login_stats, $login_stats);
 		$returnValue .= '
 			<table class="widefat">
 				<thead>
 					<tr>
-						<th>'.__('Latest login', 'ThreeWP_Activity_Monitor').'</th>
-						<th>'.__('Successful logins', 'ThreeWP_Activity_Monitor').'</th>
-						<th>'.__('Failed logins', 'ThreeWP_Activity_Monitor').'</th>
-						<th>'.__('Retrieved passwords', 'ThreeWP_Activity_Monitor').'</th>
-						<th>'.__('Reset passwords', 'ThreeWP_Activity_Monitor').'</th>
+						<th>'.$this->_('Latest login').'</th>
+						<th>'.$this->_('Successful logins').'</th>
+						<th>'.$this->_('Failed logins').'</th>
+						<th>'.$this->_('Retrieved passwords').'</th>
+						<th>'.$this->_('Reset passwords').'</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -660,7 +685,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 			$inputCrop = array(
 				'type' => 'text',
 				'name' => 'activity_monitor_activities_crop',
-				'label' => __('Crop the activity list down to this amount of rows', 'ThreeWP_Activity_Monitor'),
+				'label' => $this->_('Crop the activity list down to this amount of rows'),
 				'value' => count($logins),
 				'validation' => array(
 					'empty' => true,
@@ -672,7 +697,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 			$inputClear = array(
 				'type' => 'checkbox',
 				'name' => 'activity_monitor_index_delete',
-				'label' => __('Clear the user\'s activity list', 'ThreeWP_Activity_Monitor'),
+				'label' => $this->_('Clear the user\'s activity list'),
 				'checked' => false,
 			);
 			$returnValue .= '<p>'.$form->makeInput($inputClear).' '.$form->makeLabel($inputClear).'</p>';
@@ -694,7 +719,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 
 	public function manage_users_columns($defaults)
 	{
-		$defaults['3wp_activity_monitor'] = '<span title="'.__('Various login statistics about the user', 'ThreeWP_Activity_Monitor').'">'.__('Login statistics', 'ThreeWP_Activity_Monitor').'</span>';
+		$defaults['3wp_activity_monitor'] = '<span title="'.$this->_('Various login statistics about the user').'">'.$this->_('Login statistics').'</span>';
 		return $defaults;
 	}
 	
@@ -723,7 +748,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 
 		if (count($login_stats) < 1)
 		{
-			$message = __('No login data available', 'ThreeWP_Activity_Monitor');
+			$message = $this->_('No login data available');
 			if ($echo)
 				echo $message;
 			return $message;
@@ -734,7 +759,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		// Translate the latest login date/time to the user's locale.
 		if ($login_stats['latest_login'] != '')
 			$stats[] = sprintf('<span title="%s: '.$login_stats['latest_login']['value'].'">' . $this->ago($login_stats['latest_login']['value']) . '</span>',
-			__('Latest login', 'ThreeWP_Activity_Monitor')
+			$this->_('Latest login')
 			);
 		
 		$returnValue .= implode(' | ', $stats);
@@ -746,6 +771,9 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 	
 	public function action_new_activity($data)
 	{
+		$data = array_merge(array(
+			'activity_type' => 'action_new_activity',
+		), $data);
 		global $current_user;
 		global $blog_id;
 		get_currentuserinfo();
@@ -776,9 +804,76 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 			}
 			$new_data[$index] = $text;
 		}
-		$this->sqlLogIndex('action_new_activity', array(
+		
+		$this->sqlLogIndex($data['activity_type'], array(
 			'data' => $new_data,
 		));
+	}
+	
+	/**
+		Fills the variable with the activities we know of.
+		
+		Also fills in missing settings from other plugin activities.
+	**/
+	public function list_activities($activities)
+	{
+		$this->load_language();
+		
+		// First, fill in our own activities.
+		$activities = array_merge(array(
+			'post_publish' => array(
+				'name' => $this->_('Post published'),
+				'can_be_converted_to_a_post' => true,
+			),
+			'comment_approve' => array(
+				'name' => $this->_('Comment approved'),
+				'can_be_converted_to_a_post' => true,
+			),
+		), $activities);
+		
+		// And now clean up everyone else's activities.
+		$default_activity_settings = array(
+			'sensitive_information' => false,				// This activity does not contain sensitive information.
+			'description' => '',							// Most of the time the activity name is enough.
+			'can_be_converted_to_a_post' => false,			// This activity can be converted to a post.
+		);
+		$returnValue = array();
+		foreach($activities as $index => $activity)
+		{
+			$new_index = ( !is_int($index) ? $index : $activity['id'] );
+			$activity['id'] = $new_index;
+			$returnValue[ $new_index ] = array_merge($default_activity_settings, $activity);
+		}
+		
+		return $returnValue;
+	}
+	
+	public function convert_activity_to_post($activity, $returnValue)
+	{
+		switch($activity['index_action'])
+		{
+			case 'post_publish':
+				switch_to_blog( $activity['blog_id'] );
+				$returnValue = get_post( $activity['post_id'] );
+				
+				// Pages generate incorrect permalinks if they're generated on other blogs. Pretend it's a post. That'll work.
+				if ($returnValue->post_type == 'page')
+				{
+					$returnValue->post_type = 'post';
+					$returnValue->guid .= '?p=' . $returnValue->ID;
+				}
+				
+				restore_current_blog();
+				
+			break;
+			case 'comment_approve':
+				switch_to_blog( $activity['blog_id'] );
+				$returnValue = get_post( $activity['post_id'] );
+				$returnValue->guid = get_comment_link( $activity['comment_id'] );
+				restore_current_blog();
+			break;
+		}
+		return $returnValue;
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -873,9 +968,9 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 			if (is_super_admin())
 			{
 				$backend = sprintf('<span class="threewp_activity_monitor_overview_backend_link">[<a title="%s" href="%s">%s</a>]</span>',
-						__("Go directly to the blog's backend", 'ThreeWP_Activity_Monitor'),
+						$this->_("Go directly to the blog's backend"),
 						$this->cache['blog'][$blog_id]['url'] . '/wp-admin',
-						__('B', 'ThreeWP_Activity_Monitor')
+						$this->_('B')
 				);
 					
 			}
@@ -910,7 +1005,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 						);
 					if ( $activity['index_action'] == 'login_failure' && isset($data['password']) ) 
 						$activity_strings[] = sprintf('<span class="threewp_activity_monitor_activity_info_key">%s</span> <span class="activity_info_data">%s</span>',
-							__('Password tried:', 'ThreeWP_Activity_Monitor'),
+							$this->_('Password tried:'),
 							$data['password']
 						);
 				break;
@@ -926,7 +1021,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 						$strings['activity_message'],
 						$this->cache['blog'][$blog_id]['url'] . '/?p=' . $activity['post_id'],
 						$data['title'],
-						__('on', 'ThreeWP_Activity_Monitor'),
+						$this->_('on'),
 						$strings['blog'],
 						$backend
 					);
@@ -949,13 +1044,13 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 						$strings['activity_message'],
 
 						$this->cache['blog'][$blog_id]['url'] . '/?p=' . $activity['post_id'] . '#comment-' . $activity['comment_id'],
-						__('comment #', 'ThreeWP_Activity_Monitor') . $activity['comment_id'],
+						$this->_('comment #') . $activity['comment_id'],
 
-						__('for the post', 'ThreeWP_Activity_Monitor'),
+						$this->_('for the post'),
 						$this->cache['blog'][$blog_id]['url'] . '/?p=' . $activity['post_id'],
 						$data['post_title'],
 						
-						__('on', 'ThreeWP_Activity_Monitor'),
+						$this->_('on'),
 						$strings['blog'],
 						$backend
 					);
@@ -993,11 +1088,20 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 						$data['user_login'] . ' <span class="sep">/</span> ' . '<a href="mailto:'.$data['user_email'].'">' . $data['user_email'] . '</a>'
 					);
 				break;
-				case 'action_new_activity':
-					foreach ($data['activity'] as $data_key => $data_value)
-						$activity_strings[] = sprintf('<span class="threewp_activity_monitor_activity_info_key">%s</span> <span class="activity_info_data">%s</span>', trim($data_key), $data_value);
+				default: // action_new_activity
+					$data = apply_filters('threewp_activity_monitor_display_custom_activity', $data);
+
 					if (isset($data['tr_class']))
 						$tr_class[] = $data['tr_class'];
+					if ( !isset($data['display']) )
+					{
+						foreach ($data['activity'] as $data_key => $data_value)
+							$activity_strings[] = sprintf('<span class="threewp_activity_monitor_activity_info_key">%s</span> <span class="activity_info_data">%s</span>', trim($data_key), $data_value);
+					}
+					else
+					{
+						$activity_strings[] = $data['display'];
+					}
 				break;
 			}
 			
@@ -1010,13 +1114,13 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 				{
 					case 'addr':
 						$activity_strings[] = sprintf('<span class="threewp_activity_monitor_activity_info_key">%s</span> <span class="activity_info_data">%s</span>',
-							__('Address:', 'ThreeWP_Activity_Monitor'),
+							$this->_('Address:'),
 							$this->makeIP($activity, 'html2')
 							);
 					break;
 					case 'user_agent':
 						$activity_strings[] = sprintf('<span class="threewp_activity_monitor_activity_info_key">%s</span> <span class="activity_info_data">%s</span>',
-							__('Web browser:', 'ThreeWP_Activity_Monitor'),
+							$this->_('Web browser:'),
 							$data['user_agent']
 							);
 					break;
@@ -1045,8 +1149,8 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 			<table class="widefat threewp_activity_monitor">
 				<thead>
 					<tr>
-						<th>'.__('Time', 'ThreeWP_Activity_Monitor').'</th>
-						<th>'.__('Activity', 'ThreeWP_Activity_Monitor').'</th>
+						<th>'.$this->_('Time').'</th>
+						<th>'.$this->_('Activity').'</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -1061,68 +1165,68 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		switch($type)
 		{
 			case 'login_success':
-				return __('logged in to', 'ThreeWP_Activity_Monitor');
+				return $this->_('logged in to');
 			case 'login_failure':
-				return __('tried to log in to', 'ThreeWP_Activity_Monitor');
+				return $this->_('tried to log in to');
 			case 'logout':
-				return __('logged out from', 'ThreeWP_Activity_Monitor');
+				return $this->_('logged out from');
 			case 'password_retrieve':
-				return __('retrieved a password reset link from', 'ThreeWP_Activity_Monitor');
+				return $this->_('retrieved a password reset link from');
 			case 'password_reset':
-				return __('reset his password on', 'ThreeWP_Activity_Monitor');
+				return $this->_('reset his password on');
 				
 			case 'post_publish':
-				return __('posted', 'ThreeWP_Activity_Monitor');
+				return $this->_('posted');
 			break;
 			case 'post_update':
-				return __('updated', 'ThreeWP_Activity_Monitor');
+				return $this->_('updated');
 			break;
 			case 'trash_post':
-				return __('trashed', 'ThreeWP_Activity_Monitor');
+				return $this->_('trashed');
 			break;
 			case 'untrash_post':
-				return __('restored', 'ThreeWP_Activity_Monitor');
+				return $this->_('restored');
 			break;
 			case 'delete_post':
-				return __('deleted', 'ThreeWP_Activity_Monitor');
+				return $this->_('deleted');
 			break;
 			
 			case 'comment_pending':
-				return __('requeued', 'ThreeWP_Activity_Monitor');
+				return $this->_('requeued');
 			break;
 			case 'comment_approve':
-				return __('approved', 'ThreeWP_Activity_Monitor');
+				return $this->_('approved');
 			break;
 			case 'comment_reapprove':
-				return __('reapproved', 'ThreeWP_Activity_Monitor');
+				return $this->_('reapproved');
 			break;
 			case 'comment_hold':
-				return __('held back', 'ThreeWP_Activity_Monitor');
+				return $this->_('held back');
 			break;
 			case 'comment_spam':
-				return __('spam marked', 'ThreeWP_Activity_Monitor');
+				return $this->_('spam marked');
 			break;
 			case 'comment_unspam':
-				return __('unspammed', 'ThreeWP_Activity_Monitor');
+				return $this->_('unspammed');
 			break;
 			case 'comment_trash':
-				return __('trashed', 'ThreeWP_Activity_Monitor');
+				return $this->_('trashed');
 			break;
 			case 'comment_untrash':
-				return __('restored', 'ThreeWP_Activity_Monitor');
+				return $this->_('restored');
 			break;
 			case 'comment_delete':
-				return __('deleted', 'ThreeWP_Activity_Monitor');
+				return $this->_('deleted');
 			break;
 			
 			case 'user_register':
-				return __('has created the user', 'ThreeWP_Activity_Monitor');
+				return $this->_('has created the user');
 			break;
 			case 'profile_update':
-				return __('has updated the profile of', 'ThreeWP_Activity_Monitor');
+				return $this->_('has updated the profile of');
 			break;
 			case 'delete_user':
-				return __('has deleted the user', 'ThreeWP_Activity_Monitor');
+				return $this->_('has deleted the user');
 			break;
 		}
 	}
@@ -1132,16 +1236,16 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		switch ($change_type)
 		{
 			case 'Password changed':
-				return __('Password changed', 'ThreeWP_Activity_Monitor');
+				return $this->_('Password changed');
 			break;
 			case 'First name changed':
-				return sprintf( __('First name changed from <em>"%s"</em> to <em>"%s"</em>', 'ThreeWP_Activity_Monitor'),
+				return sprintf( $this->_('First name changed from <em>"%s"</em> to <em>"%s"</em>'),
 					$change_data[0],
 					$change_data[1]
 				);
 			break;
 			case 'Last name changed':
-				return sprintf( __('Last name changed from <em>"%s"</em> to <em>"%s"</em>', 'ThreeWP_Activity_Monitor'),
+				return sprintf( $this->_('Last name changed from <em>"%s"</em> to <em>"%s"</em>'),
 					$change_data[0],
 					$change_data[1]
 				);
@@ -1210,6 +1314,9 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		$data = array_merge(array(
 			'user_agent' => $_SERVER['HTTP_USER_AGENT'],
 		), $data);
+		
+		if ( ! isset($_SERVER['REMOTE_HOST']) )
+			$_SERVER['REMOTE_HOST'] = '';
 		
 		$l_id = $this->query_insert_id("INSERT INTO `".$this->wpdb->base_prefix."_3wp_activity_monitor_logins` (l_blog_id, l_user_id, remote_addr, remote_host) VALUES
 			('".$blog_id."', '".$user_id."', '".$_SERVER['REMOTE_ADDR']."', '".$_SERVER['REMOTE_HOST']."')");
@@ -1285,7 +1392,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		 ");
 	}
 	
-	private function sql_index_list($options)
+	public function sql_index_list($options)
 	{
 		$options = array_merge(array(
 			'limit' => 1000,
@@ -1293,24 +1400,25 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 			'page' => 0,
 			'select' => '*',
 			'user_id' => null,
+			'where' => array('1=1'),
 		), $options);
 
 		$select = ($options['count'] ? 'count(*) as ROWS' : $options['select']);
 		
 		if ($options['page'] > 0)
-		{
 			$options['page'] = $options['page'] * $options['limit'];
-		}
+		
+		if ( $options['user_id'] !== null )
+			$options['where']['user_id'] = "(user_id = '".$options['user_id']."' OR l_user_id = '".$options['user_id']."')";
 
 		$query = ("SELECT ".$select." FROM `".$this->wpdb->base_prefix."_3wp_activity_monitor_index`
 			LEFT OUTER JOIN `".$this->wpdb->base_prefix."_3wp_activity_monitor_logins` USING (l_id)
 			LEFT OUTER JOIN `".$this->wpdb->base_prefix."_3wp_activity_monitor_posts` USING (p_id)
-			WHERE 1 = 1
-			".($options['user_id'] !== null ? "AND (user_id = '".$options['user_id']."' OR l_user_id = '".$options['user_id']."')" : '')."
+			WHERE " . implode(' AND ', $options['where']) . "
 			ORDER BY i_datetime DESC
 			".(isset($options['limit']) ? "LIMIT ".$options['page'].",".$options['limit']."" : '')."
 		 ");
-		 
+
 		 $result = $this->query($query);
 		 
 		 if ($options['count'])
