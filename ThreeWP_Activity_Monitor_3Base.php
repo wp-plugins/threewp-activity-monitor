@@ -1,12 +1,15 @@
 <?php
 /**
- * Base class with some common functions.
- * 
- * Version 2011-04-11 19:08
- 
+ Base class with some common functions.
+
+ Version 2011-04-30
+
+ 2011-05-12			displayMessage now uses now() instead of date. 
+ 2011-04-30			Uses ThreeWP_Form instead of edwardForm.
+ 2011-04-29 09:19	site options are registered even when using single Wordpress.
  2011-01-25	13:14	load_language assumes filename as domain.
  2011-01-25	13:14	loadLanguages -> load_language.
- */
+*/
 class ThreeWP_Activity_Monitor_3Base
 {
 	protected $wpdb;							// Link to Wordpress' database class.
@@ -138,7 +141,7 @@ class ThreeWP_Activity_Monitor_3Base
 				'name' => 'uninstall',
 				'nameprefix' => $nameprefix,
 				'type' => 'submit',
-				'cssClass' => 'button-primary',
+				'css_class' => 'button-primary',
 				'value' => 'Uninstall plugin',
 			),
 		);
@@ -150,11 +153,11 @@ class ThreeWP_Activity_Monitor_3Base
 			</p>
 
 			<p>
-				'.$form->makeInput($inputs['sure']).' '.$form->makeLabel($inputs['sure']).'
+				'.$form->make_input($inputs['sure']).' '.$form->make_label($inputs['sure']).'
 			</p>
 
 			<p>
-				'.$form->makeInput($inputs['uninstall']).'
+				'.$form->make_input($inputs['uninstall']).'
 			</p>
 			'.$form->stop().'
 		';
@@ -184,10 +187,14 @@ class ThreeWP_Activity_Monitor_3Base
 	
 	/**
 	 * Fire an SQL query and return the results in an array.
+	 
+	 Optionally queries another wpdb.
 	 */
-	protected function query($query)
+	protected function query($query , $wpdb = null)
 	{
-		$results = $this->wpdb->get_results($query, 'ARRAY_A');
+		if ( $wpdb === null )
+			$wpdb = $this->wpdb; 
+		$results = $wpdb->get_results($query, 'ARRAY_A');
 		return (is_array($results) ? $results : array());
 	}
 	
@@ -225,6 +232,16 @@ class ThreeWP_Activity_Monitor_3Base
 	protected function sql_decode( $string )
 	{
 		return unserialize( base64_decode($string) );
+	}
+	
+	/**
+		Returns whether a table exists.
+	**/
+	protected function sql_table_exists( $table_name )
+	{
+		$query = "SHOW TABLES LIKE '$table_name'";
+		$result = $this->query( $query );
+		return count($result) > 0;
 	}
 	
 	// -------------------------------------------------------------------------------------------------
@@ -268,15 +285,15 @@ class ThreeWP_Activity_Monitor_3Base
 	}
 	
 	/**
-	 * Creats a new edwardForm.
+	 * Creats a new ThreeWP_Form.
 	 */
 	protected function form($options = array())
 	{
 		$options = array_merge($options, array('language' => preg_replace('/_.*/', '', get_locale())) );
-		if (class_exists('edwardForm'))
-			return new edwardForm($options);
-		require_once('edwardForm.php');
-		return new edwardForm($options);
+		if (class_exists('ThreeWP_Form'))
+			return new ThreeWP_Form($options);
+		require_once('ThreeWP_Form.php');
+		return new ThreeWP_Form($options);
 	}
 	
 	// -------------------------------------------------------------------------------------------------
@@ -400,12 +417,23 @@ class ThreeWP_Activity_Monitor_3Base
 		}
 
 		if ($this->isNetwork)
+		{
 			foreach($this->site_options as $option=>$value)
 			{
 				$option = $this->fix_option_name($option);
 				if (get_site_option($option) === false)
 					update_site_option($option, $value);
 			}
+		}
+		else
+		{
+			foreach($this->site_options as $option=>$value)
+			{
+				$option = $this->fix_option_name($option);
+				if (get_option($option) === false)
+					update_option($option, $value);
+			}
+		}
 	}
 	
 	/**
@@ -430,6 +458,14 @@ class ThreeWP_Activity_Monitor_3Base
 				$option = $this->fix_option_name($option);
 				delete_site_option($option);
 			}
+		else
+		{
+			foreach($this->site_options as $option=>$value)
+			{
+				$option = $this->fix_option_name($option);
+				delete_option($option, $value);
+			}
+		}
 	}
 	
 	// -------------------------------------------------------------------------------------------------
@@ -450,7 +486,9 @@ class ThreeWP_Activity_Monitor_3Base
 			$string = explode("\n", $string);
 			$string = implode('</p><p>', $string);
 		}
-		echo '<div class="'.$type.'"><p>'.$string.'</p></div>';
+		echo '<div class="'.$type.'">
+			<p style="margin-right: 1em; float: left; color: #888;" class="message_timestamp">'.$this->now().'</p>
+			<p>'.$string.'</p></div>';
 	}
 	
 	/**
@@ -549,6 +587,7 @@ class ThreeWP_Activity_Monitor_3Base
 		$options = array_merge(array(
 			'tabs' =>		array(),				// Array of tab names
 			'functions' =>	array(),				// Array of functions associated with each tab name.
+			'page_titles' =>	array(),				// Array of page titles associated with each tab.
 			'count' =>		array(),				// Optional array of a strings to display after each tab name. Think: page counts.
 			'display' => true,						// Display the tabs or return them.
 			'displayTabName' => true,				// If display==true, display the tab name.
@@ -607,7 +646,14 @@ class ThreeWP_Activity_Monitor_3Base
 			ob_start();
 			echo '<div class="wrap">';
 			if ($options['displayTabName'])
-				echo $options['displayBeforeTabName'] . $options['tabs'][$selectedIndex] . $options['displayAfterTabName'];
+			{
+				if ( isset( $options['page_titles'][$selectedIndex] ) )
+					$page_title = $options['page_titles'][$selectedIndex];
+				else
+					$page_title = $options['tabs'][$selectedIndex];
+				
+				echo $options['displayBeforeTabName'] . $page_title . $options['displayAfterTabName'];
+			}
 			echo $returnValue;
 			echo '<div style="clear: both"></div>';
 			if (isset($options['functions'][$selectedIndex]))
@@ -629,6 +675,54 @@ class ThreeWP_Activity_Monitor_3Base
 	{
 		return sanitize_title($name);
 	}
+	
+	protected function display_form_table($options)
+	{
+		$options = array_merge(array(
+			'header' => '',
+			'header_level' => 'h3',
+		), $options);
+		
+		$tr = array();
+		
+		if ( !isset($options['form']) )
+			$options['form'] = $this->form();
+			
+		foreach( $options['inputs'] as $input )
+			$tr[] = $this->display_form_table_row( $input, $options['form'] );
+		
+		$returnValue = '';
+		
+		if ( $options['header'] != '' )
+			$returnValue .= '<'.$options['header_level'].'>' . $options['header'] . '</'.$options['header_level'].'>';
+		
+		$returnValue .= '
+			<table class="form-table">
+				<tr>' . implode('</tr><tr>', $tr) . '</tr>
+			</table>
+		';
+		
+		return $returnValue;
+	}
+
+	protected function display_form_table_row($input, $form = null)
+	{
+		if ($form === null)
+			$form = $this->form();
+		return '
+			<tr>
+				<th>'.$form->make_label($input).'</th>
+				<td>
+					<div class="input_itself">
+						'.$form->make_input($input).'
+					</div>
+					<div class="input_description">
+						'.$form->make_description($input).'
+					</div>
+				</td>
+			</tr>';
+	}
+	
 	
 	/**
 	 * Make a value a key.
@@ -671,6 +765,14 @@ class ThreeWP_Activity_Monitor_3Base
 	}
 	
 	/**
+		Returns the current time(), corrected for UTC and DST.
+	**/
+	protected function time()
+	{
+		return current_time('timestamp');
+	}
+	
+	/**
 		Returns the number corrected into the min and max values.
 	*/
 	protected function minmax($number, $min, $max)
@@ -688,14 +790,16 @@ class ThreeWP_Activity_Monitor_3Base
 		return hash($type, $string);
 	}
 	
-	/**
-		See send_mail
-	**/
-	public function sendMail($mailData)
+	protected function strtolower( $string )
 	{
-		$this->send_mail($mailData);
+		return mb_strtolower( $string ); 
 	}
-
+	
+	protected function strtoupper( $string )
+	{
+		return mb_strtoupper( $string ); 
+	}
+	
 	/**
 	 * Sends mail via SMTP.
 	 * 

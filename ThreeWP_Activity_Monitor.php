@@ -3,7 +3,7 @@
 Plugin Name: ThreeWP Activity Monitor
 Plugin URI: http://mindreantre.se/threewp-activity-monitor/
 Description: Plugin to track user activity. Network aware.
-Version: 1.3
+Version: 1.4
 Author: Edward Hevlund
 Author URI: http://www.mindreantre.se
 Author Email: edward@mindreantre.se
@@ -582,7 +582,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 			'type' => 'submit',
 			'name' => '3am_submit',
 			'value' => $this->_('Apply'),
-			'cssClass' => 'button-primary',
+			'css_class' => 'button-primary',
 		);
 			
 		$returnValue = '
@@ -595,11 +595,11 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 			</p>
 			
 			<p>
-				'.$form->makeLabel($inputs['activities_limit']).' '.$form->makeInput($inputs['activities_limit']).'
+				'.$form->make_label($inputs['activities_limit']).' '.$form->make_input($inputs['activities_limit']).'
 			</p>
 			
 			<p>
-				'.$form->makeLabel($inputs['activities_limit_view']).' '.$form->makeInput($inputs['activities_limit_view']).'
+				'.$form->make_label($inputs['activities_limit_view']).' '.$form->make_input($inputs['activities_limit_view']).'
 			</p>
 			
 			<h3>Roles</h3>
@@ -609,23 +609,23 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 			</p>
 			
 			<p class="bigp">
-				'.$form->makeLabel($inputs['role_logins_view']).' '.$form->makeInput($inputs['role_logins_view']).'
+				'.$form->make_label($inputs['role_logins_view']).' '.$form->make_input($inputs['role_logins_view']).'
 			</p>
 
 			<p class="bigp">
-				'.$form->makeLabel($inputs['role_logins_view_other']).' '.$form->makeInput($inputs['role_logins_view_other']).'
+				'.$form->make_label($inputs['role_logins_view_other']).' '.$form->make_input($inputs['role_logins_view_other']).'
 			</p>
 
 			<p class="bigp">
-				'.$form->makeLabel($inputs['role_logins_delete']).' '.$form->makeInput($inputs['role_logins_delete']).'
+				'.$form->make_label($inputs['role_logins_delete']).' '.$form->make_input($inputs['role_logins_delete']).'
 			</p>
 
 			<p class="bigp">
-				'.$form->makeLabel($inputs['role_logins_delete_other']).' '.$form->makeInput($inputs['role_logins_delete_other']).'
+				'.$form->make_label($inputs['role_logins_delete_other']).' '.$form->make_input($inputs['role_logins_delete_other']).'
 			</p>
 
 			<p>
-				'.$form->makeInput($inputSubmit).'
+				'.$form->make_input($inputSubmit).'
 			</p>
 			
 			'.$form->stop().'
@@ -691,7 +691,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 					'empty' => true,
 				),
 			);
-			$returnValue .= '<p>'.$form->makeLabel($inputCrop).' '.$form->makeInput($inputCrop).'</p>';
+			$returnValue .= '<p>'.$form->make_label($inputCrop).' '.$form->make_input($inputCrop).'</p>';
 
 			// Make clear option
 			$inputClear = array(
@@ -700,7 +700,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 				'label' => $this->_('Clear the user\'s activity list'),
 				'checked' => false,
 			);
-			$returnValue .= '<p>'.$form->makeInput($inputClear).' '.$form->makeLabel($inputClear).'</p>';
+			$returnValue .= '<p>'.$form->make_input($inputClear).' '.$form->make_label($inputClear).'</p>';
 		}
 		echo $returnValue;
 	}
@@ -1256,7 +1256,8 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 	private function post_is_for_real($post)
 	{
 		// Posts must be published and the parent must be 0 (meaning no autosaves)
-		return $post->post_status == 'publish' && $post->post_parent == 0;
+		// Also: posts must actually be posts, not pages or menus or anything.
+		return $post->post_status == 'publish' && $post->post_parent == 0 && $post->post_type == 'post';
 	}
 	
 	private function make_profile_link($user_id, $text = "")

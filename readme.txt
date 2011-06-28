@@ -128,6 +128,9 @@ Converts the data column to a base64encoded serialized string.
 The old activity table is removed.
 
 == Changelog ==
+= 1.4 =
+* Only posts and pages are counted as activity. Not menus or attachments.
+* Updated the framework
 = 1.3 =
 * WP 3.1 support
 * User's activities shown in profile (fixed)

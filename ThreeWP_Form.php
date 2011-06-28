@@ -1,110 +1,154 @@
 <?php
 /**
- * Handles the making of labels, inputs and forms.
- * 
- * Call with an $options array for default values (nameprefix, for example).
- * Else leave blank to use just the options that are passed to makeLabel and makeInput.
- * 
-	$form->addSection(array(
-		'name' => 'TestSection',
-		'description' => 'Just a silly old test section.',
-	));
+	Form handling class
+	-------------------
 	
-	$form->addSectionText('TestSection', '
-		<div>
-			This is where you can write stuff. If you want. Anything you put in here will go directly into the form without question.
-		</div>
-	');
-	$form->addSectionInput('TestSection', array(
-		'type' => 'text',
-		'name'=>'textexample',
-		'label' => 'Example of a text box',
-		'value' => 'Example value',
-		'description' => 'Size and maxlength are what make a textbox what it is.',
-		'size'=>20,
-		'maxlength'=>50,
-		'validation' => array(			// Optional
-			'empty' => true,			// This input is allowed to be left empty (after trim())
-		),
-	));
-	$form->addSectionInput('TestSection', array(
-		'type' => 'password',
-		'name'=>'passwordexample',
-		'label' => 'Example of a password box',
-		'value' => 'Example value',
-		'description' => 'Size and maxlength are what make a password what it is (and the asterisks).',
-		'size'=>20,
-		'maxlength'=>50,
-		'validation' => array(			// Optional
-			'passwordstrength' => 'type',			// Only type recognized is ifacms1.
-		),
-	));
-	$form->addSectionInput('TestSection', array(
-		'type' => 'textarea',
-		'name'=>'textareaexample',
-		'label' => 'Example of a textarea',
-		'description' => 'Cols and rows are what make a textarea what it is. Text is put in the value.',
-		'cols'=>80,
-		'rows'=>10,
-		'value' => 'Text is right here! Don\'t forget to stripslashes!',
-	));
-	$form->addSectionInput('TestSection', array(
-		'type' => 'select',
-		'name'=>'selectexample',
-		'label' => 'How easy is it to make forms?',
-		'value' => 'easy',
-		'multiple' => true,													// Optional - enables a mutiple select.
-		'size'=>5,															// Optional - how many options to show
-		'options' => array(
-			array('value' => 'veryeasy',	 'text' => 'Very easy'),
-			array('value' => 'easy',		'text' => 'Easy'),
-			array('value' => 'hard',		'text' => 'Hard'),
-			array('value' => 'noopinion',	'text' => 'No opinion'),
-		),
-		'description' => 'Select lists are of type <em>select</em> and the <em>options</em> array contains the values.',
-	));
-	$form->addSectionInput('TestSection', array(
-		'type' => 'radio',
-		'name'=>'radiotest',
-		'label' => 'Are radio options harder to make?',
-		'value' => 'no',
-		'options' => array(
-			array('value' => 'yes',		'text' => 'Yes'),
-			array('value' => 'no',		'text' => 'No'),
-			array('value' => 'maybe',	'text' => 'Maybe'),
-		),
-		'description' => 'Radio lists / boxes are as easy to make as selects. Only the <em>type</em> changes.',
-	));
-	$form->addSectionInput('TestSection', array(
-		'type' => 'checkbox',
-		'name'=>'checkboxexample',
-		'label' => 'Almost done?',
-		'value' => 'on',				
-		'checked' => false,					// Checked or unchecked?
-		'description' => 'Are we almost done with the examples? Yes, almost...',
-	));
-	$form->addSectionInput('TestSection', array(
-		'type' => 'image',
-		'name'=>'imageexample',
-		'label' => 'The IMG alt tag',
-		'src' => 'images/submit.png',
-	));
-	$form->addSectionInput('TestSection', array(
-		'type' => 'file',
-		'name'=>'fileupload',
-		'value' => 'Choose file',
-		'title' => 'We can put a description in here if we want.',
-		'description' => 'Choose a file to upload by pressing this this-here button.',
-	));
-	$form->addSectionInput('TestSection', array(
-		'type' => 'submit',
-		'name'=>'submitbutton',
-		'value' => 'Quit FORMing',
-		'title' => 'We can put a description in here if we want.',
-		'description' => 'Enough of the forms already! We\' had enough examples, let\'s do some work.',
-	));
-	
-	echo $form->start() . $form->display() . $form->stop();
+<p>ThreeWP_Forms is a XHTML form class that handles: creation, display and validation of form elements and complete form layouts.</p>
+
+Using the class
+
+First, create the class:
+
+$form = new ThreeWP_Forms();
+
+During your display of the HTML:
+
+echo $form->start();
+
+Now you can build your forms using arrays as inputs.
+
+$input_text = array(
+  'name' => 'my_text_example',
+  'type' => 'text',
+  'size' => 60,  // recommended that you have any size specified
+  'css_class' => 'text_area_orange',  // optional
+  'css_style' => 'font-size: 500%;',  // optional
+  'value' => 'This is the default text displayed', // optional
+  'description' => 'This is a short, optional description. Note that you'll need to put divs around the description in order to do interesting stuff with it.',
+);
+
+echo $form->make_label( $input_text ); // The accessible label
+echo $form->make_input( $input_text ); // The input itself
+echo $form->make_description( $input_text ); // displays only the description, including validation info.
+
+
+And to finish up the form after displaying:
+
+echo $form->stop();
+
+
+
+		Input types
+
+Most of the input types have the css_class, css_style, escription, value fields in common.
+
+
+		checkbox
+
+$input_checkbox = array(
+  'name' => 'checkbox_example',
+  'type' => 'checkbox',
+  'label' => 'Label of checkbox',
+  'checked' => true,
+);
+
+value, description is optional.
+
+
+		file
+
+$input_file = array(
+  'name' => 'file_example',
+  'type' => 'file',
+  'value' => 'Text on button',
+);
+
+
+
+		image
+
+An image is used instead of a submit button.
+
+$input_image = array(
+  'name' => 'image_example',
+  'type' => 'image',
+  'label' => 'ALT value of image'
+  'src' => 'images/submit.png',
+);
+
+
+
+		password
+
+Similar to text, except that the value isn't displayed.
+
+$input_password = array(
+  'name' => 'password_example',
+  'type' => 'password',
+  'label' => 'Displayed label',
+);
+
+
+
+		radio
+
+$input_radio = array(
+  'name' => 'radio_example',
+  'type' => 'radio
+  'label' => 'Label of radio box',
+  'options' => array(
+    array('value' => 'option001', 'text' => 'First radio option'),
+    array('value' => 'option002', 'text' => 'Second radio option'),
+  ),
+);
+
+
+
+		select
+
+$input_select = array(
+  'name' => 'select_example',
+  'type' => 'select',
+  'label' => 'Label of checkbox',
+  'multiple' => false,  // Allow selection of multiple values
+  'size' => 5,  // How many option rows to display.
+  'options' => array(
+    array('value' => 'option001', 'text' => 'First select option'),
+    array('value' => 'option002', 'text' => 'Second select option'),
+  ),
+);
+
+
+
+		submit
+
+$input_submit = array(
+  'name' => 'submit_example',
+  'type' => 'submit',
+  'value' => 'Displayed on the button',
+);
+
+
+
+		text
+
+$input_text = array(
+  'name' => 'text_example',
+  'type' => 'text
+  'label' => 'Label of text box',
+);
+
+
+
+		textarea
+
+$input_textarea = array(
+  'name' => 'textarea_example',
+  'type' => 'textarea',
+  'label' => 'Label of text area',
+  'rows' => 80,
+  'cols' => 10,
+);
 	
 	Validation
 	----------
@@ -116,14 +160,14 @@
 	lengthmin		Length: minimum
 		
  */
-class edwardForm
+class ThreeWP_Form
 {
 	private $options;
 	
-	private $optionalOptions = array(
+	private $default_options = array(
 		'class' => '',
+		'global_nameprefix' => '',
 		'nameprefix' => '',
-		'nameprefixGlobal' => '',
 		'namesuffix' => '',
 		'title' => '',
 		'alt' => '',
@@ -133,9 +177,8 @@ class edwardForm
 		'maxlength' => 100,
 		'disabled' => false,
 		'readonly' => false,
-		'displayTwoRows' => false,
+		'display_two_rows' => false,
 		'style' => 'STYLE1',
-		'cssClass' => '',
 		'css_class' => '',
 		'css_style' => '',
 		'form_method' => 'post',
@@ -143,30 +186,20 @@ class edwardForm
 		'description' => '',
 	);
 	
-	private $namePrefixAll = '';
-	
-    protected $languageData = array();
+    protected $language_data = array();
 	
 	private $sections = array();
 	
 	function __construct($options = array())
 	{
-		$this->options = array_merge($this->optionalOptions, $options);
-		$this->languageData = edwardFormLanguage::$languageData;
-	}
-	
-	/**
-	 * Sets the default prefix for all inputs.
-	 */
-	public function setAllPrefixes($prefix)
-	{
-		$this->options['nameprefixGlobal'] = $prefix;
+		$this->options = array_merge($this->default_options, $options);
+		$this->language_data = ThreeWP_FormLanguage::$language_data;
 	}
 	
 	/**
 	 * Returns the _POST data of the calling class.
 	 */
-	public static function getPostData($callingClass, $POST = null)
+	public static function get_post_data($callingClass, $POST = null)
 	{
 		if ($POST === null)
 			$POST = $_POST;
@@ -175,25 +208,9 @@ class edwardForm
 	}
 	
 	/**
-	 * Converts a $_FILES-array into the array without the nameprefix.
-	 */
-	public static function fileExtractNameprefix($FILES, $namePrefix)
-	{
-		if ($FILES === null)
-			return null;
-		$returnValue = array();
-		foreach($FILES as $index=>$fileData)
-		{
-			foreach($fileData[$namePrefix] as $key=>$value)
-				$returnValue[$index][$key] = $value;
-		}
-		return $returnValue;
-	}
-	
-	/**
 	 * Cleans up the name of an input, remove illegal characters.
 	 */
-	public static function fixName($name)
+	public static function fix_name($name)
 	{
 		return preg_replace('/\[|\]| |\'|\\\|\?/', '_', $name);
 	}
@@ -201,13 +218,13 @@ class edwardForm
 	/**
 	 * Returns a text ID of this input. 
 	 */
-	public function makeID($options)
+	public function make_id($options)
 	{
 		$options = array_merge($this->options, $options);
-		$options['name'] = self::fixName($options['name']);
+		$options['name'] = self::fix_name($options['name']);
 
 		// Add the global prefix
-		$options['nameprefix'] = $this->options['nameprefixGlobal'] . $options['nameprefix'];  
+		$options['nameprefix'] = $this->options['global_nameprefix'] . $options['nameprefix'];  
 			
 		return $options['class'] . '_' . preg_replace('/\[|\]/', '_', $options['nameprefix']) .  '_' . $options['name'] .  $options['namesuffix'];
 	}
@@ -215,14 +232,14 @@ class edwardForm
 	/**
 	 * Returns the name of this input. 
 	 */
-	public static function makeName($options)
+	public static function make_name($options)
 	{
-		$options['name'] = self::fixName($options['name']);
+		$options['name'] = self::fix_name($options['name']);
 		if ($options['class']!='')
-			return $options['class'] . $options['nameprefixGlobal'] . $options['nameprefix'] . '[' . $options['name'] . ']';
+			return $options['class'] . $options['global_nameprefix'] . $options['nameprefix'] . '[' . $options['name'] . ']';
 		else
 		{
-			$returnValue = $options['nameprefixGlobal'];
+			$returnValue = $options['global_nameprefix'];
 
 			// Remove the first [ and first ]. Yeah, that's how lovely forms work: the first prefix doesn't have brackets. The rest do.
 			$returnValue .= ($returnValue == '' ?
@@ -253,7 +270,7 @@ class edwardForm
 	/**
 	 * Makes a small asterisk thingy that is supposed to symbolise that the field is required.
 	 */
-	private function makeRequiredField($options)
+	private function make_required_field($options)
 	{
 		$returnValue = '';
 		switch($options['type'])
@@ -282,7 +299,7 @@ class edwardForm
 	/**
 	 * Returns the label of this input.
 	 */
-	public function makeLabel($options)
+	public function make_label($options)
 	{
 		// Merge the given options with the options we were constructed with.
 		$options = array_merge($this->options, $options);
@@ -295,15 +312,15 @@ class edwardForm
 		if ($options['title'] != '')
 			$extra .= ' title="'.$options['title'].'"';
 			
-		$requiredField = $this->makeRequiredField($options);
+		$requiredField = $this->make_required_field($options);
 			
-		return '<label for="'.$this->makeID($options).'"'.$extra.'>'.$options['label'].$requiredField.'</label>';
+		return '<label for="'.$this->make_id($options).'"'.$extra.'>'.$options['label'].$requiredField.'</label>';
 	}
 	
 	/**
 	 * Returns the description of this input.
 	 */
-	public function makeDescription($options)
+	public function make_description($options)
 	{
 		// Merge the given options with the options we were constructed with.
 		$options = array_merge($this->options, $options);
@@ -319,12 +336,12 @@ class edwardForm
 				'.$options['description'].'
 			</div>';
 
-		$returnValue .= $this->makeValidation($options);			
+		$returnValue .= $this->make_validation($options);			
 			
 		return $returnValue;
 	}
 	
-	private function makeValidation($options)
+	private function make_validation($options)
 	{
 		$validation = array();
 		if (isset($options['validation']))
@@ -372,7 +389,7 @@ class edwardForm
 	/**
 	 * Makes an input string.
 	 */
-	public function makeInput($options)
+	public function make_input($options)
 	{
 		// Merge the given options with the options we were constructed with.
 		$options = array_merge($this->options, $options);
@@ -384,8 +401,6 @@ class edwardForm
 			$extraOptions .= ' readonly="readonly" ';
 			
 		$classes = $options['type'];
-		if ($options['cssClass'] != '')
-			$classes .= ' ' . $options['cssClass'];
 		if ($options['css_class'] != '')
 			$classes .= ' ' . $options['css_class'];
 		
@@ -399,7 +414,7 @@ class edwardForm
 			$extraOptions .= ' style="'.$options['css_style'].'"';
 			
 		// Add the global prefix
-		$options['nameprefix'] = $this->namePrefixAll . $options['nameprefix'];  
+		$options['nameprefix'] = $options['global_nameprefix'] . $options['nameprefix'];  
 			
 		switch ($options['type'])
 		{
@@ -426,7 +441,7 @@ class edwardForm
 					';
 				}
 				
-				$returnValue = '<select class="'.$classes.'" name="'.self::makeName($options).$nameSuffix.'" id="'.$this->makeID($options).'" size="'.$options['size'].'" '.$extraOptions.'>
+				$returnValue = '<select class="'.$classes.'" name="'.self::make_name($options).$nameSuffix.'" id="'.$this->make_id($options).'" size="'.$options['size'].'" '.$extraOptions.'>
 					'.$optionsText.'
 					</select>
 				';
@@ -443,14 +458,14 @@ class edwardForm
 					$option['label'] = $option['text'];
 					$returnValue .= '
 						<div>
-							<input class="'.$classes.'" type="'.$options['type'].'" name="'.self::makeName($options).'" value="'.$option['value'].'" id="'.$this->makeID($option).'" '.$checked.' '.$extraOptions.' />
-							'.$this->makeLabel($option).'
+							<input class="'.$classes.'" type="'.$options['type'].'" name="'.self::make_name($options).'" value="'.$option['value'].'" id="'.$this->make_id($option).'" '.$checked.' '.$extraOptions.' />
+							'.$this->make_label($option).'
 						</div>
 					';
 				}
 			break;
 			case 'hidden':
-				$returnValue = '<input class="'.$classes.'" type="'.$options['type'].'" name="'.self::makeName($options).'" value="'.$options['value'].'"'.$extraOptions.' />';
+				$returnValue = '<input class="'.$classes.'" type="'.$options['type'].'" name="'.self::make_name($options).'" value="'.$options['value'].'"'.$extraOptions.' />';
 			break;
 			case 'checkbox':
 				if (!isset($options['checked']))
@@ -460,13 +475,13 @@ class edwardForm
 						$options['value'] = 1;
 				}
 				$checked = ($options['checked'] == true ? ' checked="checked" ' : '');
-				$returnValue = '<input class="'.$classes.'" type="'.$options['type'].'" name="'.self::makeName($options).'" id="'.$this->makeID($options).'" value="'.$options['value'].'" '.$checked.' '.$extraOptions.' />';
+				$returnValue = '<input class="'.$classes.'" type="'.$options['type'].'" name="'.self::make_name($options).'" id="'.$this->make_id($options).'" value="'.$options['value'].'" '.$checked.' '.$extraOptions.' />';
 			break;
 			case 'submit':
-				$returnValue = '<input class="'.$classes.'" type="'.$options['type'].'" name="'.self::makeName($options).'" id="'.$this->makeID($options).'" value="'.$options['value'].'" '.$extraOptions.' />';
+				$returnValue = '<input class="'.$classes.'" type="'.$options['type'].'" name="'.self::make_name($options).'" id="'.$this->make_id($options).'" value="'.$options['value'].'" '.$extraOptions.' />';
 			break;
 			case 'file':
-				$returnValue = '<input class="'.$classes.'" type="'.$options['type'].'" name="'.self::makeName($options).'" id="'.$this->makeID($options).'" value="'.$options['value'].'" '.$extraOptions.' />';
+				$returnValue = '<input class="'.$classes.'" type="'.$options['type'].'" name="'.self::make_name($options).'" id="'.$this->make_id($options).'" value="'.$options['value'].'" '.$extraOptions.' />';
 			break;
 			case 'password':
 				if (isset($options['size']))
@@ -474,13 +489,13 @@ class edwardForm
 					$options['size'] = min($options['size'], $options['maxlength']); // Size can't be bigger than maxlength
 					$text['size'] = 'size="'.$options['size'].'"';
 				}
-				$returnValue = '<input class="'.$classes.'" type="'.$options['type'].'" '.$text['size'].' maxlength="'.$options['maxlength'].'" name="'.self::makeName($options).'"  value="'.htmlspecialchars($options['value']).'" id="'.$this->makeID($options).'"'.$extraOptions.' />';
+				$returnValue = '<input class="'.$classes.'" type="'.$options['type'].'" '.$text['size'].' maxlength="'.$options['maxlength'].'" name="'.self::make_name($options).'"  value="'.htmlspecialchars($options['value']).'" id="'.$this->make_id($options).'"'.$extraOptions.' />';
 			break;
 			case 'textarea':
-				$returnValue = '<textarea class="'.$classes.'" cols="'.$options['cols'].'" rows="'.$options['rows'].'" name="'.self::makeName($options).'" id="'.$this->makeID($options).'"'.$extraOptions.'>'.$options['value'].'</textarea>';
+				$returnValue = '<textarea class="'.$classes.'" cols="'.$options['cols'].'" rows="'.$options['rows'].'" name="'.self::make_name($options).'" id="'.$this->make_id($options).'"'.$extraOptions.'>'.$options['value'].'</textarea>';
 			break;
 			case 'image':
-				$returnValue = '<input class="'.$classes.'" type="'.$options['type'].'" name="'.self::makeName($options).'[]" id="'.$this->makeID($options).'" value="'.$options['value'].'" title="'.$options['title'].'" src="'.$options['src'].'" '.$extraOptions.' />';
+				$returnValue = '<input class="'.$classes.'" type="'.$options['type'].'" name="'.self::make_name($options).'[]" id="'.$this->make_id($options).'" value="'.$options['value'].'" title="'.$options['title'].'" src="'.$options['src'].'" '.$extraOptions.' />';
 			break;
 			default:	// Default = 'text'
 				if (isset($options['size']))
@@ -489,7 +504,7 @@ class edwardForm
 					$text['size'] = 'size="'.$options['size'].'"';
 				}
 				
-				$returnValue = '<input class="text '.$classes.'" type="text" '.$text['size'].' maxlength="'.$options['maxlength'].'" name="'.self::makeName($options).'" id="'.$this->makeID($options).'" value="'.htmlspecialchars($options['value']).'"'.$extraOptions.' />';
+				$returnValue = '<input class="text '.$classes.'" type="text" '.$text['size'].' maxlength="'.$options['maxlength'].'" name="'.self::make_name($options).'" id="'.$this->make_id($options).'" value="'.htmlspecialchars($options['value']).'"'.$extraOptions.' />';
 		}
 		return $returnValue;
 	}
@@ -503,13 +518,13 @@ class edwardForm
 	 * 	'inputs' => RESERVED
 	 * )
 	 */		
-	public function addSection($section)
+	public function add_section($section)
 	{
 		$section['inputs'] = array();
 		$this->sections[ $section['name'] ] = $section;
 	}
 	
-	private function implodeArray($data, &$strings, $glueBefore, $glueAfter, $stringPrefix = null, $currentString = null)
+	private function implode_array($data, &$strings, $glueBefore, $glueAfter, $stringPrefix = null, $currentString = null)
 	{
 		foreach($data as $key=>$value)
 		{
@@ -519,7 +534,7 @@ class edwardForm
 				$strings[$stringToAdd] = $value;
 			}
 			else
-				$this->implodeArray($value, $strings, $glueBefore, $glueAfter,  $stringPrefix, $currentString . $glueBefore.$key.$glueAfter);
+				$this->implode_array($value, $strings, $glueBefore, $glueAfter,  $stringPrefix, $currentString . $glueBefore.$key.$glueAfter);
 		}
 	}
 	
@@ -528,7 +543,7 @@ class edwardForm
 		if ($input['type']=='submit')		// Submits don't get their values posted, so return the value.
 			return $input['value'];
 			
-		$input['name'] = self::fixName($input['name']);
+		$input['name'] = self::fix_name($input['name']);
 			
 		// Merge the default options.
 		// In case this class was created with a nameprefix and the individual inputs weren't, for example.
@@ -547,7 +562,7 @@ class edwardForm
 		if ($input['nameprefix'] != '')
 		{
 			$strings = '';
-			$this->implodeArray($postData, $strings, '__', '', $this->options['class'] . '');
+			$this->implode_array($postData, $strings, '__', '', $this->options['class'] . '');
 		}
 		else
 		{
@@ -562,7 +577,7 @@ class edwardForm
 				}
 		}
 		
-		$inputID = $this->makeID($input);
+		$inputID = $this->make_id($input);
 		if (isset($strings[$inputID]))
 		{
 			switch($input['type'])
@@ -577,7 +592,7 @@ class edwardForm
 	 * Adds an input to a section.
 	 * Kinda like makeInput, but with a section name.
 	 */
-	public function addSectionInput($section, $input, $settings, $postData = null)
+	public function add_section_input($section, $input, $settings, $postData = null)
 	{
 		if (!is_string($input))
 		{
@@ -597,7 +612,7 @@ class edwardForm
 		$this->sections[ $section['name'] ]['inputs'][] = $input;
 	}
 	
-	public function addSectionText($sectionName, $text)
+	public function add_text_section($sectionName, $text)
 	{
 		$this->sections[ $sectionName ]['inputs'][] = array(
 			'type' => 'rawtext',
@@ -634,7 +649,7 @@ class edwardForm
 		layoutarray and make the tab name the key.
 		
 	*/
-	public function addLayout($layouts, $inputData, $settings, $postData = null)
+	public function add_layout($layouts, $inputData, $settings, $postData = null)
 	{
 		$layoutDefaults = array(
 			'autoinputs' => array(),
@@ -643,7 +658,7 @@ class edwardForm
 
 		foreach($layouts as $sectionNumber => $layout)
 		{
-			$this->addSection($layout);
+			$this->add_section($layout);
 			$layout = array_merge($layoutDefaults, $layout);
 			
 			foreach($layout['autoinputs'] as $inputName)
@@ -652,10 +667,10 @@ class edwardForm
 				
 				$input['name'] = $inputName;
 
-				$this->addSectionInput($layout, $input, $settings, $postData);
+				$this->add_section_input($layout, $input, $settings, $postData);
 			}
 			foreach($layout['inputs'] as $manualInput)
-				$this->addSectionInput($layout, $manualInput, $settings, $postData);
+				$this->add_section_input($layout, $manualInput, $settings, $postData);
 		}
 	}
 	
@@ -699,7 +714,7 @@ class edwardForm
 		{
 			$sectionData = array_merge(array(
 				'description' => null,
-				'cssClass' => null,
+				'css_class' => null,
 			), $sectionData);
 			$sectionDescription = ($sectionData['description']!=null ? $style['sectionDescriptionStart'] . $sectionData['description'] . $style['sectionDescriptionStop'] . "\n" : '');
 			$returnValue .= $style['sectionStart'] . "\n" .
@@ -714,51 +729,51 @@ class edwardForm
 			{
 				if ($input['type'] == 'hidden')
 				{
-					$returnValue .= $this->makeInput($input);
+					$returnValue .= $this->make_input($input);
 					continue;
 				}	
 
 				// Force validation stuff to make a description if there isn't one already.
-				$validation = $this->makeValidation($input);
+				$validation = $this->make_validation($input);
 				if ($validation != '' && !isset($input['description']))
 					$input['description'] = '';
 					
 				$description = (isset($input['description']) ?
 					$style['descriptionContainerStart'] . "\n".
 						$style['descriptionStart'] . "\n".
-							$this->makeDescription($input) . "\n".
+							$this->make_description($input) . "\n".
 						$style['descriptionStop'] . "\n".
 					$style['descriptionContainerStop'] . "\n"
 				: '');
 				
 				if ($input['type'] == 'rawtext')
 				{
-					if (isset($input['cssClass']))
-						$inputData = '<div class="'.$input['cssClass'].'">'.$input['value'].'</div>';
+					if (isset($input['css_class']))
+						$inputData = '<div class="'.$input['css_class'].'">'.$input['value'].'</div>';
 					else
 						$inputData = $input['value'];
 				}
 				else
 				{
-					if (!isset($input['displayTwoRows']))
-						$input['displayTwoRows'] = false;		// Standard is one row
+					if (!isset($input['display_two_rows']))
+						$input['display_two_rows'] = false;		// Standard is one row
 					
 					
 					if ($input['type'] == 'submit')
-						$input['displayTwoRows'] = true;
+						$input['display_two_rows'] = true;
 						
-					if ($input['displayTwoRows'] == true)
+					if ($input['display_two_rows'] == true)
 					{
 						$inputData =
 							$style['labelContainerSingleStart'] . "\n".
 								$style['labelStart'] . "\n".
-									'					' . $this->makeLabel($input) . "\n".
+									'					' . $this->make_label($input) . "\n".
 								$style['labelStop'] . "\n".
 							$style['labelContainerSingleStop'] . "\n".
 							
 							$style['inputContainerSingleStart'] . "\n".
 								$style['inputStart'] . "\n".
-									'					' . $this->makeInput($input) . "\n".
+									'					' . $this->make_input($input) . "\n".
 								$style['inputStop'] . "\n".
 							$style['inputContainerSingleStop'] . "\n".
 							
@@ -770,13 +785,13 @@ class edwardForm
 							'<div class="container_for_'.$input['type'].'">' .
 							$style['labelContainerStart'] . "\n".
 								$style['labelStart'] . "\n".
-									'					' . $this->makeLabel($input) . "\n".
+									'					' . $this->make_label($input) . "\n".
 								$style['labelStop'] . "\n".
 							$style['labelContainerStop'] . "\n".
 								
 							$style['inputContainerStart'] . "\n".
 								$style['inputStart'] . "\n".
-									'					' . $this->makeInput($input) . "\n".
+									'					' . $this->make_input($input) . "\n".
 								$style['inputStop'] . "\n".
 							$style['inputContainerStop'] . "\n".
 							"</div>" .
@@ -808,7 +823,7 @@ class edwardForm
 	 * @param	inputsToChange An array of names of which inputs to change.
 	 * @param	tableName The table's name
 	 */
-	public static function generateChangedSQL($inputs, $inputsToChange, $tableName, $uniqueKey, $oldValues, $newValues)
+	public static function generate_changed_sql($inputs, $inputsToChange, $tableName, $uniqueKey, $oldValues, $newValues)
 	{
 		if ($oldValues === null)
 		{
@@ -908,7 +923,7 @@ class edwardForm
 	Returns true if the email address has the email 
 	address format and the domain exists.
 	*/
-	public static function validEmail($email)
+	public static function valid_email($email)
 	{
 	   $isValid = true;
 	   $atIndex = strrpos($email, "@");
@@ -978,16 +993,16 @@ class edwardForm
 	 * 
 	 * Returns an array of $key / 'error message' if validation fails, else returns true.
 	 */		
-	public function validatePost($inputs, $inputsToCheck, $values)
+	public function validate_post($inputs, $inputs_to_check, $values)
 	{
 		$returnValue = array();
 		
-		foreach($inputsToCheck as $key)
+		foreach($inputs_to_check as $key)
 		{
 			$input = $inputs[$key];
 			
 			// Because form fixes the name to remove illegal characters, we need to do the same to the key here so that we find the correct values in the POST.
-			$key = self::fixName($key);
+			$key = self::fix_name($key);
 			
 			$input['type'] = (isset($input['type']) ? $input['type'] : 'text');		// Assume type text.
 		
@@ -997,7 +1012,7 @@ class edwardForm
 					if (isset( $input['validation']['email']) )
 					{
 						$email = trim($values[$key]);
-						if (!self::validEmail($email))
+						if (!self::valid_email($email))
 							$returnValue[$key] = $this->l('Invalid email address') . ': ' . $email;
 					}
 					if (isset( $input['validation']['datetime']) )
@@ -1066,11 +1081,11 @@ class edwardForm
 	{
 		$language = $this->options['language'];
 		
-		if (!isset($this->languageData[$string]))
+		if (!isset($this->language_data[$string]))
 			$returnValue = $string;
 		else
-			if (isset($this->languageData[$string][$language]))
-				$returnValue = $this->languageData[$string][$language];
+			if (isset($this->language_data[$string][$language]))
+				$returnValue = $this->language_data[$string][$language];
 			else
 				$returnValue = $string;
 				
@@ -1084,9 +1099,9 @@ class edwardForm
 	}
 }
 
-class edwardFormLanguage
+class ThreeWP_FormLanguage
 {
-    public static $languageData = array(
+    public static $language_data = array(
 		'Could not parse date' => array(
 			'sv' => 'Kunde inte tolka datumet',
 		),
