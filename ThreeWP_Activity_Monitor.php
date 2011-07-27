@@ -88,8 +88,9 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		
 		$this->register_options();
 		
-		// v0.3 has an activity_monitor table. Not necessary anymore.		
-		$this->query("DROP TABLE `".$this->wpdb->base_prefix."activity_monitor`");
+		// v0.3 has an activity_monitor table. Not necessary anymore.
+		if ($this->sql_table_exists( $this->wpdb->base_prefix."activity_monitor" ) )		
+			$this->query("DROP TABLE `".$this->wpdb->base_prefix."activity_monitor`");
 
 		wp_schedule_event(time() + 600, 'daily', 'threewp_activity_monitor_cron');
 		

@@ -16,7 +16,7 @@ class ThreeWP_Activity_Monitor_3Base
 		
 		@var	bool
 	**/
-	protected $isNetwork;
+	protected $is_network;
 	
 	/**
 		Contains the paths to the plugin and other places of interest.
@@ -46,6 +46,13 @@ class ThreeWP_Activity_Monitor_3Base
 		@var	array
 	**/ 
 	protected $local_options = array();
+
+	/**
+		Array of options => default_values that this plugin stores locally or globally.
+		@var	array
+		@deprecated
+	**/ 
+	protected $options = array();
 
 	/**
 		Text domain of .PO translation.
@@ -104,7 +111,6 @@ class ThreeWP_Activity_Monitor_3Base
 		global $wpdb;
 		$this->wpdb = $wpdb;
 		$this->is_network = MULTISITE;
-		$this->isNetwork = $this->is_network;
 		
 		$this->paths = array(
 			'name' => get_class($this),
@@ -419,7 +425,7 @@ class ThreeWP_Activity_Monitor_3Base
 	protected function get_option($option)
 	{
 		$option = $this->fix_option_name($option);
-		if ($this->isNetwork)
+		if ($this->is_network)
 			return get_site_option($option);
 		else
 			return get_option($option);
@@ -436,7 +442,7 @@ class ThreeWP_Activity_Monitor_3Base
 	protected function update_option($option, $value)
 	{
 		$option = $this->fix_option_name($option);
-		if ($this->isNetwork)
+		if ($this->is_network)
 			update_site_option($option, $value);
 		else
 			update_option($option, $value);
@@ -452,7 +458,7 @@ class ThreeWP_Activity_Monitor_3Base
 	protected function delete_option($option)
 	{
 		$option = $this->fix_option_name($option);
-		if ($this->isNetwork)
+		if ($this->is_network)
 			delete_site_option($option);
 		else
 			delete_option($option);
@@ -546,7 +552,7 @@ class ThreeWP_Activity_Monitor_3Base
 				update_option($option, $value);
 		}
 
-		if ($this->isNetwork)
+		if ($this->is_network)
 		{
 			foreach($this->site_options as $option=>$value)
 			{
@@ -582,7 +588,7 @@ class ThreeWP_Activity_Monitor_3Base
 			delete_option($option);
 		}
 
-		if ($this->isNetwork)
+		if ($this->is_network)
 			foreach($this->site_options as $option=>$value)
 			{
 				$option = $this->fix_option_name($option);
