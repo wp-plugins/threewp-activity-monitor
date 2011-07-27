@@ -1,7 +1,7 @@
 === ThreeWP Activity Monitor ===
 Tags: wp, wpms, network, threewp, activity, monitor, activity monitor, blog activity, user, comments, logins,
-Requires at least: 3.1
-Tested up to: 3.1.1
+Requires at least: 3.2
+Tested up to: 3.2
 Stable tag: trunk
 Contributors: edward mindreantre
 Track and display site or network-wide user activity.
@@ -34,31 +34,41 @@ Since v1.2 other plugins can add new activities.
 
 == Custom activities ==
 
+Your plugin can both log activities it creates and [optionally] display them.
+
+1. First, use the filter threewp_activity_monitor_list_activities.
+2. Then log the activity using the threewp_activity_monitor_new_activity action.
+3. Then, optionally, you can handle the displaying of the activity yourself: filter threewp_activity_monitor_display_activity
+
 = action: threewp_activity_monitor_new_activity =
 
-If you're the author of a plugin and want a custom action added to the list, use the following code.
-
 `do_action('threewp_activity_monitor_new_activity', array(
-	'activity_type' => '25char_description',
-	'tr_class' => 'first_action_class second_action_class',
-	'activity' => array(
+	'activity_id' => '25char_description',
+	'activity_strings' => array(
 		"" => "%user_display_name_with_link% removed a category on %blog_name_with_panel_link%",
 		"Action key 1" => "The key is displayed as small, grey text in front of the other text. Something interesting happened and user # %user_id% caused it!",
 		"  " => "%user_login% didnt want any header here so %user_login_with_link% left it blank with two spaces",
 		"Another key!" => "This time I wanted a key on %blog_name% (%blog_id%).",
 	),
+	['user_data'] => $user_object,
+	['post_data'] => $post_object,
+	['comment_data'] => $comment_object,
+	['other_data'] => $any,
 ));`
 
-*activity_type* is an optional string to use as an index. See the _index table for the existing index_action strings which you should avoid (comment_approve, login_success, etc). 25 chars max.
-*tr_class* is an optional value that signifies which extra css classes to give the action's row.
-*activity* is the activity itself, that is an array of header => text.
+*activity_id* is the string to use as an index. See the _index table for the existing activity_id strings which you should avoid (comment_approve, login_success, etc). 25 chars max.
+*activity_strings* is a description of the activity. It is an array of key/header => value/text.
 
 The *key* is the small, gray text. It can be left empty. If you want several empty keys, use a different amount of spaces for each one. The spaces are trimmed off.
 The *value* is the black text to be displayed to the right of the key or by itself on a line.
 
 Both the *key* and *value* can be normal HTML and are both capable of *keywords*.
 
-The following keywords are automatically replaced by Activity Monitor.
+*user_data* is an optional user object, if you want the user-related keywords to work with other user data other than the logged-in user's.
+*post_data* is an optional post object that enables the post-related keywords.
+*comment_data* is an optional comment object that enables the comment-related keywords.
+
+The following keywords are automatically replaced by Activity Monitor. Note that post and comment keywords only work when post_data or comment_data are specified.
 
 * %user_id% ID of user.
 * %user_login% User's login name.
@@ -73,39 +83,132 @@ The following keywords are automatically replaced by Activity Monitor.
 * %blog_panel_link% Link to blog's admin panel.
 * %blog_name_with_link% Blog's name with link to front page.
 * %blog_name_with_panel_link% Blog's name with link to admin panel.
+* %server_http_user_agent% User's web browser
+* %server_http_remote_host% User's hostname
+* %server_http_remote_addr% User's IP address
+* %post_title% The post's title
+* %post_link% The post's title
+* %post_title_with_link% The post's title
+* %comment_id% The comment's ID
+* %comment_link% The link to the comment
+* %comment_id_with_link% The comment's linked ID.
+
+Any other data stored in the array is saved automatically. This array can later be retrieved and used for custom display using the filter: threewp_activity_monitor_display_activity
+
+The activity is stored only if you've used threewp_activity_monitor_list_activities to allow the admin to log the activity at all.
 
 = filter: threewp_activity_monitor_list_activities =
 
-List all of the activities that your plugin creates.
-
 `
-add_filter( 'threewp_activity_monitor_list_activities', array(&$this, 'list_activities') 10, 1);
+add_filter( 'threewp_activity_monitor_list_activities', array(&$this, 'list_activities'), 10, 2 );
 
 public function list_activities($activities)
 {
-	$activities = array_merge(array(
-		'post_publish' => array(						// The activity name as per the database
-			'name' => 'Post published',					// Human readable activity name
+	// Create an array which we fill with out own activities.
+	$this->activities = array(
+		// The bare minimum needed: the key and an array with the name of the activity.
+		'wp_login' => array(
+			'name' => _('User login'),
 		),
-		'comment_approve' => array(
-			'name' => 'Comment approved',
-			'description => 'A comment has been approved by an administrator and is now visible to blog visitors.',		// Optional description.
-			'sensitive_information' => false,			// Optional value to tell the other plugins that this activity contains information that shouldn't be shown to just anyone. Default is false. 
+		// And now one with all options set.
+		'wp_login_failed' => array(
+			'name' => _('User login failed'),
+			'description' => _('Logs the password the user tried to login with.'),
+			'sensitive' => true,
+			'can_be_converted_to_post' => true,		// In this example, it can.
 		),
-	), $activities);
+	);
+	
+	// Insert our module name in all the array values.
+	// You can do this once, here, or several times manually in the above array.
+	// After inserting the plugin name, insert the activity into the main $activities array.
+	foreach( $this->activities as $index => $activity )
+	{
+		$activity['plugin'] = 'ThreeWP Activity Monitor';
+		$activities[ $index ] = $activity;
+	}
+	
+	// Return the complete array.
 	return $activities;
+}`
+
+= filter: threewp_activity_monitor_display_custom_activity =
+
+`
+add_filter( 'threewp_activity_monitor_display_custom_activity', array(&$this, 'display_custom_activity') 10, 1);
+
+/**
+	Inserts display info into the activity.
+	
+	The following options are available for display:
+	
+	Optional: a raw string.
+	$activity['display_string'] => 'Is a completely unfiltered string.';
+
+	Optional: strings with headings.
+	$activity['display_strings'] = array(
+		'' => 'No heading, text string.',
+		' ' => 'Another non-heading, displaying just this string.',
+		'User ID' => 'The heading user id, and then this string',
+		'   ' => 'More (trimmed) spaces means another non-heading',
+	);
+	
+	If you want special classes appended to the activity's <tr>, append values to the display_tr_classes array.
+	$activity['display_tr_classes'] = array('class1', 'class2');
+	
+	@param		array		$activity		Activity to be filled in.
+	@return		array						Activity with a combination of display_string, display_strings and display_tr_classes keys set.
+**/
+public function display_activity( $activity )
+{
+	switch( $activity['activity_id'] )
+	{
+		case 'custom_act_22':
+			$activity['display_string'] = 'This string is outputted without much ado. No filtering or anything.';
+			break;
+		case 'user_exploded':
+			$activity['display_strings'] = array_merge( array(
+				'' => 'This is the first line, without a heading',
+				'Good heading' => 'Is a the second line, with a very good heading',
+			), $activity['data']['activity_strings'] );
+			$activity['display_string'] = 'This string is outputted without much ado. No filtering or anything.';
+			
+			$activity['display_strings']['Cows'] = 'The user has ' . $activity['data']['cow_count'] . ' cows available for purchase.';
+			break;
+			
+	}
+	return $activity;
 }
 `
-Since the Activity Monitor itself adds default values then only the array key and name values are necessary.
 
-If you decide that more keys are necessary, <a href="edward@mindreantre.se">send me a patch</a>.
+= filter: threewp_activity_monitor_find_activities =
+
+Get a list of semi-specific activities from the database.
+
+Selection of exactly which activities you want is done using the where option in the array.
+
+See the following example from ThreeWP Activity Monitor RSS Creator.
+
+`
+$activities = apply_filters( 'threewp_activity_monitor_find_activities', array (
+	'where' => array(
+		"activity_id" => "activity_id IN ('". implode("','", $feed['activities']) . "')",
+		"blog_id" => "blog_id IN ('". implode("','", $feed['blogs']) . "')",
+	),
+	'limit' => $feed['limit'],
+));
+
+`
+
+This uses the filter to requests $feed[limit] amount of activities, that have the $feed[activities] activity_ids and from the $feed[blogs] blogs.
+
+This returns an array of activities, which the plugin later uses and calls another filter: convert_activity_to_post, in order to display the activities as an RSS feed.
 
 = filter: threewp_activity_monitor_convert_activity_to_post =
 
 If your plugin creates activities that can be displayed to the user in the form of posts (eg: new posts, updated posts, new comments) then add a filter.
 
 Return a complete post. The guid should be used as a link to the post or comment in question.
-
 
 == Installation ==
 
@@ -122,12 +225,23 @@ Return a complete post. The guid should be used as a link to the post or comment
 
 == Upgrade Notice ==
 
+= 2.0 =
+* Data storage is in new format. Old data is discarded, unfortunately.
+* New filters: threewp_activity_monitor_find_activities, threewp_activity_monitor_delete_activity, threewp_activity_monitor_list_activities
+* Selection of activities to log
+* Pagination and selection of activities to delete
 = 1.2 =
 Converts the data column to a base64encoded serialized string.
 = 1.0 =
 The old activity table is removed.
 
 == Changelog ==
+= 2.0 =
+* _login and _posts tables aren't used anymore.
+* Most activity collected until now is obsolete. The activity log will have to be cleared.
+* User's activity is now clearable again.
+* Stored actions are self-contained and static, no longer dynamic (that's a pretty big change right there).
+* Fixed column overwriting (thanks groucho75).
 = 1.4 =
 * Only posts and pages are counted as activity. Not menus or attachments.
 * Updated the framework

@@ -40,7 +40,7 @@ echo $form->stop();
 
 		Input types
 
-Most of the input types have the css_class, css_style, escription, value fields in common.
+Most of the input types have the css_class, css_style, description, value fields in common.
 
 
 		checkbox
@@ -109,12 +109,12 @@ $input_radio = array(
 $input_select = array(
   'name' => 'select_example',
   'type' => 'select',
-  'label' => 'Label of checkbox',
+  'label' => 'Label of select',
   'multiple' => false,  // Allow selection of multiple values
   'size' => 5,  // How many option rows to display.
   'options' => array(
-    array('value' => 'option001', 'text' => 'First select option'),
-    array('value' => 'option002', 'text' => 'Second select option'),
+    'option001' => 'First select option',
+    'option002' => 'Second select option',
   ),
 );
 
@@ -152,12 +152,26 @@ $input_textarea = array(
 	
 	Validation
 	----------
+
+To add validation to your input, add a key called validation and make it an array with any of the following keys:
+
 	empty			Field is allowed to be empty
-	valuemin		Value: minimum
-	valuemax		Value: maximum
+	valuemin		Integer value: minimum
+	valuemax		Integer value: maximum
 	datetime		Date must be in this format. (Use format keywords from date(). "Y-m-d").
 	datemaximum		Latest date/time allowed. Any date() format.
 	lengthmin		Length: minimum
+	
+Validation example:
+
+$input_text = array(
+  'name' => 'text_example',
+  'type' => 'text
+  'label' => 'Label of text box',
+  'validation' => array(
+  	'empty' => true,
+  ),
+);
 		
  */
 class ThreeWP_Form
@@ -174,7 +188,7 @@ class ThreeWP_Form
 		'value' => '',
 		'multiple' => false,
 		'size' => 1,
-		'maxlength' => 100,
+		'maxlength' => 255,
 		'disabled' => false,
 		'readonly' => false,
 		'display_two_rows' => false,
@@ -433,11 +447,19 @@ class ThreeWP_Form
 					
 				// Make the options
 				$optionsText = '';
-				foreach($options['options'] as $option)
+				foreach($options['options'] as $option_value => $option_text )
 				{
-					$selected = in_array($option['value'], $options['value'], true) ? 'selected="selected"' : '';
+					// 2011-07-25 - options array is now an array of value => text, so this is for backwards compatability.
+					if ( is_array( $option_text ) )
+					{
+						$option_value = $option_text['value'];
+						$option_text = $option_text['text'];
+					}
+
+					$selected = in_array($option_value, $options['value'], true) ? 'selected="selected"' : '';
+					
 					$optionsText .= '
-						<option value="'.$option['value'].'" '.$selected.'>'.$option['text'].'</option>
+						<option value="'.$option_value.'" '.$selected.'>'.$option_text.'</option>
 					';
 				}
 				
@@ -538,7 +560,7 @@ class ThreeWP_Form
 		}
 	}
 	
-	public function usePostValue(&$input, $settings, $postData, $key)
+	public function use_post_value(&$input, $post_data, $key)
 	{
 		if ($input['type']=='submit')		// Submits don't get their values posted, so return the value.
 			return $input['value'];
@@ -549,30 +571,24 @@ class ThreeWP_Form
 		// In case this class was created with a nameprefix and the individual inputs weren't, for example.
 		$input = array_merge($this->options, $input);
 			
-		if ($postData === null)
-		{
-			if ($settings !== null)
-				if (in_array($input['type'], array('text', 'textarea', 'checkbox', 'select')))
-					if (@$input['value'] == '')
-						$input['value'] = stripslashes( $settings->get($key) );
+		if ($post_data === null)
 			return;
-		}
 		
 		// Nameprefix? Find the right array section in the post.			
 		if ($input['nameprefix'] != '')
 		{
 			$strings = '';
-			$this->implode_array($postData, $strings, '__', '', $this->options['class'] . '');
+			$this->implode_array($post_data, $strings, '__', '', $this->options['class'] . '');
 		}
 		else
 		{
-			if (isset($postData[$input['name']]))
-				if (!is_array($postData[$input['name']]))
-					$input['value'] = @stripslashes($postData[$input['name']]);		// @ is for unchecked checkboxes. *sigh*
+			if (isset($post_data[$input['name']]))
+				if (!is_array($post_data[$input['name']]))
+					$input['value'] = @stripslashes($post_data[$input['name']]);		// @ is for unchecked checkboxes. *sigh*
 				else
 				{
 					$input['value'] = array();	// Kill the value, otherwise postvalues are just appended and therefore do nothing.
-					foreach($postData[$input['name']] as $index=>$value)
+					foreach($post_data[$input['name']] as $index=>$value)
 						$input['value'][$index] = stripslashes($value);
 				}
 		}
@@ -592,14 +608,14 @@ class ThreeWP_Form
 	 * Adds an input to a section.
 	 * Kinda like makeInput, but with a section name.
 	 */
-	public function add_section_input($section, $input, $settings, $postData = null)
+	public function add_section_input($section, $input, $settings, $post_data = null)
 	{
 		if (!is_string($input))
 		{
 			$input = array_merge($this->options, $input);
 			if ($input['type'] == 'rawtext')
 				$input['name'] = rand(0, time());
-			$this->usePostValue($input, $settings, $postData, $input['name']);
+			$this->use_post_value($input, $post_data, $input['name']);
 		}
 		else
 			$input = array(
@@ -819,9 +835,9 @@ class ThreeWP_Form
 	 * 
 	 * On an update, it only changes the values that have changed (compares newvalues to oldvalues).
 	 * 
-	 * @param	inputs An array of inputs in standard input format (see top).
-	 * @param	inputsToChange An array of names of which inputs to change.
-	 * @param	tableName The table's name
+	 * @param	array		inputs				An array of inputs in standard input format (see top).
+	 * @param	array		inputsToChange		An array of names of which inputs to change.
+	 * @param	string		tableName			The table's name
 	 */
 	public static function generate_changed_sql($inputs, $inputsToChange, $tableName, $uniqueKey, $oldValues, $newValues)
 	{
@@ -918,10 +934,10 @@ class ThreeWP_Form
 	}
 
 	/**
-	Validate an email address.
-	Provide email address (raw input)
-	Returns true if the email address has the email 
-	address format and the domain exists.
+		Validate an email address.
+		
+		@param		string		$email		Email address to validate
+		@return		bool					True, if the address is valid.
 	*/
 	public static function valid_email($email)
 	{

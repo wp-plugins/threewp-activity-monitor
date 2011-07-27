@@ -20,7 +20,7 @@ table.threewp_activity_monitor li
 	margin: 0;
 }
 
-tr.action_login_failure
+tr.action_wp_login_failed
 {
 	background-color: #ffecec;
 }
@@ -52,9 +52,21 @@ tr.action_post_publish		td.activity_monitor_action		{	background-image: url("../
 
 tr.action_comment_approve	td.activity_monitor_action		{	background-image: url("../images/icons/comment_approve.png");		}
 
-tr.action_trash_post		td.activity_monitor_action		{	background-image: url("../images/icons/trash.png");		}
+tr.action_trashed_post		td.activity_monitor_action		{	background-image: url("../images/icons/trash.png");		}
 
 tr.action_password_reset	td.activity_monitor_action		{	background-image: url("../images/icons/password_reset.png");		}
 
-tr.action_login_success		td.activity_monitor_action		{	background-image: url("../images/icons/login_success.png");		}
-tr.action_login_failure		td.activity_monitor_action		{	background-image: url("../images/icons/login_failure.png");		}
+tr.action_wp_login			td.activity_monitor_action		{	background-image: url("../images/icons/login_success.png");		}
+tr.action_wp_login_failed	td.activity_monitor_action		{	background-image: url("../images/icons/login_failure.png");		}
+
+.dashboard_page_ThreeWP_Activity_Monitor span.sensitive
+{
+	background-color: #d3d96f;
+	padding: 2px;
+}
+
+.dashboard_page_ThreeWP_Activity_Monitor span.converted_to_post
+{
+	background-color: #6fd997;
+	padding: 2px;
+}
