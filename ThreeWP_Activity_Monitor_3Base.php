@@ -1,20 +1,27 @@
 <?php
 /**
-	Base class with some common functions. v2011-07-19
-
-	2011-07-19			Documentation added.<br />
-	2011-05-12			displayMessage now uses now() instead of date.<br />
-	2011-04-30			Uses ThreeWP_Form instead of edwardForm.<br />
-	2011-04-29	09:19	site options are registered even when using single Wordpress.<br />
-	2011-01-25	13:14	load_language assumes filename as domain.<br />
-	2011-01-25	13:14	loadLanguages -> load_language.<br />
+	Provides a simple framework with common Wordpress functions.
+	
+	@par	Changelog
+	
+	- 2011-08-03			tab functions can now be arrays (class, method)
+	- 2011-08-02			array_to_object
+	- 2011-07-28			activate, decactivate and uninstall are public.
+	- 2011-07-19			Documentation added.<br />
+	- 2011-05-12			displayMessage now uses now() instead of date.<br />
+	- 2011-04-30			Uses ThreeWP_Form instead of edwardForm.<br />
+	- 2011-04-29	09:19	site options are registered even when using single Wordpress.<br />
+	- 2011-01-25	13:14	load_language assumes filename as domain.<br />
+	- 2011-01-25	13:14	loadLanguages -> load_language.<br />
+	
+	@brief		Base class for the ThreeWP series of Wordpress plugins.
+	@author		Edward
 */
 class ThreeWP_Activity_Monitor_3Base
 {
 	/**
 		Stores whether this blog is a network blog.
-		
-		@var	bool
+		@var	$is_network
 	**/
 	protected $is_network;
 	
@@ -30,27 +37,27 @@ class ThreeWP_Activity_Monitor_3Base
 		path_from_base_directory<br /> 
 		url<br />
 
-		@var	array
+		@var	$paths
 	**/
 	protected $paths = array();
 	
 	/**
 		Array of options => default_values that this plugin stores sitewide.
 		
-		@var	array
+		@var	$site_options
 	**/ 
 	protected $site_options = array();
 
 	/**
 		Array of options => default_values that this plugin stores locally.
-		@var	array
+		@var	$local_options
 	**/ 
 	protected $local_options = array();
 
 	/**
 		Array of options => default_values that this plugin stores locally or globally.
-		@var	array
-		@deprecated
+		@var	$options
+		@deprecated 
 	**/ 
 	protected $options = array();
 
@@ -59,13 +66,13 @@ class ThreeWP_Activity_Monitor_3Base
 		
 		If left unset will be set to the base filename minus the .php
 		
-		@var	string
+		@var	$language_domain
 	**/ 
 	protected $language_domain = ''; 
 
 	/**
 		Links to Wordpress' database object.
-		@var	object
+		@var	$wpdb
 	**/
 	protected $wpdb;
 	
@@ -76,7 +83,7 @@ class ThreeWP_Activity_Monitor_3Base
 		
 		And then each role is an array of name => role_name and current_user_can => capability.
 
-		@var	array
+		@var	$roles
 	**/
 	protected $roles = array(
 		'administrator' => array(
@@ -104,7 +111,7 @@ class ThreeWP_Activity_Monitor_3Base
 	/**
 		Construct the class.
 		
-		@param		string		$filename		The full path of the parent class.
+		@param		$filename		string		The full path of the parent class.
 	**/
 	public function __construct($filename)
 	{
@@ -129,14 +136,15 @@ class ThreeWP_Activity_Monitor_3Base
 		
 		It's here in case plugins need a common activation method in the future.
 	**/
-	protected function activate()
+	public function activate()
 	{
+		$this->register_options();
 	}
 	
 	/**
 		Overridable method to deactive the plugin.
 	**/
-	protected function deactivate()
+	public function deactivate()
 	{
 	}
 	
@@ -153,7 +161,7 @@ class ThreeWP_Activity_Monitor_3Base
 	/**
 		Overridable uninstall method.
 	**/
-	protected function uninstall()
+	public function uninstall()
 	{
 		$this->deregister_options();
 	}
@@ -233,7 +241,7 @@ class ThreeWP_Activity_Monitor_3Base
 		
 		Reads the language data from the class's name domain as default.
 		
-		@param	string		$domain		Optional domain.
+		@param		$domain		string		Optional domain.
 	**/
 	protected function load_language($domain = '')
 	{
@@ -250,7 +258,7 @@ class ThreeWP_Activity_Monitor_3Base
 		
 		Like Wordpress' internal _() method except this one automatically uses the plugin's domain.
 		
-		@param		string		$domain		String to translate.
+		@param		$string		string		String to translate.
 		@return		string					Translated string, or the untranslated string.
 	**/
 	protected function _($string)
@@ -265,8 +273,8 @@ class ThreeWP_Activity_Monitor_3Base
 	/**
 		Sends a query to wpdb and return the results.
 		
-		@param		string		$query		The SQL query.
-		@param		object		$wpdb		An optional, other WPDB if the standard $wpdb isn't good enough for you.
+		@param		$query		string		The SQL query.
+		@param		$wpdb		WPDB		An optional, other WPDB if the standard $wpdb isn't good enough for you.
 		@return		array					The rows from the query.
 	**/
 	protected function query($query , $wpdb = null)
@@ -280,7 +288,7 @@ class ThreeWP_Activity_Monitor_3Base
 	/**
 		Fire an SQL query and return the results only if there is one row result.
 		
-		@param		string		$query		The SQL query.
+		@param		$query		string		The SQL query.
 		@return		array|false				Either the row as an array, or false if more than one row.
 	**/
 	protected function query_single($query)
@@ -294,7 +302,7 @@ class ThreeWP_Activity_Monitor_3Base
 	/**
 		Fire an SQL query and return the row ID of the inserted row.
 
-		@param		string		$query		The SQL query.
+		@param		$query		string		The SQL query.
 		@return		int						The inserted ID.
 	**/
 	protected function query_insert_id($query)
@@ -306,7 +314,7 @@ class ThreeWP_Activity_Monitor_3Base
 	/**
 		Converts an object to a base64 encoded, serialized string, ready to be inserted into sql.
 		
-		@param		object		$object		An object.
+		@param		$object		object		An object.
 		@return		string					Serialized, base64-encoded string.
 	**/
 	protected function sql_encode( $object )
@@ -316,7 +324,7 @@ class ThreeWP_Activity_Monitor_3Base
 	
 	/**
 		Converts a base64 encoded, serialized string back into an object.
-		@param		string		$string		Serialized, base64-encoded string.
+		@param		$string		string		Serialized, base64-encoded string.
 		@return		object					Object, if possible.
 	**/
 	protected function sql_decode( $string )
@@ -327,8 +335,8 @@ class ThreeWP_Activity_Monitor_3Base
 	/**
 		Returns whether a table exists.
 		
-		@param		string		$table_name	Table name to check for.
-		@return		bool					True if the table exists.
+		@param		$table_name		string		Table name to check for.
+		@return		bool						True if the table exists.
 	**/
 	protected function sql_table_exists( $table_name )
 	{
@@ -355,7 +363,7 @@ class ThreeWP_Activity_Monitor_3Base
 	/**
 		Checks whether the user's role is at least $role.
 		
-		@param		string		$role		Role as string.
+		@param		$role		string		Role as string.
 		@return		bool					True if role is at least $role.
 	**/
 	protected function role_at_least($role)
@@ -386,7 +394,7 @@ class ThreeWP_Activity_Monitor_3Base
 	/**
 		Creates a new ThreeWP_Form.
 		
-		@param		array		$options	Default options to send to the ThreeWP form constructor.
+		@param		$options	array		Default options to send to the ThreeWP form constructor.
 		@return		object					A new ThreeWP form class.
 	**/ 
 	protected function form($options = array())
@@ -407,7 +415,7 @@ class ThreeWP_Activity_Monitor_3Base
 		
 		Will prepend the class name in front, to make the options easily findable in the table.
 		
-		@param		string		$option		Option name to fix.
+		@param		$option		string		Option name to fix.
 	**/
 	protected function fix_option_name($option)
 	{
@@ -419,7 +427,7 @@ class ThreeWP_Activity_Monitor_3Base
 		
 		If this is a network, the site option is preferred.
 		
-		@param		string		$option		Name of option to get.
+		@param		$option		string		Name of option to get.
 		@return		mixed					Value.
 	**/
 	protected function get_option($option)
@@ -436,8 +444,8 @@ class ThreeWP_Activity_Monitor_3Base
 		
 		If this is a network, the site option is preferred.
 		
-		@param		string		$option		Name of option to update.
-		@param		mixed		$value		New value
+		@param		$option		string		Name of option to update.
+		@param		$value		mixed		New value
 	**/
 	protected function update_option($option, $value)
 	{
@@ -453,7 +461,7 @@ class ThreeWP_Activity_Monitor_3Base
 		
 		If this is a network, the site option is preferred.
 		
-		@param		string		$option		Name of option to delete.
+		@param		$option		string		Name of option to delete.
 	**/
 	protected function delete_option($option)
 	{
@@ -467,7 +475,7 @@ class ThreeWP_Activity_Monitor_3Base
 	/**
 		Gets the value of a local option.
 		
-		@param		string		$option		Name of option to get.
+		@param		$option		$string		Name of option to get.
 		@return		mixed					Value.
 	**/
 	protected function get_local_option($option)
@@ -479,8 +487,8 @@ class ThreeWP_Activity_Monitor_3Base
 	/**
 		Updates a local option.
 		
-		@param		string		$option		Name of option to update.
-		@param		mixed		$value		New value
+		@param		option		$string		Name of option to update.
+		@param		$value		mixed		New value
 	**/
 	protected function update_local_option($option, $value)
 	{
@@ -491,7 +499,7 @@ class ThreeWP_Activity_Monitor_3Base
 	/**
 		Deletes a local option.
 		
-		@param		string		$option		Name of option to delete.
+		@param		$option		$string		Name of option to delete.
 	**/
 	protected function delete_local_option($option)
 	{
@@ -502,7 +510,7 @@ class ThreeWP_Activity_Monitor_3Base
 	/**
 		Gets the value of a site option.
 		
-		@param		string		$option		Name of option to get.
+		@param		$option		string		Name of option to get.
 		@return		mixed					Value.
 	**/
 	protected function get_site_option($option)
@@ -514,8 +522,8 @@ class ThreeWP_Activity_Monitor_3Base
 	/**
 		Updates a site option.
 		
-		@param		string		$option		Name of option to update.
-		@param		mixed		$value		New value
+		@param		$option		string		Name of option to update.
+		@param		$value		mixed		New value
 	**/
 	protected function update_site_option($option, $value)
 	{
@@ -526,7 +534,7 @@ class ThreeWP_Activity_Monitor_3Base
 	/**
 		Deletes a site option.
 		
-		@param		string		$option		Name of option to delete.
+		@param		$option		string		Name of option to delete.
 	**/
 	protected function delete_site_option($option)
 	{
@@ -613,10 +621,10 @@ class ThreeWP_Activity_Monitor_3Base
 		
 		Autodetects HTML / text.
 		
-		@param		string		$type		Type of message: error, warning, whatever. Free content.
-		@param		string		$string		The message to display.
+		@param		$type		string		Type of message: error, warning, whatever. Free content.
+		@param		$string		string		The message to display.
 	**/
-	public function displayMessage($type, $string)
+	public function display_message($type, $string)
 	{
 		// If this string has html codes, then output it as it.
 		$stripped = strip_tags($string);
@@ -635,21 +643,21 @@ class ThreeWP_Activity_Monitor_3Base
 		
 		The only thing that makes it an error message is that the div has the class "error".
 		
-		@param		string		$string		String to display.
+		@param		$string		string		String to display.
 	**/
 	public function error($string)
 	{
-		$this->displayMessage('error', $string);
+		$this->display_message('error', $string);
 	}
 	
 	/**
 		Displays an informational message.
 		
-		@param		string		$string		String to display.
+		@param		$string		string		String to display.
 	**/
 	public function message($string)
 	{
-		$this->displayMessage('updated', $string);
+		$this->display_message('updated', $string);
 	}
 		
 	// -------------------------------------------------------------------------------------------------
@@ -719,7 +727,7 @@ class ThreeWP_Activity_Monitor_3Base
 	/**
 		Displays Wordpress tabs.
 		
-		@param	array		$options			See options.
+		@param		$options		array		See options.
 	**/
 	protected function tabs($options)
 	{
@@ -798,7 +806,12 @@ class ThreeWP_Activity_Monitor_3Base
 			if (isset($options['functions'][$selected_index]))
 			{
 				$functionName = $options['functions'][$selected_index];
-				$this->$functionName();
+				if ( is_array( $functionName ) )
+				{
+					$functionName[0]->$functionName[1]();
+				}
+				else 
+					$this->$functionName();
 			}
 			echo '</div>';
 			ob_end_flush();
@@ -810,11 +823,21 @@ class ThreeWP_Activity_Monitor_3Base
 	/**
 		Sanitizes the name of a tab.
 	
-		@param		string		$name		String to sanitize.
+		@param		$string		String to sanitize.
 	**/
-	protected function tab_slug($name)
+	protected function tab_slug( $string )
 	{
-		return sanitize_title($name);
+		return $this->slug( $string );
+	}
+	
+	/**
+		Sanitizes a string.
+	
+		@param		$string		String to sanitize.
+	**/
+	protected function slug( $string )
+	{
+		return sanitize_title( $string );
 	}
 	
 	protected function display_form_table($options)
@@ -864,14 +887,13 @@ class ThreeWP_Activity_Monitor_3Base
 			</tr>';
 	}
 	
-	
 	/**
 		Make a value a key.
 		
 		Given an array of arrays, take the key from the subarray and makes it the key of the main array.
 	
 		@param		array		$array		Array to rearrange.
-		@param		string		$key		Which if the subarray keys to make the key in the main array.
+		@param		$key		$string		Which if the subarray keys to make the key in the main array.
 		@return		array					Rearranged array.
 	**/
 	public function array_moveKey($array, $key)
@@ -885,12 +907,12 @@ class ThreeWP_Activity_Monitor_3Base
 	/**
 		Convert an object to an array.
 	
-		@param		object		$object		Object to convert.
-		@return		array					Returned array.
+		@param		$object		Object or array of objects to convert to a simple array.
+		@return		Array.
 	**/
-	public function object_to_array($object)
+	public function object_to_array( $object )
 	{
-		if (is_array($object))
+		if (is_array( $object ))
 		{
 			$returnValue = array();
 			foreach($object as $o)
@@ -902,10 +924,31 @@ class ThreeWP_Activity_Monitor_3Base
 	}
 	
 	/**
+		Convert an array to stdClass, or appends the $array to an existing $object.
+		
+		@param	$array		Array to convert.
+		@param	$object		Existing object, if any, to append data to.
+		@return				Object with fields from the array.
+	**/ 
+	public function array_to_object( $array, $object = null )
+	{
+		if ( ! is_array( $array ) )
+			$array = array();
+
+		if ( $object === null )
+			$object = new stdClass();
+		
+		foreach( $array as $key => $value )
+			$object->$key = $value;
+		
+		return $object;
+	}
+	
+	/**
 		Display the time ago as human-readable string.
 		
-		@param		string		$time_string	"2010-04-12 15:19"
-		@param		string		$time			An optional timestamp to base time difference on, if not now.
+		@param		$time_string	string		"2010-04-12 15:19"
+		@param		$time			string		An optional timestamp to base time difference on, if not now.
 		@return		string						"28 minutes ago"
 	**/
 	protected function ago($time_string, $time = null)
@@ -951,8 +994,8 @@ class ThreeWP_Activity_Monitor_3Base
 	/**
 		Returns a hash value of a string. The standard hash type is sha512 (64 chars).
 		
-		@param		string		$string			String to hash.
-		@param		string		$type			Hash to use. Default is sha512.
+		@param		$string		string			String to hash.
+		@param		$type		string			Hash to use. Default is sha512.
 		@return		string						Hashed string.
 	**/
 	protected function hash($string, $type = 'sha512')
@@ -963,7 +1006,7 @@ class ThreeWP_Activity_Monitor_3Base
 	/**
 		Multibyte strtolower.
 	
-		@param		string		$string			String to lowercase.
+		@param		$string		string			String to lowercase.
 		@return		string						Lowercased string.
 	**/
 	protected function strtolower( $string )
@@ -974,7 +1017,7 @@ class ThreeWP_Activity_Monitor_3Base
 	/**
 		Multibyte strtoupper.
 	
-		@param		string		$string			String to uppercase.
+		@param		$string		string			String to uppercase.
 		@return		string						Uppercased string.
 	**/
 	protected function strtoupper( $string )
@@ -983,9 +1026,10 @@ class ThreeWP_Activity_Monitor_3Base
 	}
 	
 	/**
-	 * Sends mail via SMTP.
-	 * 
-	*/
+		Sends mail via SMTP.
+		
+		@param		$mail_data					Mail data.
+	**/
 	public function send_mail($mail_data)
 	{
 		// backwards compatability

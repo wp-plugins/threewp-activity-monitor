@@ -236,6 +236,11 @@ Converts the data column to a base64encoded serialized string.
 The old activity table is removed.
 
 == Changelog ==
+= 2.1 =
+* Fixed make_input problem.
+* Uses Wordpress' check-column column for selecting activites.
+* Site-admin role visible in settings.
+* Form UI updated here and there.
 = 2.0 =
 * _login and _posts tables aren't used anymore.
 * Most activity collected until now is obsolete. The activity log will have to be cleared.

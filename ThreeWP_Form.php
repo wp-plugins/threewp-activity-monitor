@@ -3,9 +3,8 @@
 	Form handling class
 	-------------------
 	
-<p>ThreeWP_Forms is a XHTML form class that handles: creation, display and validation of form elements and complete form layouts.</p>
 
-Using the class
+@par	Using the class
 
 First, create the class:
 
@@ -13,10 +12,13 @@ $form = new ThreeWP_Forms();
 
 During your display of the HTML:
 
+<pre>
 echo $form->start();
+</pre>
 
 Now you can build your forms using arrays as inputs.
 
+<pre>
 $input_text = array(
   'name' => 'my_text_example',
   'type' => 'text',
@@ -26,86 +28,89 @@ $input_text = array(
   'value' => 'This is the default text displayed', // optional
   'description' => 'This is a short, optional description. Note that you'll need to put divs around the description in order to do interesting stuff with it.',
 );
+</pre>	
 
+<pre>
 echo $form->make_label( $input_text ); // The accessible label
 echo $form->make_input( $input_text ); // The input itself
 echo $form->make_description( $input_text ); // displays only the description, including validation info.
-
+</pre>
 
 And to finish up the form after displaying:
 
+<pre>
 echo $form->stop();
+</pre>
 
-
-
-		Input types
+@par	Input types
 
 Most of the input types have the css_class, css_style, description, value fields in common.
-
-
 		checkbox
 
+<pre>
 $input_checkbox = array(
   'name' => 'checkbox_example',
   'type' => 'checkbox',
   'label' => 'Label of checkbox',
   'checked' => true,
 );
+</pre>
 
 value, description is optional.
 
 
 		file
 
+<pre>
 $input_file = array(
   'name' => 'file_example',
   'type' => 'file',
   'value' => 'Text on button',
 );
-
-
+</pre>
 
 		image
 
 An image is used instead of a submit button.
 
+<pre>
 $input_image = array(
   'name' => 'image_example',
   'type' => 'image',
   'label' => 'ALT value of image'
   'src' => 'images/submit.png',
 );
-
-
+</pre>
 
 		password
 
 Similar to text, except that the value isn't displayed.
 
+<pre>
 $input_password = array(
   'name' => 'password_example',
   'type' => 'password',
   'label' => 'Displayed label',
 );
-
-
+</pre>
 
 		radio
 
+<pre>
 $input_radio = array(
   'name' => 'radio_example',
   'type' => 'radio
   'label' => 'Label of radio box',
   'options' => array(
-    array('value' => 'option001', 'text' => 'First radio option'),
-    array('value' => 'option002', 'text' => 'Second radio option'),
+    'option001' => 'First radio option',
+    'option002' => 'Second radio option',
   ),
 );
-
-
+</pre>
 
 		select
 
+<pre>
 $input_select = array(
   'name' => 'select_example',
   'type' => 'select',
@@ -117,31 +122,36 @@ $input_select = array(
     'option002' => 'Second select option',
   ),
 );
+</pre>
 
 
 
 		submit
 
+<pre>
 $input_submit = array(
   'name' => 'submit_example',
   'type' => 'submit',
   'value' => 'Displayed on the button',
 );
+</pre>
 
 
 
 		text
 
+<pre>
 $input_text = array(
   'name' => 'text_example',
   'type' => 'text
   'label' => 'Label of text box',
 );
-
+</pre>
 
 
 		textarea
 
+<pre>
 $input_textarea = array(
   'name' => 'textarea_example',
   'type' => 'textarea',
@@ -149,9 +159,9 @@ $input_textarea = array(
   'rows' => 80,
   'cols' => 10,
 );
-	
-	Validation
-	----------
+</pre>
+
+@par	Validation
 
 To add validation to your input, add a key called validation and make it an array with any of the following keys:
 
@@ -173,7 +183,14 @@ $input_text = array(
   ),
 );
 		
- */
+@par	Changelog
+	
+- 2011-08-08	More documentation
+- 2011-08-01	More documentation
+
+@brief	ThreeWP_Forms is a XHTML form class that handles: creation, display and validation of form elements and complete form layouts.
+@author		Edward Plainview	edward.plainview@sverigedemokraterna.se
+*/
 class ThreeWP_Form
 {
 	private $options;
@@ -266,7 +283,7 @@ class ThreeWP_Form
 	}
 	
 	/**
-	 * Returns a simple <form> tag (with action and method set).
+	 * Returns a simple &lt;form&gt; tag (with action and method set).
 	 */
 	public function start()
 	{
@@ -274,7 +291,7 @@ class ThreeWP_Form
 	}
 	
 	/**
-	 * Returns </form>. That's it.
+	 * Returns &lt;/form&gt;. That's it.
 	 */
 	public function stop()
 	{
@@ -472,15 +489,15 @@ class ThreeWP_Form
 				// Make the options
 				$returnValue = '';
 				$baseOptions = array_merge($this->options, $options);
-				foreach($options['options'] as $option)
+				foreach( $options['options'] as $option_value => $option_text )
 				{
-					$checked = ($option['value'] == $options['value']) ? 'checked="checked"' : '';
-					$option = array_merge($baseOptions, $option);
-					$option['namesuffix'] = $option['value'];
-					$option['label'] = $option['text'];
+					$checked = ($option_value == $options['value']) ? 'checked="checked"' : '';
+					$option = $baseOptions;
+					$option['namesuffix'] = $option_value;
+					$option['label'] = $option_text;
 					$returnValue .= '
 						<div>
-							<input class="'.$classes.'" type="'.$options['type'].'" name="'.self::make_name($options).'" value="'.$option['value'].'" id="'.$this->make_id($option).'" '.$checked.' '.$extraOptions.' />
+							<input class="'.$classes.'" type="'.$options['type'].'" name="'.self::make_name($options).'" value="'.$option_value.'" id="'.$this->make_id($option).'" '.$checked.' '.$extraOptions.' />
 							'.$this->make_label($option).'
 						</div>
 					';
@@ -831,13 +848,17 @@ class ThreeWP_Form
 	}
 
 	/**
-	 * Generates an SQL-statement that either updates or inserts the values into a table.
-	 * 
-	 * On an update, it only changes the values that have changed (compares newvalues to oldvalues).
-	 * 
-	 * @param	array		inputs				An array of inputs in standard input format (see top).
-	 * @param	array		inputsToChange		An array of names of which inputs to change.
-	 * @param	string		tableName			The table's name
+	 Generates an SQL-statement that either updates or inserts the values into a table.
+	 
+	 On an update, it only changes the values that have changed (compares newvalues to oldvalues).
+	 
+	 @param		$inputs				array		An array of inputs in standard input format (see top).
+	 @param		$inputsToChange		array		An array of names of which inputs to change.
+	 @param		$tableName			string		The table's name.
+	 @param		$uniqueKey			string		The unique key column name.
+	 @param		$oldValues			array		Associative array of old values.
+	 @param		$newValues			array		Associative array of new values.
+	 @return	string							Prepared SQL string. 
 	 */
 	public static function generate_changed_sql($inputs, $inputsToChange, $tableName, $uniqueKey, $oldValues, $newValues)
 	{
@@ -936,7 +957,7 @@ class ThreeWP_Form
 	/**
 		Validate an email address.
 		
-		@param		string		$email		Email address to validate
+		@param		$email		$email		Email address to validate
 		@return		bool					True, if the address is valid.
 	*/
 	public static function valid_email($email)

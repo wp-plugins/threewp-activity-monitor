@@ -3,7 +3,7 @@
 Plugin Name: ThreeWP Activity Monitor
 Plugin URI: http://mindreantre.se/threewp-activity-monitor/
 Description: Plugin to track user activity. Network aware.
-Version: 2.0
+Version: 2.1
 Author: Edward Hevlund
 Author URI: http://www.mindreantre.se
 Author Email: edward@mindreantre.se
@@ -77,8 +77,6 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 	// --------------------------------------------------------------------------------------------
 	public function activate()
 	{
-		parent::activate();
-		
 		// If we are on a network site, make the site-admin the default role to access the functions.
 		if ($this->is_network)
 		{
@@ -86,7 +84,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 				$this->options[$key] = 'super_admin';
 		}
 		
-		$this->register_options();
+		parent::activate();
 		
 		// v0.3 has an activity_monitor table. Not necessary anymore.
 		if ($this->sql_table_exists( $this->wpdb->base_prefix."activity_monitor" ) )		
@@ -171,9 +169,9 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		));
 	}
 
-	protected function uninstall()
+	public function uninstall()
 	{
-		$this->deregister_options();
+		parent::uninstall();
 		$this->query("DROP TABLE `".$this->wpdb->base_prefix."3wp_activity_monitor_index`");
 		$this->query("DROP TABLE `".$this->wpdb->base_prefix."3wp_activity_monitor_user_statistics`");
 	}
@@ -209,7 +207,9 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 			add_filter( 'manage_users_custom_column', array(&$this, 'manage_users_custom_column'), 10, 3 );
 			
 			add_submenu_page('index.php', $this->_('Activity Monitor'), $this->_('Activity Monitor'), 'read', 'ThreeWP_Activity_Monitor', array (&$this, 'admin'));
-			wp_enqueue_script( '3wp_am', '/' . $this->paths['path_from_base_directory'] . '/js/admin.js' );
+			
+			// Not needed anymore (2011-08-30).
+			//wp_enqueue_script( '3wp_am', '/' . $this->paths['path_from_base_directory'] . '/js/admin.js' );
 		}
 	}
 
@@ -279,7 +279,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		// Collect all the roles.
 		$roles = array();
 		if ($this->is_network)
-			$roles['super_admin']['super_admin'] = 'Site admin';
+			$roles['super_admin'] = 'Site admin';
 		foreach($this->roles as $role)
 			$roles[ $role['name'] ] = ucfirst($role['name']);
 			
@@ -372,13 +372,10 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 				There are currently '.$count.' activities in the database.
 			</p>
 			
-			<p>
-				'.$form->make_label($inputs['activities_limit']).' '.$form->make_input($inputs['activities_limit']).'
-			</p>
-			
-			<p>
-				'.$form->make_label($inputs['activities_limit_view']).' '.$form->make_input($inputs['activities_limit_view']).'
-			</p>
+			' . $this->display_form_table( array( 'inputs' => array(
+				$inputs['activities_limit'],
+				$inputs['activities_limit_view'],
+			) ) ) . '
 			
 			<h3>Roles</h3>
 			
@@ -386,25 +383,13 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 				Actions can be restricted to specific user roles.
 			</p>
 			
-			<p class="bigp">
-				'.$form->make_label($inputs['role_logins_view']).' '.$form->make_input($inputs['role_logins_view']).'
-			</p>
-
-			<p class="bigp">
-				'.$form->make_label($inputs['role_logins_view_other']).' '.$form->make_input($inputs['role_logins_view_other']).'
-			</p>
-
-			<p class="bigp">
-				'.$form->make_label($inputs['role_logins_delete']).' '.$form->make_input($inputs['role_logins_delete']).'
-			</p>
-
-			<p class="bigp">
-				'.$form->make_label($inputs['role_logins_delete_other']).' '.$form->make_input($inputs['role_logins_delete_other']).'
-			</p>
-
-			<p>
-				'.$form->make_input($inputSubmit).'
-			</p>
+			' . $this->display_form_table( array( 'inputs' => array(
+				$inputs['role_logins_view'],
+				$inputs['role_logins_view_other'],
+				$inputs['role_logins_delete'],
+				$inputs['role_logins_delete_other'],
+				$inputSubmit,
+			) ) ) . '
 			
 			'.$form->stop().'
 		';
@@ -1375,6 +1360,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 	
 	private function show_activities($options)
 	{
+		$form = $this->form();
 		$options = array_merge( array(
 			'show_mass_edit' => $this->role_at_least( $this->get_option('role_logins_delete_other') ),
 		), $options );
@@ -1384,15 +1370,14 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		
 		$mass = '';
 		$th_cb = '';
-		$form_start = '';
-		$form_stop = '';
 		
-		if ( $options['show_mass_edit'] === true )
+		$may_delete = $this->role_at_least( $this->get_option('role_logins_delete_other') ) && ( $options['show_mass_edit'] === true );
+		
+		$form_start = $may_delete ? $form->start() : '';
+		$form_stop = $may_delete ? $form->stop() : '';
+		
+		if ( $may_delete )
 		{
-			$form = $this->form();
-			$form_start = $form->start();
-			$form_stop = $form->stop();
-			
 			if ( isset($_POST['mass_submit']) )
 			{
 				$selected = array();
@@ -1442,9 +1427,14 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 				</div>
 			';
 			
+			$selected = array(
+				'type' => 'checkbox',
+				'name' => 'check',
+			);
+
 			$th_cb = '
-						<th>
-							<span class="screen-reader-text">'.$this->_('Selected').'</span>
+						<th class="check-column">
+							' . $form->make_input( $selected ) . '<span class="screen-reader-text">' . $this->_('Selected') . '</span>
 						</th>
 			';
 		}
@@ -1456,7 +1446,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 			
 			$cb = '';
 			
-			if ( $this->role_at_least( $this->get_option('role_logins_delete_other') ) )
+			if ( $may_delete )
 			{
 				$activity_id = $activity['i_id'];
 				$cb_input = array(
@@ -1468,10 +1458,10 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 				);
 				
 				$cb = '
-					<td class="cb">
+					<th scope="row" class="check-column">
 						' . $form->make_input( $cb_input ) . '
 						<span class="screen-reader-text">' . $form->make_label( $cb_input ) . '</span>
-					</td>
+					</th>
 				';
 			}
 
@@ -1525,6 +1515,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 				
 		return '
 			' . $form_start . '
+
 			' . $mass . '
 
 			<table class="widefat threewp_activity_monitor">
