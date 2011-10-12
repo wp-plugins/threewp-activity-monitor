@@ -3,7 +3,7 @@
 Plugin Name: ThreeWP Activity Monitor
 Plugin URI: http://mindreantre.se/threewp-activity-monitor/
 Description: Plugin to track user activity. Network aware.
-Version: 2.1
+Version: 2.2
 Author: Edward Hevlund
 Author URI: http://www.mindreantre.se
 Author Email: edward@mindreantre.se
@@ -11,8 +11,8 @@ Author Email: edward@mindreantre.se
 
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
 
-require_once('ThreeWP_Activity_Monitor_3Base.php');
-class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
+require_once('SD_Activity_Monitor_Base.php');
+class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 {
 	private $cache = array('user' => array(), 'blog' => array(), 'post' => array());
 	
@@ -331,28 +331,28 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 				'type' => 'select',
 				'label' => 'View own login statistics',
 				'value' => $this->get_option('role_logins_view'),
-				'options' => $roles,
+				'options' => $this->roles_as_options(),
 			),
 			'role_logins_view_other' => array(
 				'name' => 'role_logins_view_other',
 				'type' => 'select',
 				'label' => 'View other users\' login statistics',
 				'value' => $this->get_option('role_logins_view_other'),
-				'options' => $roles,
+				'options' => $this->roles_as_options(),
 			),
 			'role_logins_delete' => array(
 				'name' => 'role_logins_delete',
 				'type' => 'select',
 				'label' => 'Delete own login statistics',
 				'value' => $this->get_option('role_logins_delete'),
-				'options' => $roles,
+				'options' => $this->roles_as_options(),
 			),
 			'role_logins_delete_other' => array(
 				'name' => 'role_logins_delete_other',
 				'type' => 'select',
 				'label' => 'Delete other users\' login statistics and administer the plugin settings',
 				'value' => $this->get_option('role_logins_delete_other'),
-				'options' => $roles,
+				'options' => $this->roles_as_options(),
 			),
 		);
 		
@@ -542,16 +542,15 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 	/**
 		Logs the successful login of a user.
 	*/
-	public function wp_login($username)
+	public function wp_login( $username )
 	{
 		$user_data = get_userdatabylogin( $username );
-		
 		do_action('threewp_activity_monitor_new_activity', array(
 			'activity_id' => 'wp_login',
 			'activity_strings' => array(
-				"" => "%user_login_with_link% logged in to %blog_name_with_link%",
-				'IP' => $this->make_ip('html2'),
-				'User agent' => '%server_http_user_agent%',
+				"" => $this->_( "%user_login_with_link% logged in to %blog_name_with_link%" ),
+				$this->_( 'IP' ) => $this->make_ip('html2'),
+				$this->_( 'User agent' ) => '%server_http_user_agent%',
 			),
 			'user_data' => $user_data,
 		));
@@ -564,16 +563,16 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 	/**
 		Logs the unsuccessful login of a user.
 	*/
-	public function wp_login_failed($username)
+	public function wp_login_failed( $username )
 	{
 		$user_data = get_userdatabylogin( $username );
 		do_action('threewp_activity_monitor_new_activity', array(
 			'activity_id' => 'wp_login_failed',
 			'activity_strings' => array(
-				'' => "%user_login_with_link% tried to log in to %blog_name_with_link%",
-				'Password tried' => $_POST['pwd'],
-				'IP' => $this->make_ip('html2'),
-				'User agent' => '%server_http_user_agent%',
+				'' => $this->_( "%user_login_with_link% tried to log in to %blog_name_with_link%" ),
+				$this->_( 'Password tried' ) => esc_html( $_POST['pwd'] ),
+				$this->_( 'IP' ) => $this->make_ip('html2'),
+				$this->_( 'User agent' ) => '%server_http_user_agent%',
 			),
 			'user_data' => $user_data,
 		));
@@ -583,12 +582,12 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 	/**
 		Logs the logout of a user.
 	*/
-	public function wp_logout($username)
+	public function wp_logout( $username )
 	{
 		do_action('threewp_activity_monitor_new_activity', array(
 			'activity_id' => 'wp_logout',
 			'activity_strings' => array(
-				'' => "%user_login_with_link% logged out from %blog_name_with_link%",
+				'' => $this->_( "%user_login_with_link% logged out from %blog_name_with_link%" ),
 			),
 		));
 	}
@@ -599,9 +598,9 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		do_action('threewp_activity_monitor_new_activity', array(
 			'activity_id' => 'password_retrieve',
 			'activity_strings' => array(
-				'' => "%user_login_with_link% wanted a new password from %blog_name_with_link%",
-				'IP' => $this->make_ip('html2'),
-				'User agent' => '%server_http_user_agent%',
+				'' => $this->_( "%user_login_with_link% wanted a new password from %blog_name_with_link%" ),
+				$this->_( 'IP' ) => $this->make_ip('html2'),
+				$this->_( 'User agent' ) => '%server_http_user_agent%',
 			),
 			'user_data' => $user_data,
 		));
@@ -613,9 +612,9 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		do_action('threewp_activity_monitor_new_activity', array(
 			'activity_id' => 'password_reset',
 			'activity_strings' => array(
-				'' => "%user_login_with_link% has reset the password on %blog_name_with_link%",
-				'IP' => $this->make_ip('html2'),
-				'User agent' => '%server_http_user_agent%',
+				'' => $this->_( "%user_login_with_link% has reset the password on %blog_name_with_link%" ),
+				$this->_( 'IP' ) => $this->make_ip('html2'),
+				$this->_( 'User agent' ) => '%server_http_user_agent%',
 			),
 			'user_data' => $user_data,
 		));
@@ -628,13 +627,23 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		$changes = array();
 		
 		if ($old_userdata->user_pass != $new_userdata->user_pass)
-			$changes['Password'] = 'Password changed';
+			$changes[ $this->_( 'Password' ) ] = $this->_( 'Password changed' );
 		
 		if ($old_userdata->first_name != $new_userdata->first_name)
-			$changes['First name'] = "From <em>" . $old_userdata->first_name . "</em> to <em>" . $new_userdata->first_name . '</em>';
+			$changes[ $this->_( 'First name' ) ] =
+				sprintf(
+					$this->_( "From <em>%s</em> to <em>%s</em>" ),
+					$old_userdata->first_name,
+					$new_userdata->first_name
+				);
 		
 		if ($old_userdata->last_name != $new_userdata->last_name)
-			$changes['Last name'] = "From <em>" . $old_userdata->last_name . "</em> to <em>" . $new_userdata->last_name . '</em>';
+			$changes[ $this->_( 'Last name' )] =
+				sprintf(
+					$this->_( "From <em>%s</em> to <em>%s</em>" ),
+					$old_userdata->last_name,
+					$new_userdata->last_name
+				);
 		
 		if ( count($changes) < 1 )
 			return;
@@ -651,7 +660,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		do_action('threewp_activity_monitor_new_activity', array(
 			'activity_id' => 'delete_user',
 			'activity_strings' => array(
-				'' => '%user_login_with_link% deleted' . sprintf( ' %s (%s)',
+				'' => $this->_( '%user_login_with_link% deleted' ) . sprintf( ' %s (%s)',
 					$user_data->user_login,
 					$user_data->user_email
 				),
@@ -665,7 +674,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		do_action('threewp_activity_monitor_new_activity', array(
 			'activity_id' => 'user_register',
 			'activity_strings' => array(
-				'' => '%user_login_with_link% created' . sprintf( ' %s (%s)',
+				'' => $this->_( '%user_login_with_link% created' ) . sprintf( ' %s (%s)',
 					$user_data->user_login,
 					$user_data->user_email
 				),
@@ -691,7 +700,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		do_action('threewp_activity_monitor_new_activity', array(
 			'activity_id' => 'post_publish',
 			'activity_strings' => array(
-				'' => '%user_login_with_link% wrote %post_title_with_link% on %blog_name_with_link%',
+				'' => $this->_( '%user_login_with_link% wrote %post_title_with_link% on %blog_name_with_link%' ),
 			),
 			'post_data' => $post,
 		));
@@ -707,7 +716,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		do_action('threewp_activity_monitor_new_activity', array(
 			'activity_id' => 'post_updated',
 			'activity_strings' => array(
-				'' => '%user_login_with_link% updated %post_title_with_link% on %blog_name_with_link%',
+				'' => $this->_( '%user_login_with_link% updated %post_title_with_link% on %blog_name_with_link%' ),
 			),
 			'post_data' => $new_post,
 		));
@@ -720,7 +729,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		do_action('threewp_activity_monitor_new_activity', array(
 			'activity_id' => 'trashed_post',
 			'activity_strings' => array(
-				'' => '%user_login_with_link% trashed %post_title_with_link% on %blog_name_with_link%',
+				'' => $this->_( '%user_login_with_link% trashed %post_title_with_link% on %blog_name_with_link%' ),
 			),
 			'post_data' => $post_data,
 		));
@@ -733,7 +742,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		do_action('threewp_activity_monitor_new_activity', array(
 			'activity_id' => 'untrashed_post',
 			'activity_strings' => array(
-				'' => '%user_login_with_link% untrashed %post_title_with_link% on %blog_name_with_link%',
+				'' => $this->_( '%user_login_with_link% untrashed %post_title_with_link% on %blog_name_with_link%' ),
 			),
 			'post_data' => $post_data,
 		));
@@ -749,7 +758,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		do_action('threewp_activity_monitor_new_activity', array(
 			'activity_id' => 'untrashed_post',
 			'activity_strings' => array(
-				'' => '%user_login_with_link% deleted %post_title_with_link% on %blog_name_with_link%',
+				'' => $this->_( '%user_login_with_link% deleted %post_title_with_link% on %blog_name_with_link%' ),
 			),
 			'post_data' => $post_data,
 		));
@@ -789,7 +798,7 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 		do_action( 'threewp_activity_monitor_new_activity', array(
 			'activity_id' => 'comment_' . $status,
 			'activity_strings' => array(
-				'' => '%user_login_with_link% ' . $verb. ' comment %comment_id_with_link% on %post_title_with_link%',
+				'' => $this->_( '%user_login_with_link% ' . $verb. ' comment %comment_id_with_link% on %post_title_with_link%' ),
 			),
 			'post_data' => $post_data,
 			'comment_data' => $comment_data,
@@ -999,20 +1008,21 @@ class ThreeWP_Activity_Monitor extends ThreeWP_Activity_Monitor_3Base
 
 		$replacements = array(
 			'%user_id%' => $user_id,
-			'%user_login%' => $current_user->user_login,
-			'%user_login_with_link%' => $this->make_profile_link($user_id),
-			'%user_display_name%' => $current_user->display_name,
-			'%user_display_name_with_link%' => $this->make_profile_link($user_id, $current_user->display_name),
 			'%blog_id%' => $blog_id,
 			'%blog_name%' => $bloginfo_name,
 			'%blog_link%' => $bloginfo_url,
 			'%blog_panel_link%' => $bloginfo_url . '/wp-admin',
 			'%blog_name_with_link%' => sprintf('<a href="%s">%s</a>', $bloginfo_url, $bloginfo_name),
 			'%blog_name_with_panel_link%' => sprintf('<a href="%s">%s</a>', $bloginfo_url . '/wp-admin', $bloginfo_name),
-			'%server_http_user_agent%' => $_SERVER['HTTP_USER_AGENT'],
+			'%server_http_user_agent%' => esc_html( $_SERVER['HTTP_USER_AGENT'] ),
 			'%server_http_remote_host%' => $_SERVER['REMOTE_HOST'],
 			'%server_http_remote_addr%' => $_SERVER['REMOTE_ADDR'],
 		);
+		
+		$replacements[ '%user_login%' ] = $current_user->user_login;
+		$replacements[ '%user_login_with_link%' ] = $this->make_profile_link($user_id);
+		$replacements[ '%user_display_name%' ] = $current_user->display_name;
+		$replacements[ '%user_display_name_with_link%' ] = $this->make_profile_link($user_id, $current_user->display_name);
 		
 		if ( $options['post_data'] !== null )
 		{

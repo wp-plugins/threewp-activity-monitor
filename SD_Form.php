@@ -8,7 +8,7 @@
 
 First, create the class:
 
-$form = new ThreeWP_Forms();
+$form = new SD_Forms();
 
 During your display of the HTML:
 
@@ -188,10 +188,10 @@ $input_text = array(
 - 2011-08-08	More documentation
 - 2011-08-01	More documentation
 
-@brief	ThreeWP_Forms is a XHTML form class that handles: creation, display and validation of form elements and complete form layouts.
+@brief	SD_Forms is a XHTML form class that handles: creation, display and validation of form elements and complete form layouts.
 @author		Edward Plainview	edward.plainview@sverigedemokraterna.se
 */
-class ThreeWP_Form
+class SD_Form
 {
 	private $options;
 	
@@ -224,7 +224,7 @@ class ThreeWP_Form
 	function __construct($options = array())
 	{
 		$this->options = array_merge($this->default_options, $options);
-		$this->language_data = ThreeWP_FormLanguage::$language_data;
+		$this->language_data = SD_FormLanguage::$language_data;
 	}
 	
 	/**
@@ -1136,7 +1136,7 @@ class ThreeWP_Form
 	}
 }
 
-class ThreeWP_FormLanguage
+class SD_FormLanguage
 {
     public static $language_data = array(
 		'Could not parse date' => array(

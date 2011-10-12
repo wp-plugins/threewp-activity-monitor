@@ -7,17 +7,22 @@
 	- 2011-08-03			tab functions can now be arrays (class, method)
 	- 2011-08-02			array_to_object
 	- 2011-07-28			activate, decactivate and uninstall are public.
-	- 2011-07-19			Documentation added.<br />
-	- 2011-05-12			displayMessage now uses now() instead of date.<br />
-	- 2011-04-30			Uses ThreeWP_Form instead of edwardForm.<br />
-	- 2011-04-29	09:19	site options are registered even when using single Wordpress.<br />
-	- 2011-01-25	13:14	load_language assumes filename as domain.<br />
-	- 2011-01-25	13:14	loadLanguages -> load_language.<br />
+	- 2011-07-19			Documentation added.
+	- 2011-05-12			displayMessage now uses now() instead of date.
+	- 2011-04-30			Uses ThreeWP_Form instead of edwardForm.
+	- 2011-04-29	09:19	site options are registered even when using single Wordpress.
+	- 2011-01-25	13:14	load_language assumes filename as domain.
+	- 2011-01-25	13:14	loadLanguages -> load_language.
+	- 2011-09-19	12:43	No more need to register activation or deactivation hooks.
+	- 2011-09-22	14:29	+roles_as_options
+	- 2011-09-26	12:05	_() method made public. 
+	- 2011-09-29	21:16	role_at_least checks that there is a user logged in at all.
+	- 2011-10-08	07:34	Uses SD_Form instead of ThreeWP_Form (name change).
 	
-	@brief		Base class for the ThreeWP series of Wordpress plugins.
-	@author		Edward
+	@brief		Base class for the SD series of Wordpress plugins.
+	@author		Edward Plainview	edward.plainview@sverigedemokraterna.se
 */
-class ThreeWP_Activity_Monitor_3Base
+class SD_Activity_Monitor_Base
 {
 	/**
 		Stores whether this blog is a network blog.
@@ -118,7 +123,7 @@ class ThreeWP_Activity_Monitor_3Base
 		global $wpdb;
 		$this->wpdb = $wpdb;
 		$this->is_network = MULTISITE;
-		
+
 		$this->paths = array(
 			'name' => get_class($this),
 			'filename' => basename($filename),
@@ -128,7 +133,10 @@ class ThreeWP_Activity_Monitor_3Base
 			'url' => WP_PLUGIN_URL . '/' . basename(dirname($filename)),
 		);
 		
-		add_action( 'admin_init', array(&$this, 'admin_uninstall_post') );
+		register_activation_hook( $this->paths['filename_from_plugin_directory'],	array( $this, 'activate') );
+		register_deactivation_hook( $this->paths['filename_from_plugin_directory'],	array( $this, 'deactivate') );
+		
+		add_action( 'admin_init', array(&$this, 'admin_init') );
 	}
 	
 	/**
@@ -167,11 +175,9 @@ class ThreeWP_Activity_Monitor_3Base
 	}
 	
 	/**
-		Handles the uninstall command in the $_POST.
-		
-		If the user correctly filled in the uninstall form, the plugin will deactivate itself and return to the plugin list.
+		Filter for admin_init. 
 	**/
-	public function admin_uninstall_post()
+	public function admin_init()
 	{
 		$class_name = get_class($this);
 		if ( isset($_POST[ $class_name ]['uninstall']) )
@@ -261,7 +267,7 @@ class ThreeWP_Activity_Monitor_3Base
 		@param		$string		string		String to translate.
 		@return		string					Translated string, or the untranslated string.
 	**/
-	protected function _($string)
+	public function _($string)
 	{
 		return __( $string, $this->language_domain );
 	}
@@ -368,6 +374,12 @@ class ThreeWP_Activity_Monitor_3Base
 	**/
 	protected function role_at_least($role)
 	{
+		global $current_user;
+		wp_get_current_user();
+		
+		if ( $current_user === null )
+		    return false;
+
 		if ($role == '')
 			return true;
 
@@ -376,7 +388,22 @@ class ThreeWP_Activity_Monitor_3Base
 				return is_super_admin();
 			else
 				return false;
-		return current_user_can($this->roles[$role]['current_user_can']);
+		
+		return current_user_can( $this->roles[$role]['current_user_can'] );
+	}
+	
+	/**
+		Returns the user roles as a select options array.
+		@return		The user roles as a select options array.
+	**/ 
+	protected function roles_as_options()
+	{
+		$returnValue = array();
+		if (function_exists('is_super_admin'))
+			$returnValue['super_admin'] = $this->_( 'Super admin');
+		foreach( $this->roles as $role )
+			$returnValue[ $role[ 'name' ] ] = __( ucfirst( $role[ 'name' ] ) );		// See how we ask WP to translate the roles for us? See also how it doesn't. Sometimes.
+		return $returnValue;
 	}
 	
 	/**
@@ -392,18 +419,18 @@ class ThreeWP_Activity_Monitor_3Base
 	}
 	
 	/**
-		Creates a new ThreeWP_Form.
+		Creates a new SD_Form.
 		
-		@param		$options	array		Default options to send to the ThreeWP form constructor.
-		@return		object					A new ThreeWP form class.
+		@param		$options	array		Default options to send to the SD form constructor.
+		@return		object					A new SD form class.
 	**/ 
 	protected function form($options = array())
 	{
 		$options = array_merge($options, array('language' => preg_replace('/_.*/', '', get_locale())) );
-		if (class_exists('ThreeWP_Form'))
-			return new ThreeWP_Form($options);
-		require_once('ThreeWP_Form.php');
-		return new ThreeWP_Form($options);
+		if (class_exists('SD_Form'))
+			return new SD_Form($options);
+		require_once('SD_Form.php');
+		return new SD_Form($options);
 	}
 	
 	// -------------------------------------------------------------------------------------------------
@@ -746,6 +773,7 @@ class ThreeWP_Activity_Monitor_3Base
 		), $options);
 		
 		$getKey = $options['getKey'];			// Convenience.
+
 		if (!isset($_GET[$getKey]))	// Select the default tab if none is selected.
 			$_GET[$getKey] = sanitize_title( $options['tabs'][$options['default']] );
 		$selected = $_GET[$getKey];
@@ -1141,4 +1169,3 @@ class ThreeWP_Activity_Monitor_3Base
 		return $returnValue;		
 	}
 }
-?>

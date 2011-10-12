@@ -135,7 +135,7 @@ public function list_activities($activities)
 = filter: threewp_activity_monitor_display_custom_activity =
 
 `
-add_filter( 'threewp_activity_monitor_display_custom_activity', array(&$this, 'display_custom_activity') 10, 1);
+add_filter( 'threewp_activity_monitor_display_activity', array(&$this, 'display_custom_activity'), 10, 1);
 
 /**
 	Inserts display info into the activity.
@@ -236,6 +236,10 @@ Converts the data column to a base64encoded serialized string.
 The old activity table is removed.
 
 == Changelog ==
+= 2.2 =
+* Documentation fixes
+* Password should actually be displayed in all cases now
+* More language strings
 = 2.1 =
 * Fixed make_input problem.
 * Uses Wordpress' check-column column for selecting activites.
