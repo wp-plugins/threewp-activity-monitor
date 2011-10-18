@@ -236,10 +236,12 @@ Converts the data column to a base64encoded serialized string.
 The old activity table is removed.
 
 == Changelog ==
+= 2.3 =
+* Comment tracking is back.
 = 2.2 =
-* Documentation fixes
-* Password should actually be displayed in all cases now
-* More language strings
+* Documentation fixes.
+* Password should actually be displayed in all cases now.
+* More language strings.
 = 2.1 =
 * Fixed make_input problem.
 * Uses Wordpress' check-column column for selecting activites.

@@ -18,6 +18,7 @@
 	- 2011-09-26	12:05	_() method made public. 
 	- 2011-09-29	21:16	role_at_least checks that there is a user logged in at all.
 	- 2011-10-08	07:34	Uses SD_Form instead of ThreeWP_Form (name change).
+	- 2011-10-17	09:34	paths also includes __FILE__.
 	
 	@brief		Base class for the SD series of Wordpress plugins.
 	@author		Edward Plainview	edward.plainview@sverigedemokraterna.se
@@ -125,6 +126,7 @@ class SD_Activity_Monitor_Base
 		$this->is_network = MULTISITE;
 
 		$this->paths = array(
+			'__FILE__' => $filename,
 			'name' => get_class($this),
 			'filename' => basename($filename),
 			'filename_from_plugin_directory' => basename(dirname($filename)) . '/' . basename($filename),

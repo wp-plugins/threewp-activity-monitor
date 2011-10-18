@@ -3,10 +3,11 @@
 Plugin Name: ThreeWP Activity Monitor
 Plugin URI: http://mindreantre.se/threewp-activity-monitor/
 Description: Plugin to track user activity. Network aware.
-Version: 2.2
-Author: Edward Hevlund
+Version: 2.3
+Author: edward mindreantre
 Author URI: http://www.mindreantre.se
 Author Email: edward@mindreantre.se
+License: GPLv3
 */
 
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
@@ -183,8 +184,8 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 	
 	public function network_admin_menu()
 	{
-//		$this->common_admin_menu();
-//		add_submenu_page('settings.php', $this->_('Activity Monitor'), $this->_('Activity Monitor'), 'read', 'ThreeWP_Activity_Monitor', array (&$this, 'admin'));
+		$this->common_admin_menu();
+		add_submenu_page('settings.php', $this->_('Activity Monitor'), $this->_('Activity Monitor'), 'read', 'ThreeWP_Activity_Monitor', array (&$this, 'admin'));
 	}
 	
 	public function common_admin_menu()
@@ -207,9 +208,6 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 			add_filter( 'manage_users_custom_column', array(&$this, 'manage_users_custom_column'), 10, 3 );
 			
 			add_submenu_page('index.php', $this->_('Activity Monitor'), $this->_('Activity Monitor'), 'read', 'ThreeWP_Activity_Monitor', array (&$this, 'admin'));
-			
-			// Not needed anymore (2011-08-30).
-			//wp_enqueue_script( '3wp_am', '/' . $this->paths['path_from_base_directory'] . '/js/admin.js' );
 		}
 	}
 
@@ -791,7 +789,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 				$verb = 'deleted';
 				break;
 			default:
-				$verb = 'approved';
+				$verb = 'approve';
 				break;
 		}
 		
@@ -1096,6 +1094,27 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 		
 		// First, fill in our own activities.
 		$this->activities = array(
+			'comment_0' => array(
+				'name' => $this->_('Comment was reset.'),
+			),
+			'comment_1' => array(
+				'name' => $this->_('Comment was reapproved.'),
+			),
+			'comment_hold' => array(
+				'name' => $this->_('Comment was held back.'),
+			),
+			'comment_spam' => array(
+				'name' => $this->_('Comment was spammed.'),
+			),
+			'comment_trash' => array(
+				'name' => $this->_('Comment was trashed.'),
+			),
+			'comment_delete' => array(
+				'name' => $this->_('Comment was deleted.'),
+			),
+			'comment_approve' => array(
+				'name' => $this->_('Comment was approved.'),
+			),
 			'wp_login' => array(
 				'name' => $this->_('User login'),
 			),
