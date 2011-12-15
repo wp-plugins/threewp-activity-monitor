@@ -1,7 +1,7 @@
 === ThreeWP Activity Monitor ===
 Tags: wp, wpms, network, threewp, activity, monitor, activity monitor, blog activity, user, comments, logins,
-Requires at least: 3.2
-Tested up to: 3.2
+Requires at least: 3.3
+Tested up to: 3.3
 Stable tag: trunk
 Contributors: edward mindreantre
 Track and display site or network-wide user activity.
@@ -236,6 +236,10 @@ Converts the data column to a base64encoded serialized string.
 The old activity table is removed.
 
 == Changelog ==
+= 2.4 =
+* Wordpress 3.3 compatability.
+* Page updates are tracked. Same as post updates.
+* First and last name changes are quoted.
 = 2.3 =
 * Comment tracking is back.
 = 2.2 =

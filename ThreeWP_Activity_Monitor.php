@@ -3,7 +3,7 @@
 Plugin Name: ThreeWP Activity Monitor
 Plugin URI: http://mindreantre.se/threewp-activity-monitor/
 Description: Plugin to track user activity. Network aware.
-Version: 2.3
+Version: 2.4
 Author: edward mindreantre
 Author URI: http://www.mindreantre.se
 Author Email: edward@mindreantre.se
@@ -542,7 +542,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 	*/
 	public function wp_login( $username )
 	{
-		$user_data = get_userdatabylogin( $username );
+		$user_data = get_user_by( 'login', $username );
 		do_action('threewp_activity_monitor_new_activity', array(
 			'activity_id' => 'wp_login',
 			'activity_strings' => array(
@@ -563,7 +563,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 	*/
 	public function wp_login_failed( $username )
 	{
-		$user_data = get_userdatabylogin( $username );
+		$user_data = get_user_by( 'login', $username );
 		do_action('threewp_activity_monitor_new_activity', array(
 			'activity_id' => 'wp_login_failed',
 			'activity_strings' => array(
@@ -592,7 +592,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 	
 	public function retrieve_password($username)
 	{
-		$userdata = get_userdatabylogin($username);
+		$user_data = get_user_by( 'login', $username );
 		do_action('threewp_activity_monitor_new_activity', array(
 			'activity_id' => 'password_retrieve',
 			'activity_strings' => array(
@@ -630,7 +630,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 		if ($old_userdata->first_name != $new_userdata->first_name)
 			$changes[ $this->_( 'First name' ) ] =
 				sprintf(
-					$this->_( "From <em>%s</em> to <em>%s</em>" ),
+					$this->_( 'From "<em>%s</em>" to "<em>%s</em>"' ),
 					$old_userdata->first_name,
 					$new_userdata->first_name
 				);
@@ -638,7 +638,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 		if ($old_userdata->last_name != $new_userdata->last_name)
 			$changes[ $this->_( 'Last name' )] =
 				sprintf(
-					$this->_( "From <em>%s</em> to <em>%s</em>" ),
+					$this->_( 'From "<em>%s</em>" to "<em>%s</em>"' ),
 					$old_userdata->last_name,
 					$new_userdata->last_name
 				);
@@ -765,6 +765,11 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 	public function wp_set_comment_status($comment_id, $status)
 	{
 		$comment_data = get_comment($comment_id);
+		
+		// Wordpress is autocleaning things.
+		if ( $comment_data === null )
+			return;
+
 		$post_id = $comment_data->comment_post_ID;
 		$post_data = get_post($post_id);
 		
@@ -1024,10 +1029,13 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 		
 		if ( $options['post_data'] !== null )
 		{
+			// Sometimes people write posts that don't have titles.
+			$post_title = $post_data->post_title == '' ? $this->_( 'no title' ) : $post_data->post_title;
+			
 			$post_data = $options['post_data'];
 			$post_link = $bloginfo_url . '?p=' . $post_data->ID;
-			$replacements['%post_title%'] = $post_data->post_title;
-			$replacements['%post_link%'] = $post_data->post_title;
+			$replacements['%post_title%'] = $post_title;
+			$replacements['%post_link%'] = $post_link;
 			$replacements['%post_title_with_link%'] = sprintf( '<a href="%s">%s</a>',
 				$post_link,
 				$post_data->post_title
@@ -1349,7 +1357,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 		
 		$this->cache['user'][$user_id] = get_userdata($user_id);
 
-		if ( ! $this->cache['user'][$user_id] instanceof stdClass )
+		if ( ! $this->cache['user'][$user_id] instanceof WP_User )
 		{
 			$this->cache['user'][$user_id] = new stdClass();
 			$this->cache['user'][$user_id]->user_login = 'Wordpress';
@@ -1570,7 +1578,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 		// Also: posts must actually be posts, not pages or menus or anything.
 		if ( !is_object($post) )
 			return false;
-		return $post->post_status == 'publish' && $post->post_parent == 0 && $post->post_type == 'post';
+		return $post->post_status == 'publish' && $post->post_parent == 0 && ( $post->post_type == 'post' || $post->post_type == 'page' );
 	}
 	
 	private function make_profile_link($user_id, $text = "")

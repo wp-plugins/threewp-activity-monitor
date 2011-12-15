@@ -19,6 +19,10 @@
 	- 2011-09-29	21:16	role_at_least checks that there is a user logged in at all.
 	- 2011-10-08	07:34	Uses SD_Form instead of ThreeWP_Form (name change).
 	- 2011-10-17	09:34	paths also includes __FILE__.
+	- 2011-10-22	19:16	get_site_option and get_local_option have default parameters.
+	- 2011-10-28	14:00	URLMake removed. tabs() now uses Wordpress' add_query_arg and remove_query_arg.
+	- 2011-11-04	09:42	now() is public
+	- 2011-11-07	16:11	new: rmdir().
 	
 	@brief		Base class for the SD series of Wordpress plugins.
 	@author		Edward Plainview	edward.plainview@sverigedemokraterna.se
@@ -117,7 +121,7 @@ class SD_Activity_Monitor_Base
 	/**
 		Construct the class.
 		
-		@param		$filename		string		The full path of the parent class.
+		@param		$filename		The full path of the parent class.
 	**/
 	public function __construct($filename)
 	{
@@ -249,7 +253,7 @@ class SD_Activity_Monitor_Base
 		
 		Reads the language data from the class's name domain as default.
 		
-		@param		$domain		string		Optional domain.
+		@param		$domain		Optional domain.
 	**/
 	protected function load_language($domain = '')
 	{
@@ -266,8 +270,8 @@ class SD_Activity_Monitor_Base
 		
 		Like Wordpress' internal _() method except this one automatically uses the plugin's domain.
 		
-		@param		$string		string		String to translate.
-		@return		string					Translated string, or the untranslated string.
+		@param		$string		String to translate.
+		@return					Translated string, or the untranslated string.
 	**/
 	public function _($string)
 	{
@@ -281,9 +285,9 @@ class SD_Activity_Monitor_Base
 	/**
 		Sends a query to wpdb and return the results.
 		
-		@param		$query		string		The SQL query.
-		@param		$wpdb		WPDB		An optional, other WPDB if the standard $wpdb isn't good enough for you.
-		@return		array					The rows from the query.
+		@param		$query		The SQL query.
+		@param		$wpdb		An optional, other WPDB if the standard $wpdb isn't good enough for you.
+		@return		array		The rows from the query.
 	**/
 	protected function query($query , $wpdb = null)
 	{
@@ -296,8 +300,8 @@ class SD_Activity_Monitor_Base
 	/**
 		Fire an SQL query and return the results only if there is one row result.
 		
-		@param		$query		string		The SQL query.
-		@return		array|false				Either the row as an array, or false if more than one row.
+		@param		$query			The SQL query.
+		@return						Either the row as an array, or false if more than one row.
 	**/
 	protected function query_single($query)
 	{
@@ -310,8 +314,8 @@ class SD_Activity_Monitor_Base
 	/**
 		Fire an SQL query and return the row ID of the inserted row.
 
-		@param		$query		string		The SQL query.
-		@return		int						The inserted ID.
+		@param		$query		The SQL query.
+		@return					The inserted ID.
 	**/
 	protected function query_insert_id($query)
 	{
@@ -322,8 +326,8 @@ class SD_Activity_Monitor_Base
 	/**
 		Converts an object to a base64 encoded, serialized string, ready to be inserted into sql.
 		
-		@param		$object		object		An object.
-		@return		string					Serialized, base64-encoded string.
+		@param		$object		An object.
+		@return					Serialized, base64-encoded string.
 	**/
 	protected function sql_encode( $object )
 	{
@@ -332,8 +336,8 @@ class SD_Activity_Monitor_Base
 	
 	/**
 		Converts a base64 encoded, serialized string back into an object.
-		@param		$string		string		Serialized, base64-encoded string.
-		@return		object					Object, if possible.
+		@param		$string			Serialized, base64-encoded string.
+		@return						Object, if possible.
 	**/
 	protected function sql_decode( $string )
 	{
@@ -343,8 +347,8 @@ class SD_Activity_Monitor_Base
 	/**
 		Returns whether a table exists.
 		
-		@param		$table_name		string		Table name to check for.
-		@return		bool						True if the table exists.
+		@param		$table_name		Table name to check for.
+		@return						True if the table exists.
 	**/
 	protected function sql_table_exists( $table_name )
 	{
@@ -359,7 +363,7 @@ class SD_Activity_Monitor_Base
 	
 	/**
 		Returns the user's role as a string.
-		@return		string					User's role as a string.
+		@return					User's role as a string.
 	**/
 	protected function get_user_role()
 	{
@@ -371,8 +375,8 @@ class SD_Activity_Monitor_Base
 	/**
 		Checks whether the user's role is at least $role.
 		
-		@param		$role		string		Role as string.
-		@return		bool					True if role is at least $role.
+		@param		$role		Role as string.
+		@return					True if role is at least $role.
 	**/
 	protected function role_at_least($role)
 	{
@@ -423,8 +427,8 @@ class SD_Activity_Monitor_Base
 	/**
 		Creates a new SD_Form.
 		
-		@param		$options	array		Default options to send to the SD form constructor.
-		@return		object					A new SD form class.
+		@param		$options	Default options to send to the SD form constructor.
+		@return					A new SD form class.
 	**/ 
 	protected function form($options = array())
 	{
@@ -444,7 +448,7 @@ class SD_Activity_Monitor_Base
 		
 		Will prepend the class name in front, to make the options easily findable in the table.
 		
-		@param		$option		string		Option name to fix.
+		@param		$option		Option name to fix.
 	**/
 	protected function fix_option_name($option)
 	{
@@ -456,8 +460,8 @@ class SD_Activity_Monitor_Base
 		
 		If this is a network, the site option is preferred.
 		
-		@param		$option		string		Name of option to get.
-		@return		mixed					Value.
+		@param		$option		Name of option to get.
+		@return					Value.
 	**/
 	protected function get_option($option)
 	{
@@ -473,8 +477,8 @@ class SD_Activity_Monitor_Base
 		
 		If this is a network, the site option is preferred.
 		
-		@param		$option		string		Name of option to update.
-		@param		$value		mixed		New value
+		@param		$option		Name of option to update.
+		@param		$value		New value
 	**/
 	protected function update_option($option, $value)
 	{
@@ -490,7 +494,7 @@ class SD_Activity_Monitor_Base
 		
 		If this is a network, the site option is preferred.
 		
-		@param		$option		string		Name of option to delete.
+		@param		$option		Name of option to delete.
 	**/
 	protected function delete_option($option)
 	{
@@ -504,20 +508,25 @@ class SD_Activity_Monitor_Base
 	/**
 		Gets the value of a local option.
 		
-		@param		$option		$string		Name of option to get.
-		@return		mixed					Value.
+		@param		$option			Name of option to get.
+		@param		$default		The default value if the option === false
+		@return						Value.
 	**/
-	protected function get_local_option($option)
+	protected function get_local_option($option, $default = false)
 	{
 		$option = $this->fix_option_name($option);
-		return get_option($option);
+		$value = get_option($option);
+		if ( $value === false )
+			return $default;
+		else
+			return $value;
 	}
 	
 	/**
 		Updates a local option.
 		
-		@param		option		$string		Name of option to update.
-		@param		$value		mixed		New value
+		@param		option		Name of option to update.
+		@param		$value		New value
 	**/
 	protected function update_local_option($option, $value)
 	{
@@ -528,7 +537,7 @@ class SD_Activity_Monitor_Base
 	/**
 		Deletes a local option.
 		
-		@param		$option		$string		Name of option to delete.
+		@param		$option		Name of option to delete.
 	**/
 	protected function delete_local_option($option)
 	{
@@ -539,20 +548,25 @@ class SD_Activity_Monitor_Base
 	/**
 		Gets the value of a site option.
 		
-		@param		$option		string		Name of option to get.
-		@return		mixed					Value.
+		@param		$option		Name of option to get.
+		@param		$default	The default value if the option === false
+		@return					Value.
 	**/
-	protected function get_site_option($option)
+	protected function get_site_option($option, $default = false)
 	{
 		$option = $this->fix_option_name($option);
-		return get_site_option($option);
+		$value = get_site_option($option);
+		if ( $value === false )
+			return $default;
+		else
+			return $value;
 	}
 	
 	/**
 		Updates a site option.
 		
-		@param		$option		string		Name of option to update.
-		@param		$value		mixed		New value
+		@param		$option		Name of option to update.
+		@param		$value		New value
 	**/
 	protected function update_site_option($option, $value)
 	{
@@ -563,7 +577,7 @@ class SD_Activity_Monitor_Base
 	/**
 		Deletes a site option.
 		
-		@param		$option		string		Name of option to delete.
+		@param		$option		Name of option to delete.
 	**/
 	protected function delete_site_option($option)
 	{
@@ -650,8 +664,8 @@ class SD_Activity_Monitor_Base
 		
 		Autodetects HTML / text.
 		
-		@param		$type		string		Type of message: error, warning, whatever. Free content.
-		@param		$string		string		The message to display.
+		@param		$type		Type of message: error, warning, whatever. Free content.
+		@param		$string		The message to display.
 	**/
 	public function display_message($type, $string)
 	{
@@ -672,7 +686,7 @@ class SD_Activity_Monitor_Base
 		
 		The only thing that makes it an error message is that the div has the class "error".
 		
-		@param		$string		string		String to display.
+		@param		$string		String to display.
 	**/
 	public function error($string)
 	{
@@ -682,7 +696,7 @@ class SD_Activity_Monitor_Base
 	/**
 		Displays an informational message.
 		
-		@param		$string		string		String to display.
+		@param		$string		String to display.
 	**/
 	public function message($string)
 	{
@@ -694,91 +708,39 @@ class SD_Activity_Monitor_Base
 	// -------------------------------------------------------------------------------------------------
 	
 	/**
-		Replaces an existing &OPTION=VALUE pair from the uri.
-		If value is NULL, will remove the option completely.
-		If pair does not exist, the pair will be placed at the end of the uri.
-		
-		Examples:
-			URLmake("sortorder", "name", "index.php?page=start")
-			=> "index.php?page=start&sortorder=name"
-			
-			URLmake("sortorder", "name", "index.php?page=start&sortorder=date")
-			=> "index.php?page=start&sortorder=name"
-		
-			URLmake("sortorder", null, "index.php?page=start&sortorder=date")
-			=> "index.php?page=start"
-		
-			URLmake("page", null, "index.php?page=start&sortorder=date")
-			=> "index.php?sortorder=date"
-		
-			URLmake("sortorder", "name", "index.php?page=start&sortorder=date&security=none")
-			=> "index.php?page=start&security=none&sortorder=name"
-	*/	
-	public static function urlMake($option, $value = null, $url = null)
-	{
-		if ($url === null)
-			$url = $_SERVER['REQUEST_URI'];
-		
-		$url = html_entity_decode($url);
-		
-		// Replace all ? with & and add an & at the end
-		$url = preg_replace('/\?/', '&', $url);
-		$url = preg_replace('/&+$/', '&', $url . '&');
-		
-		// Remove the value?
-		if ($value === null)
-		{
-			// Remove the key
-			$url = preg_replace('/&'.$option.'=?(.*)&/U', '&', $url);
-		}
-		else
-		{
-			$value = (string)$value;		// Else we have 0-problems.
-			// Fix the value
-			if ($value != '')
-				$value = '=' . $value;
-			// Does the key exist? Replace
-			if (strpos($url, '&'.$option) !== false)
-				$url = preg_replace('/&'.$option.'=(.*)&|&'.$option.'&/U', '&' . $option . $value . '&', $url);
-			else	// Or append
-				$url .= $option . $value . '&';
-		}
-		
-		// First & becomes a question mark
-		$url = preg_replace('/&(.*)&$/U', '?\1', $url);
-		
-		// Remove & at the end
-		$url = preg_replace('/&$/', '', $url);
-
-		return htmlentities($url);
-	}
-	
-	/**
 		Displays Wordpress tabs.
 		
-		@param		$options		array		See options.
+		@param		$options		See options.
 	**/
 	protected function tabs($options)
 	{
 		$options = array_merge(array(
-			'tabs' =>		array(),				// Array of tab names
-			'functions' =>	array(),				// Array of functions associated with each tab name.
-			'page_titles' =>	array(),				// Array of page titles associated with each tab.
 			'count' =>		array(),				// Optional array of a strings to display after each tab name. Think: page counts.
+			'default' => null,						// Default tab index.
 			'display' => true,						// Display the tabs or return them.
 			'displayTabName' => true,				// If display==true, display the tab name.
 			'displayBeforeTabName' => '<h2>',		// If displayTabName==true, what to display before the tab name.
 			'displayAfterTabName' => '</h2>',		// If displayTabName==true, what to display after the tab name.
-			'getKey' =>	'tab',						// $_GET key to get the tab value from.
+			'functions' =>	array(),				// Array of functions associated with each tab name.
+			'get_key' =>	'tab',						// $_GET key to get the tab value from.
+			'page_titles' =>	array(),			// Array of page titles associated with each tab.
+			'tabs' =>		array(),				// Array of tab names
 			'valid_get_keys' => array(),			// Display only these _GET keys.
-			'default' => 0,							// Default tab index.
 		), $options);
 		
-		$getKey = $options['getKey'];			// Convenience.
+		// Work on a copy of the _GET.
+		$get = $_GET;
+		
+		$get_key = $options['get_key'];			// Convenience.
+		
+		// Is the default not set or set to something stupid? Fix it.
+		if ( ! isset( $options['tabs'][ $options['default'] ] ) )
+			$options['default'] = key( $options['tabs'] );
 
-		if (!isset($_GET[$getKey]))	// Select the default tab if none is selected.
-			$_GET[$getKey] = sanitize_title( $options['tabs'][$options['default']] );
-		$selected = $_GET[$getKey];
+		// Select the default tab if none is selected.
+		if (!isset($get[$get_key]))
+			$get[$get_key] = sanitize_title( $options['tabs'][$options['default']] );
+		$selected = $get[$get_key];
 		
 		$options['valid_get_keys']['page'] = 'page';
 		
@@ -786,17 +748,28 @@ class SD_Activity_Monitor_Base
 		if (count($options['tabs'])>1)
 		{
 			$returnValue .= '<ul class="subsubsub">';
-			$link = $_SERVER['REQUEST_URI'];
+			$original_link = $_SERVER['REQUEST_URI'];
 
-			foreach($_GET as $key => $value)
+			foreach($get as $key => $value)
 				if ( !in_array($key, $options['valid_get_keys']) )
-					$link = remove_query_arg($key, $link);
+					$original_link = remove_query_arg($key, $original_link);
 			
 			$index = 0;
 			foreach($options['tabs'] as $tab_index => $tab)
 			{
 				$slug = $this->tab_slug($tab);
-				$link = ($index == $options['default'] ? self::urlMake($getKey, null, $link) : self::urlMake($getKey, $slug, $link));
+				
+				// Make the link.
+				// If we're already on that tab, just return the current url.
+				if ( $get[$get_key] == $slug )
+					$link = remove_query_arg( time() );
+				else
+				{
+					if ( $index == $options['default'] )
+						$link = remove_query_arg( $get_key, $original_link );
+					else
+						$link = add_query_arg( $get_key, $slug, $original_link );
+				}
 				
 				$text = $tab;
 				if (isset($options['count'][$index]))
@@ -922,9 +895,9 @@ class SD_Activity_Monitor_Base
 		
 		Given an array of arrays, take the key from the subarray and makes it the key of the main array.
 	
-		@param		array		$array		Array to rearrange.
-		@param		$key		$string		Which if the subarray keys to make the key in the main array.
-		@return		array					Rearranged array.
+		@param		$array		Array to rearrange.
+		@param		$key		Which if the subarray keys to make the key in the main array.
+		@return		array		Rearranged array.
 	**/
 	public function array_moveKey($array, $key)
 	{
@@ -977,9 +950,9 @@ class SD_Activity_Monitor_Base
 	/**
 		Display the time ago as human-readable string.
 		
-		@param		$time_string	string		"2010-04-12 15:19"
-		@param		$time			string		An optional timestamp to base time difference on, if not now.
-		@return		string						"28 minutes ago"
+		@param		$time_string	"2010-04-12 15:19"
+		@param		$time			An optional timestamp to base time difference on, if not now.
+		@return						"28 minutes ago"
 	**/
 	protected function ago($time_string, $time = null)
 	{
@@ -994,11 +967,34 @@ class SD_Activity_Monitor_Base
 	/**
 		Returns WP's current timestamp (corrected for UTC)
 		
-		@return		string						Current timestamp in MYSQL datetime format.
+		@return						Current timestamp in MYSQL datetime format.
 	*/
-	protected function now()
+	public function now()
 	{
 		return date('Y-m-d H:i:s', current_time('timestamp'));
+	}
+	
+	/**
+		Recursively removes a directory.
+		
+		Assumes that all files in the directory, and the dir itself, are writeable.
+		
+		@param		$directory		Directory to remove.
+	**/
+	public function rmdir( $directory )
+	{
+		$directory = rtrim( $directory, '/' );
+		if ( $directory == '.' || $directory == '..' )
+			return;
+		if ( is_file( $directory ) )
+			unlink ( $directory );
+		else
+		{
+			$files = glob( $directory . '/*' );
+			foreach( $files as $file )
+				$this->rmdir( $file );
+			rmdir( $directory );
+		}
 	}
 	
 	/**
@@ -1024,9 +1020,9 @@ class SD_Activity_Monitor_Base
 	/**
 		Returns a hash value of a string. The standard hash type is sha512 (64 chars).
 		
-		@param		$string		string			String to hash.
-		@param		$type		string			Hash to use. Default is sha512.
-		@return		string						Hashed string.
+		@param		$string			String to hash.
+		@param		$type			Hash to use. Default is sha512.
+		@return						Hashed string.
 	**/
 	protected function hash($string, $type = 'sha512')
 	{
@@ -1036,8 +1032,8 @@ class SD_Activity_Monitor_Base
 	/**
 		Multibyte strtolower.
 	
-		@param		$string		string			String to lowercase.
-		@return		string						Lowercased string.
+		@param		$string			String to lowercase.
+		@return						Lowercased string.
 	**/
 	protected function strtolower( $string )
 	{
@@ -1047,8 +1043,8 @@ class SD_Activity_Monitor_Base
 	/**
 		Multibyte strtoupper.
 	
-		@param		$string		string			String to uppercase.
-		@return		string						Uppercased string.
+		@param		$string			String to uppercase.
+		@return						Uppercased string.
 	**/
 	protected function strtoupper( $string )
 	{
