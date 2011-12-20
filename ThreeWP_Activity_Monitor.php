@@ -3,7 +3,7 @@
 Plugin Name: ThreeWP Activity Monitor
 Plugin URI: http://mindreantre.se/threewp-activity-monitor/
 Description: Plugin to track user activity. Network aware.
-Version: 2.4
+Version: 2.5
 Author: edward mindreantre
 Author URI: http://www.mindreantre.se
 Author Email: edward@mindreantre.se
@@ -22,6 +22,8 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 	protected $site_options = array(
 		'activities_limit' => 100000,
 		'activities_limit_view' => 100,
+		'password_length' => 99,									// How many characters of the password to show
+		'post_types' => array( 'page', 'post' ),					// Which post types to save
 		'role_logins_view'	=>			'administrator',			// Role required to view own logins
 		'role_logins_view_other' =>		'administrator',			// Role required to view other users' logins
 		'role_logins_delete' =>			'administrator',			// Role required to delete own logins 
@@ -70,7 +72,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 		add_filter( 'threewp_activity_monitor_find_activities', array(&$this, 'find_activities'), 10, 2 );
 		add_filter( 'threewp_activity_monitor_list_activities', array(&$this, 'list_activities'), 10, 2 );
 		add_filter( 'threewp_activity_monitor_list_activities', array(&$this, 'clean_activities_list'), 100000, 2 );		
-		add_filter( 'threewp_activity_monitor_convert_activity_to_post', array(&$this, 'convert_activity_to_post'), 100000, 2 );		
+		add_filter( 'threewp_activity_monitor_convert_activity_to_post', array(&$this, 'convert_activity_to_post'), 100000, 2 );
 	}
 	
 	// --------------------------------------------------------------------------------------------
@@ -115,7 +117,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 			) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 		");
 		
-		if ($this->get_option('database_version') < 120)
+		if ($this->get_site_option( 'database_version') < 120)
 		{
 			// v1.2 serializes AND base64_encodes the data. So go through all the rows and encode what is necessary.
 			$rows = $this->sql_index_list(array('limit' => 100000000));
@@ -125,10 +127,10 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 				if ( $data !== false)
 					$this->query("UPDATE `".$this->wpdb->base_prefix."_3wp_activity_monitor_index` SET data = '". base64_encode(serialize($data))."' WHERE i_id = '".$row['i_id']."'");
 			}
-			$this->update_option('database_version', 120);
+			$this->update_site_option('database_version', 120);
 		}
 		
-		if ($this->get_option('database_version') < 200)
+		if ($this->get_site_option( 'database_version') < 200)
 		{
 			// v1.5 doesn't need the post and login tables.
 			$this->query( "DROP TABLE `".$this->wpdb->base_prefix."_3wp_activity_monitor_index`" );
@@ -143,7 +145,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 			// We have an extra column in index.
 			$this->query("ALTER TABLE `".$this->wpdb->base_prefix."3wp_activity_monitor_index` ADD `user_id` INT NULL COMMENT 'User''s ID' AFTER `activity_id`" );
 			$this->query("ALTER TABLE `".$this->wpdb->base_prefix."3wp_activity_monitor_index` ADD INDEX ( `user_id`)");
-			$this->update_option('database_version', 200);
+			$this->update_site_option('database_version', 200);
 		}
 		
 		// Select all activities per default
@@ -166,7 +168,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 	public function cron()
 	{
 		$this->sql_activities_crop(array(
-			'limit' => $this->get_option('activities_limit'),
+			'limit' => $this->get_site_option( 'activities_limit'),
 		));
 	}
 
@@ -190,17 +192,17 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 	
 	public function common_admin_menu()
 	{
-		if ($this->role_at_least( $this->get_option('role_logins_view') ))
+		if ($this->role_at_least( $this->get_site_option( 'role_logins_view') ))
 			add_filter( 'show_user_profile', array(&$this, 'show_user_profile'));
-		if ($this->role_at_least( $this->get_option('role_logins_delete') ))
+		if ($this->role_at_least( $this->get_site_option( 'role_logins_delete') ))
 			add_filter( 'personal_options_update', array(&$this, 'personal_options_update'));
 
-		if ($this->role_at_least( $this->get_option('role_logins_view_other') ))
+		if ($this->role_at_least( $this->get_site_option( 'role_logins_view_other') ))
 			add_filter( 'edit_user_profile', array(&$this, 'show_user_profile'));
-		if ($this->role_at_least( $this->get_option('role_logins_delete_other') ))
+		if ($this->role_at_least( $this->get_site_option( 'role_logins_delete_other') ))
 			add_filter( 'edit_user_profile_update', array(&$this, 'personal_options_update'));
 
-		if ($this->role_at_least( $this->get_option('role_logins_view_other') ))
+		if ($this->role_at_least( $this->get_site_option( 'role_logins_view_other') ))
 		{
 			add_filter( 'manage_users_columns', array(&$this, 'manage_users_columns')); 
 			add_filter( 'wpmu_users_columns', array(&$this, 'manage_users_columns')); 
@@ -223,7 +225,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 		$tab_data['tabs'][] = $this->_('Overview');
 		$tab_data['functions'][] = 'adminOverview';
 
-		if ($this->role_at_least( $this->get_option('role_logins_delete_other') ))
+		if ($this->role_at_least( $this->get_site_option( 'role_logins_delete_other') ))
 		{
 			$tab_data['tabs'][] = $this->_('Settings');
 			$tab_data['functions'][] = 'admin_settings';
@@ -244,7 +246,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 			'count' => true,
 		));
 		
-		$per_page = $this->get_option('activities_limit_view');
+		$per_page = $this->get_site_option( 'activities_limit_view');
 		$max_pages = floor($count / $per_page);
 		$page = (isset($_GET['paged']) ? $_GET['paged'] : 1);
 		$page = $this->minmax($page, 1, $max_pages);
@@ -283,15 +285,17 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 			
 		if (isset($_POST['3am_submit']))
 		{
-			$this->update_option( 'activities_limit', intval($_POST['activities_limit']) );
-			$this->update_option( 'activities_limit_view', intval($_POST['activities_limit_view']) );
+			$this->update_site_option( 'activities_limit', intval($_POST['activities_limit']) );
+			$this->update_site_option( 'activities_limit_view', intval($_POST['activities_limit_view']) );
 			
 			$this->sql_activities_crop(array(
-				'limit' => $this->get_option( 'activities_limit' )
+				'limit' => $this->get_site_option( 'activities_limit' )
 			));
 
+			$this->update_site_option( 'password_length', intval($_POST['password_length']) );
+
 			foreach(array('role_logins_view', 'role_logins_view_other', 'role_logins_delete', 'role_logins_delete_other') as $key)
-				$this->update_option($key, (isset($roles[$_POST[$key]]) ? $_POST[$key] : 'administrator'));
+				$this->update_site_option($key, (isset($roles[$_POST[$key]]) ? $_POST[$key] : 'administrator'));
 
 			$this->message('Options saved!');
 		}
@@ -308,7 +312,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 				'label' => $this->_('Keep at most this amount of activities in the database'),
 				'maxlength' => 10,
 				'size' => 5,
-				'value' => $this->get_option('activities_limit'),
+				'value' => $this->get_site_option( 'activities_limit'),
 				'validation' => array(
 					'empty' => true,
 				),
@@ -319,39 +323,65 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 				'label' => $this->_('Display this amount of activities per page'),
 				'maxlength' => 10,
 				'size' => 5,
-				'value' => $this->get_option('activities_limit_view'),
+				'value' => $this->get_site_option( 'activities_limit_view'),
 				'validation' => array(
 					'empty' => true,
 				),
+			),
+			'password_length' => array(
+				'type' => 'text',
+				'name' => 'password_length',
+				'label' => $this->_('Password length'),
+				'description' => $this->_('Maximum length of passwords to show when logging failed logins. Set to 0 to disable logging of failed passwords.'),
+				'maxlength' => 2,
+				'size' => 2,
+				'value' => $this->get_site_option( 'password_length'),
+			),
+			'post_types' => array(
+				'name' => 'post_types',
+				'type' => 'select',
+				'label' => $this->_('Post types'),
+				'description' => $this->_('Which type of post types to log.'),
+				'multiple' => true,
+				'size' => 5,
+				'css_style' => 'height: auto;',
+				'value' => $this->get_site_option( 'post_types' ),
 			),
 			'role_logins_view' => array(
 				'name' => 'role_logins_view',
 				'type' => 'select',
 				'label' => 'View own login statistics',
-				'value' => $this->get_option('role_logins_view'),
+				'value' => $this->get_site_option( 'role_logins_view'),
 				'options' => $this->roles_as_options(),
 			),
 			'role_logins_view_other' => array(
 				'name' => 'role_logins_view_other',
 				'type' => 'select',
 				'label' => 'View other users\' login statistics',
-				'value' => $this->get_option('role_logins_view_other'),
+				'value' => $this->get_site_option( 'role_logins_view_other'),
 				'options' => $this->roles_as_options(),
 			),
 			'role_logins_delete' => array(
 				'name' => 'role_logins_delete',
 				'type' => 'select',
 				'label' => 'Delete own login statistics',
-				'value' => $this->get_option('role_logins_delete'),
+				'value' => $this->get_site_option( 'role_logins_delete'),
 				'options' => $this->roles_as_options(),
 			),
 			'role_logins_delete_other' => array(
 				'name' => 'role_logins_delete_other',
 				'type' => 'select',
 				'label' => 'Delete other users\' login statistics and administer the plugin settings',
-				'value' => $this->get_option('role_logins_delete_other'),
+				'value' => $this->get_site_option( 'role_logins_delete_other'),
 				'options' => $this->roles_as_options(),
 			),
+		);
+	
+		$post_types = array( 'post', 'page' );
+		$custom_post_types = get_post_types( array( 'public' => true, '_builtin' => false ) );
+		$inputs[ 'post_types' ][ 'options' ] = array_combine(
+			array_merge( $post_types, $custom_post_types ),
+			array_merge( $post_types, $custom_post_types )
 		);
 		
 		$inputSubmit = array(
@@ -386,6 +416,14 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 				$inputs['role_logins_view_other'],
 				$inputs['role_logins_delete'],
 				$inputs['role_logins_delete_other'],
+				$inputSubmit,
+			) ) ) . '
+			
+			<h3>Misc</h3>
+			
+			' . $this->display_form_table( array( 'inputs' => array(
+				$inputs['password_length'],
+				$inputs['post_types'],
 				$inputSubmit,
 			) ) ) . '
 			
@@ -564,14 +602,20 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 	public function wp_login_failed( $username )
 	{
 		$user_data = get_user_by( 'login', $username );
+		$activity_strings = array(
+			'' => $this->_( "%user_login_with_link% tried to log in to %blog_name_with_link%" ),
+			$this->_( 'Password tried' ) => $this->maybe_censor_password( esc_html( $_POST['pwd'] ) ),
+			$this->_( 'IP' ) => $this->make_ip('html2'),
+			$this->_( 'User agent' ) => '%server_http_user_agent%',
+		);
+		
+		// Don't bother even showing the password heading if the password is completely censored.
+		if ( $activity_strings[ $this->_( 'Password tried' ) ] == '' )
+			unset( $activity_strings[ $this->_( 'Password tried' ) ] );
+
 		do_action('threewp_activity_monitor_new_activity', array(
 			'activity_id' => 'wp_login_failed',
-			'activity_strings' => array(
-				'' => $this->_( "%user_login_with_link% tried to log in to %blog_name_with_link%" ),
-				$this->_( 'Password tried' ) => esc_html( $_POST['pwd'] ),
-				$this->_( 'IP' ) => $this->make_ip('html2'),
-				$this->_( 'User agent' ) => '%server_http_user_agent%',
-			),
+			'activity_strings' => $activity_strings,
 			'user_data' => $user_data,
 		));
 		$this->sql_stats_increment( $user_data->ID, 'login_failure' );
@@ -854,7 +898,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 			'show_mass_edit' => false,
 		));
 
-		if ($this->role_at_least( $this->get_option('role_logins_delete') ))
+		if ($this->role_at_least( $this->get_site_option( 'role_logins_delete') ))
 		{
 			$form = $this->form();
 			
@@ -1008,6 +1052,8 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 		$bloginfo_name = get_bloginfo('name');		// Convenience
 		$bloginfo_url = get_bloginfo('url');		// Convenience
 		$options['blog_id'] = $blog_id;
+		
+		$this->fix_remote_host();
 
 		$replacements = array(
 			'%user_id%' => $user_id,
@@ -1033,7 +1079,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 			$post_title = $post_data->post_title == '' ? $this->_( 'no title' ) : $post_data->post_title;
 			
 			$post_data = $options['post_data'];
-			$post_link = $bloginfo_url . '?p=' . $post_data->ID;
+			$post_link = get_permalink( $post_data->ID );
 			$replacements['%post_title%'] = $post_title;
 			$replacements['%post_link%'] = $post_link;
 			$replacements['%post_title_with_link%'] = sprintf( '<a href="%s">%s</a>',
@@ -1364,9 +1410,23 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 		}
 	}
 	
+	/**
+		Maybe censor the password, depending on the user's settings.
+		
+		@param		$password		Password to maybe censor.
+		@return						The maybe-censored password.
+	**/	
+	public function maybe_censor_password( $password )
+	{
+		$password_length = $this->get_site_option( 'password_length' );
+		return substr( $password, 0, strlen( $password ) );
+	}
+	
 	private function make_ip($type = 'text1')
 	{
-		switch($type)
+		$this->fix_remote_host();
+
+		switch($type)		
 		{
 			case 'text1':
 				if ($_SERVER['REMOTE_HOST'] != '')
@@ -1399,7 +1459,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 	{
 		$form = $this->form();
 		$options = array_merge( array(
-			'show_mass_edit' => $this->role_at_least( $this->get_option('role_logins_delete_other') ),
+			'show_mass_edit' => $this->role_at_least( $this->get_site_option( 'role_logins_delete_other') ),
 		), $options );
 		
 		$ago = true;			// Display the login time as "ago" or datetime?
@@ -1408,7 +1468,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 		$mass = '';
 		$th_cb = '';
 		
-		$may_delete = $this->role_at_least( $this->get_option('role_logins_delete_other') ) && ( $options['show_mass_edit'] === true );
+		$may_delete = $this->role_at_least( $this->get_site_option( 'role_logins_delete_other') ) && ( $options['show_mass_edit'] === true );
 		
 		$form_start = $may_delete ? $form->start() : '';
 		$form_stop = $may_delete ? $form->stop() : '';
@@ -1575,10 +1635,12 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 	private function post_is_for_real($post)
 	{
 		// Posts must be published and the parent must be 0 (meaning no autosaves)
-		// Also: posts must actually be posts, not pages or menus or anything.
+		// Also: posts must actually be posts or custom post types, not pages or menus or anything.
 		if ( !is_object($post) )
 			return false;
-		return $post->post_status == 'publish' && $post->post_parent == 0 && ( $post->post_type == 'post' || $post->post_type == 'page' );
+		$post_types = $this->get_site_option( 'post_types' );
+		
+		return $post->post_status == 'publish' && in_array( $post->post_type, $post_types );
 	}
 	
 	private function make_profile_link($user_id, $text = "")
@@ -1588,6 +1650,16 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 			$text = $this->cache['user'][$user_id]->user_login;
 		
 		return '<a href="user-edit.php?user_id='.$user_id.'">'. $text .'</a>';
+	}
+	
+	/**
+		If the REMOTE_HOST isn't set, try to look it up.
+	**/
+	private function fix_remote_host()
+	{
+		$new_remote_host = ( isset( $_SERVER['REMOTE_HOST'] ) ) ? $_SERVER['REMOTE_HOST'] : @gethostbyaddr( $_SERVER['REMOTE_ADDR'] );
+		if ( $new_remote_host != $_SERVER['REMOTE_ADDR'] )
+			$_SERVER['REMOTE_HOST'] = esc_html( $new_remote_host );
 	}
 	
 	// --------------------------------------------------------------------------------------------

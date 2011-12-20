@@ -17,321 +17,338 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ThreeWP_Activity_Monitor.php:804
+#: ThreeWP_Activity_Monitor.php:848
 msgid "%user_login_with_link% "
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:675
+#: ThreeWP_Activity_Monitor.php:719
 #, php-format
 msgid "%user_login_with_link% created"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:661
+#: ThreeWP_Activity_Monitor.php:705
 #, php-format
 msgid "%user_login_with_link% deleted"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:759
+#: ThreeWP_Activity_Monitor.php:803
 msgid "%user_login_with_link% deleted %post_title_with_link% on %blog_name_with_link%"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:613
+#: ThreeWP_Activity_Monitor.php:657
 msgid "%user_login_with_link% has reset the password on %blog_name_with_link%"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:549
+#: ThreeWP_Activity_Monitor.php:587
 msgid "%user_login_with_link% logged in to %blog_name_with_link%"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:588
+#: ThreeWP_Activity_Monitor.php:632
 msgid "%user_login_with_link% logged out from %blog_name_with_link%"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:730
+#: ThreeWP_Activity_Monitor.php:774
 msgid "%user_login_with_link% trashed %post_title_with_link% on %blog_name_with_link%"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:570
+#: ThreeWP_Activity_Monitor.php:606
 msgid "%user_login_with_link% tried to log in to %blog_name_with_link%"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:743
+#: ThreeWP_Activity_Monitor.php:787
 msgid "%user_login_with_link% untrashed %post_title_with_link% on %blog_name_with_link%"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:717
+#: ThreeWP_Activity_Monitor.php:761
 msgid "%user_login_with_link% updated %post_title_with_link% on %blog_name_with_link%"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:599
+#: ThreeWP_Activity_Monitor.php:643
 msgid "%user_login_with_link% wanted a new password from %blog_name_with_link%"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:701
+#: ThreeWP_Activity_Monitor.php:745
 msgid "%user_login_with_link% wrote %post_title_with_link% on %blog_name_with_link%"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1157
+#: ThreeWP_Activity_Monitor.php:1203
 msgid "A new page or post has been published."
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:231
+#: ThreeWP_Activity_Monitor.php:233
 msgid "Activities"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1563
+#: ThreeWP_Activity_Monitor.php:1623
 msgid "Activity"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:188 ThreeWP_Activity_Monitor.php:210
+#: ThreeWP_Activity_Monitor.php:190 ThreeWP_Activity_Monitor.php:212
 msgid "Activity Monitor"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:487
+#: ThreeWP_Activity_Monitor.php:525
 msgid "Also select all activities that log sensitive information"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:360 ThreeWP_Activity_Monitor.php:495
-#: ThreeWP_Activity_Monitor.php:1455
+#: ThreeWP_Activity_Monitor.php:390 ThreeWP_Activity_Monitor.php:533
+#: ThreeWP_Activity_Monitor.php:1515
 msgid "Apply"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:465
+#: ThreeWP_Activity_Monitor.php:503
 msgid "Can be converted to a post."
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:877
+#: ThreeWP_Activity_Monitor.php:921
 msgid "Clear the user's activity list completely"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1124
+#: ThreeWP_Activity_Monitor.php:1170
 msgid "Comment was approved."
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1121
+#: ThreeWP_Activity_Monitor.php:1167
 msgid "Comment was deleted."
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1112
+#: ThreeWP_Activity_Monitor.php:1158
 msgid "Comment was held back."
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1109
+#: ThreeWP_Activity_Monitor.php:1155
 msgid "Comment was reapproved."
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1106
+#: ThreeWP_Activity_Monitor.php:1152
 msgid "Comment was reset."
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1115
+#: ThreeWP_Activity_Monitor.php:1161
 msgid "Comment was spammed."
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1118
+#: ThreeWP_Activity_Monitor.php:1164
 msgid "Comment was trashed."
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:865
+#: ThreeWP_Activity_Monitor.php:909
 msgid "Crop the activity list down to this amount of rows"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1448
+#: ThreeWP_Activity_Monitor.php:1508
 msgid "Delete"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:486
+#: ThreeWP_Activity_Monitor.php:524
 msgid "Deselect all"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:488
+#: ThreeWP_Activity_Monitor.php:526
 msgid "Deselect all activities that log sensitive information"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:319
+#: ThreeWP_Activity_Monitor.php:323
 msgid "Display this amount of activities per page"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:831
+#: ThreeWP_Activity_Monitor.php:875
 msgid "Failed logins"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:631
+#: ThreeWP_Activity_Monitor.php:675
 msgid "First name"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:633 ThreeWP_Activity_Monitor.php:641
+#: ThreeWP_Activity_Monitor.php:677 ThreeWP_Activity_Monitor.php:685
 #, php-format
 msgid "From \"<em>%s</em>\" to \"<em>%s</em>\""
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:550 ThreeWP_Activity_Monitor.php:572
-#: ThreeWP_Activity_Monitor.php:600 ThreeWP_Activity_Monitor.php:614
+#: ThreeWP_Activity_Monitor.php:588 ThreeWP_Activity_Monitor.php:608
+#: ThreeWP_Activity_Monitor.php:644 ThreeWP_Activity_Monitor.php:658
 msgid "IP"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:308
+#: ThreeWP_Activity_Monitor.php:312
 msgid "Keep at most this amount of activities in the database"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:639
+#: ThreeWP_Activity_Monitor.php:683
 msgid "Last name"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:829 ThreeWP_Activity_Monitor.php:950
+#: ThreeWP_Activity_Monitor.php:873 ThreeWP_Activity_Monitor.php:994
 msgid "Latest login"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:907
+#: ThreeWP_Activity_Monitor.php:951
 msgid "Login statistics"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:462
+#: ThreeWP_Activity_Monitor.php:500
 msgid "Logs sensitive information."
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1131
+#: ThreeWP_Activity_Monitor.php:1177
 msgid "Logs the password the user tried to login with."
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1150
+#: ThreeWP_Activity_Monitor.php:335
+msgid "Maximum length of passwords to show when logging failed logins. Set to 0 to disable logging of failed passwords."
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:1196
 msgid "New password was requested"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:939
+#: ThreeWP_Activity_Monitor.php:983
 msgid "No login data available"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1447
+#: ThreeWP_Activity_Monitor.php:1507
 msgid "Nothing"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:223
+#: ThreeWP_Activity_Monitor.php:225
 msgid "Overview"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:628
+#: ThreeWP_Activity_Monitor.php:672
 msgid "Password"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:628
+#: ThreeWP_Activity_Monitor.php:672
 msgid "Password changed"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:571
+#: ThreeWP_Activity_Monitor.php:334
+msgid "Password length"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:607 ThreeWP_Activity_Monitor.php:613
+#: ThreeWP_Activity_Monitor.php:614
 msgid "Password tried"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1153
+#: ThreeWP_Activity_Monitor.php:1199
 msgid "Password was reset"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1156
+#: ThreeWP_Activity_Monitor.php:1202
 msgid "Post published"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1171
+#: ThreeWP_Activity_Monitor.php:343
+msgid "Post types"
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:1217
 msgid "Post was deleted"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1165
+#: ThreeWP_Activity_Monitor.php:1211
 msgid "Post was trashed"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1168
+#: ThreeWP_Activity_Monitor.php:1214
 msgid "Post was untrashed"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1162
+#: ThreeWP_Activity_Monitor.php:1208
 msgid "Post was updated"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:833
+#: ThreeWP_Activity_Monitor.php:877
 msgid "Reset passwords"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:832
+#: ThreeWP_Activity_Monitor.php:876
 msgid "Retrieved passwords"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:484
+#: ThreeWP_Activity_Monitor.php:522
 msgid "Save marked activities"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:485
+#: ThreeWP_Activity_Monitor.php:523
 msgid "Select all"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1474
+#: ThreeWP_Activity_Monitor.php:1534
 msgid "Selected"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:228
+#: ThreeWP_Activity_Monitor.php:230
 msgid "Settings"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:830
+#: ThreeWP_Activity_Monitor.php:874
 msgid "Successful logins"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1434
+#: ThreeWP_Activity_Monitor.php:1494
 #, php-format
 msgid "The selected activities have been deleted! %sReload this page%s."
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1562
+#: ThreeWP_Activity_Monitor.php:1622
 msgid "Time"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:234
+#: ThreeWP_Activity_Monitor.php:236
 msgid "Uninstall"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:820
+#: ThreeWP_Activity_Monitor.php:864
 msgid "User activity"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:551 ThreeWP_Activity_Monitor.php:573
-#: ThreeWP_Activity_Monitor.php:601 ThreeWP_Activity_Monitor.php:615
+#: ThreeWP_Activity_Monitor.php:589 ThreeWP_Activity_Monitor.php:609
+#: ThreeWP_Activity_Monitor.php:645 ThreeWP_Activity_Monitor.php:659
 msgid "User agent"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1144
+#: ThreeWP_Activity_Monitor.php:1190
 msgid "User deleted (network)"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1147
+#: ThreeWP_Activity_Monitor.php:1193
 msgid "User deleted (single)"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1127
+#: ThreeWP_Activity_Monitor.php:1173
 msgid "User login"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1130
+#: ThreeWP_Activity_Monitor.php:1176
 msgid "User login failed"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1135
+#: ThreeWP_Activity_Monitor.php:1181
 msgid "User logout"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1141
+#: ThreeWP_Activity_Monitor.php:1187
 msgid "User profile updated"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1138
+#: ThreeWP_Activity_Monitor.php:1184
 msgid "User registration"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:907
+#: ThreeWP_Activity_Monitor.php:951
 msgid "Various login statistics about the user"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1445
+#: ThreeWP_Activity_Monitor.php:344
+msgid "Which type of post types to log."
+msgstr ""
+
+#: ThreeWP_Activity_Monitor.php:1505
 msgid "With the selected actions do:"
 msgstr ""
 
-#: ThreeWP_Activity_Monitor.php:1033
+#: ThreeWP_Activity_Monitor.php:1079
 msgid "no title"
 msgstr ""

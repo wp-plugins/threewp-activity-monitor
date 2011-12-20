@@ -219,7 +219,6 @@ Return a complete post. The guid should be used as a link to the post or comment
 
 1. Main activity monitor tab
 1. User list with "last login" column
-1. Password tried info
 1. Settings tab
 1. Uninstall settings
 
@@ -236,6 +235,10 @@ Converts the data column to a base64encoded serialized string.
 The old activity table is removed.
 
 == Changelog ==
+= 2.5 =
+* Post link uses get_permalink.
+* Remote host isn't displayed if it doesn't actually have a hostname.
+* Custom posts can be logged.
 = 2.4 =
 * Wordpress 3.3 compatability.
 * Page updates are tracked. Same as post updates.
