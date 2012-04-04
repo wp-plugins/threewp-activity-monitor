@@ -3,7 +3,7 @@
 Plugin Name: ThreeWP Activity Monitor
 Plugin URI: http://mindreantre.se/threewp-activity-monitor/
 Description: Plugin to track user activity. Network aware.
-Version: 2.5
+Version: 2.9
 Author: edward mindreantre
 Author URI: http://www.mindreantre.se
 Author Email: edward@mindreantre.se
@@ -67,6 +67,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 		add_action( 'wp_set_comment_status', array(&$this, 'wp_set_comment_status'), 10, 3 );
 		
 		add_action( 'threewp_activity_monitor_new_activity', array(&$this, 'log_new_activity'), 100000, 1 );
+
 		add_filter( 'threewp_activity_monitor_delete_activity', array(&$this, 'delete_activity'), 100000, 2 );
 		add_filter( 'threewp_activity_monitor_display_activity', array(&$this, 'display_activity'), 100000, 2 );
 		add_filter( 'threewp_activity_monitor_find_activities', array(&$this, 'find_activities'), 10, 2 );
@@ -296,6 +297,8 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 
 			foreach(array('role_logins_view', 'role_logins_view_other', 'role_logins_delete', 'role_logins_delete_other') as $key)
 				$this->update_site_option($key, (isset($roles[$_POST[$key]]) ? $_POST[$key] : 'administrator'));
+			
+			$this->update_site_option( 'post_types', $_POST[ 'post_types' ] );
 
 			$this->message('Options saved!');
 		}
@@ -376,7 +379,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 				'options' => $this->roles_as_options(),
 			),
 		);
-	
+		
 		$post_types = array( 'post', 'page' );
 		$custom_post_types = get_post_types( array( 'public' => true, '_builtin' => false ) );
 		$inputs[ 'post_types' ][ 'options' ] = array_combine(
@@ -594,6 +597,8 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 		$this->sql_stats_increment( $user_data->ID, 'login_success' );
 		// Updated the latest login time.
 		$this->sql_stats_set($user_data->ID, 'latest_login', $this->now());
+		
+		return $username;
 	}
 	
 	/**
@@ -602,8 +607,17 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 	public function wp_login_failed( $username )
 	{
 		$user_data = get_user_by( 'login', $username );
+		
+		if ( $user_data === false )
+			$user = $username;
+		else
+			$user = '%user_login_with_link%';
+		
 		$activity_strings = array(
-			'' => $this->_( "%user_login_with_link% tried to log in to %blog_name_with_link%" ),
+			'' => sprintf( "%s %s",
+					$user,
+					$this->_( "tried to log in to %blog_name_with_link%" )
+				),
 			$this->_( 'Password tried' ) => $this->maybe_censor_password( esc_html( $_POST['pwd'] ) ),
 			$this->_( 'IP' ) => $this->make_ip('html2'),
 			$this->_( 'User agent' ) => '%server_http_user_agent%',
@@ -619,6 +633,8 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 			'user_data' => $user_data,
 		));
 		$this->sql_stats_increment( $user_data->ID, 'login_failure' );
+
+		return $username;
 	}
 	
 	/**
@@ -632,13 +648,14 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 				'' => $this->_( "%user_login_with_link% logged out from %blog_name_with_link%" ),
 			),
 		));
+		return $username;
 	}
 	
 	public function retrieve_password($username)
 	{
 		$user_data = get_user_by( 'login', $username );
 		do_action('threewp_activity_monitor_new_activity', array(
-			'activity_id' => 'password_retrieve',
+			'activity_id' => 'retrieve_password',
 			'activity_strings' => array(
 				'' => $this->_( "%user_login_with_link% wanted a new password from %blog_name_with_link%" ),
 				$this->_( 'IP' ) => $this->make_ip('html2'),
@@ -646,6 +663,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 			),
 			'user_data' => $user_data,
 		));
+		return $username;
 	}
 	
 	public function password_reset($user_data)
@@ -660,40 +678,30 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 			),
 			'user_data' => $user_data,
 		));
+		return $user_data;
 	}
 	
 	public function profile_update($user_id, $old_userdata)
 	{
-		$new_userdata = get_userdata($user_id);		
+		$new_userdata = get_userdata($user_id);
 		
 		$changes = array();
-		
+
 		if ($old_userdata->user_pass != $new_userdata->user_pass)
 			$changes[ $this->_( 'Password' ) ] = $this->_( 'Password changed' );
 		
-		if ($old_userdata->first_name != $new_userdata->first_name)
-			$changes[ $this->_( 'First name' ) ] =
-				sprintf(
-					$this->_( 'From "<em>%s</em>" to "<em>%s</em>"' ),
-					$old_userdata->first_name,
-					$new_userdata->first_name
-				);
-		
-		if ($old_userdata->last_name != $new_userdata->last_name)
-			$changes[ $this->_( 'Last name' )] =
-				sprintf(
-					$this->_( 'From "<em>%s</em>" to "<em>%s</em>"' ),
-					$old_userdata->last_name,
-					$new_userdata->last_name
-				);
-		
 		if ( count($changes) < 1 )
 			return;
+		
+		// First row of string should be the actual action.
+		$changes = array( ' '  => '%user_login_with_link% has updated their profile.' ) + $changes;
 		
 		do_action('threewp_activity_monitor_new_activity', array(
 			'activity_id' => 'profile_update',
 			'activity_strings' => $changes,
 		) );
+
+		return $user_id;
 	}
 	
 	public function delete_user($user_id)
@@ -708,6 +716,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 				),
 			),
 		));
+		return $user_id;
 	}
 	
 	public function user_register($user_id)
@@ -722,6 +731,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 				),
 			),
 		));
+		return $user_id;
 	}
 	
 	public function publish_post($new_status, $old_status, $post)
@@ -764,9 +774,12 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 		));
 	}
 	
-	public function trashed_post($post_id)
+	public function trashed_post( $post_id )
 	{
 		$post_data = get_post($post_id);
+
+		if ( !$this->post_is_for_real( $post_data ) )
+			return;
 
 		do_action('threewp_activity_monitor_new_activity', array(
 			'activity_id' => 'trashed_post',
@@ -780,6 +793,9 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 	public function untrashed_post($post_id)
 	{
 		$post_data = get_post($post_id);
+
+		if ( !$this->post_is_for_real( $post_data ) )
+			return;
 
 		do_action('threewp_activity_monitor_new_activity', array(
 			'activity_id' => 'untrashed_post',
@@ -798,7 +814,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 			return;
 
 		do_action('threewp_activity_monitor_new_activity', array(
-			'activity_id' => 'untrashed_post',
+			'activity_id' => 'deleted_post',
 			'activity_strings' => array(
 				'' => $this->_( '%user_login_with_link% deleted %post_title_with_link% on %blog_name_with_link%' ),
 			),
@@ -1064,7 +1080,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 			'%blog_name_with_link%' => sprintf('<a href="%s">%s</a>', $bloginfo_url, $bloginfo_name),
 			'%blog_name_with_panel_link%' => sprintf('<a href="%s">%s</a>', $bloginfo_url . '/wp-admin', $bloginfo_name),
 			'%server_http_user_agent%' => esc_html( $_SERVER['HTTP_USER_AGENT'] ),
-			'%server_http_remote_host%' => $_SERVER['REMOTE_HOST'],
+			'%server_http_remote_host%' => isset( $_SERVER['REMOTE_HOST'] ) ? $_SERVER['REMOTE_HOST'] : '',
 			'%server_http_remote_addr%' => $_SERVER['REMOTE_ADDR'],
 		);
 		
@@ -1075,10 +1091,10 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 		
 		if ( $options['post_data'] !== null )
 		{
-			// Sometimes people write posts that don't have titles.
-			$post_title = $post_data->post_title == '' ? $this->_( 'no title' ) : $post_data->post_title;
-			
 			$post_data = $options['post_data'];
+			// Sometimes people write posts that don't have titles.
+			// __() is for qTranslate support.
+			$post_title = $post_data->post_title == '' ? $this->_( 'no title' ) : __( $post_data->post_title );
 			$post_link = get_permalink( $post_data->ID );
 			$replacements['%post_title%'] = $post_title;
 			$replacements['%post_link%'] = $post_link;
@@ -1370,7 +1386,6 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 		
 		@param		array		$options		Find options.
 	**/
-	
 	public function find_activities( $options )
 	{
 		return $this->sql_index_list( $options );
@@ -1419,7 +1434,12 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 	public function maybe_censor_password( $password )
 	{
 		$password_length = $this->get_site_option( 'password_length' );
-		return substr( $password, 0, strlen( $password ) );
+		if ( $password_length < strlen( $password ) )
+		{
+			return substr( $password, 0, $password_length );
+		}
+		else
+			return $password;
 	}
 	
 	private function make_ip($type = 'text1')
@@ -1429,25 +1449,25 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 		switch($type)		
 		{
 			case 'text1':
-				if ($_SERVER['REMOTE_HOST'] != '')
+				if ( isset( $_SERVER['REMOTE_HOST'] ) )
 					return $_SERVER['REMOTE_HOST'] . ' ('.$_SERVER['REMOTE_ADDR'].')';
 				else
 					return $_SERVER['REMOTE_ADDR'];
 			break;
 			case 'text2':
-				if ($_SERVER['REMOTE_HOST'] != '')
+				if ( isset( $_SERVER['REMOTE_HOST'] ) )
 					return $_SERVER['REMOTE_HOST'] . ' / '.$_SERVER['REMOTE_ADDR'];
 				else
 					return $_SERVER['REMOTE_ADDR'];
 			break;
 			case 'html1':
-				if ($_SERVER['REMOTE_HOST'] != '')
+				if ( isset( $_SERVER['REMOTE_HOST'] ) )
 					return '<span title="'.$_SERVER['REMOTE_ADDR'].'">' . $_SERVER['REMOTE_HOST'] . '</span>';
 				else
 					return $_SERVER['REMOTE_ADDR'];
 			break;
 			case 'html2':
-				if ($_SERVER['REMOTE_HOST'] != '')
+				if ( isset( $_SERVER['REMOTE_HOST'] ) )
 					return $_SERVER['REMOTE_HOST'] . ' <span class="threewp_activity_monitor_sep">|</span> '.$_SERVER['REMOTE_ADDR'];
 				else
 					return $_SERVER['REMOTE_ADDR'];
@@ -1634,9 +1654,13 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 	
 	private function post_is_for_real($post)
 	{
+		// If Wordpress itself is doing things then ignore it.
+		if ( get_current_user_id() < 1 )
+			return false;
+
 		// Posts must be published and the parent must be 0 (meaning no autosaves)
 		// Also: posts must actually be posts or custom post types, not pages or menus or anything.
-		if ( !is_object($post) )
+		if ( !is_object( $post ) )
 			return false;
 		$post_types = $this->get_site_option( 'post_types' );
 		
@@ -1730,7 +1754,7 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 		$this->query( $query );
 	}
 	
-	public function sql_index_list($options)
+	public function sql_index_list( $options )
 	{
 		$options = array_merge(array(
 			'limit' => 1000,
@@ -1771,43 +1795,33 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 	{
 		$options = array_merge(array(
 			'user_id' => null,
+			'limit' => null,
 		), $options);
 		
 		$rows = $this->sql_index_list(array(
 			'user_id' => $options['user_id'],
-			'limit' => ($options['user_id'] !== null ? null : $options['limit']),
+			'limit' => $options[ 'limit' ],
 			'select' => 'i_id',
 		));
 		
 		if ($options['user_id'] !== null)
 		{
-			for($counter=0; $counter < $options['limit']; $counter++)
-				array_shift($rows);
+			$rows_to_keep = array();
+			foreach( $rows as $row )
+				$rows_to_keep[] = $row['i_id'];
 
-			$rows_to_delete = array(
-				'i_id' => array(),
-			);
-			foreach($rows as $row)
-				foreach($rows_to_delete as $key => $ignore)
-					if ($row[$key] != '')
-						$rows_to_delete[$key][] = $row[$key];
-						
-			$query = "DELETE FROM `".$this->wpdb->base_prefix."3wp_activity_monitor_index` WHERE i_id IN ('".(implode("', '", $rows_to_delete['i_id']))."')";
+			$query = "DELETE FROM `".$this->wpdb->base_prefix."3wp_activity_monitor_index` WHERE i_id NOT IN ('".(implode("', '", $rows_to_keep))."') AND `user_id` = '" . $options['user_id'] . "'";
 			$this->query($query);
 			return;
 		}
 		
 		$rows = $this->array_moveKey($rows, 'i_id');
 		
-		$rows_to_keep = array(
-			'i_id' => array(),
-		);
-		foreach($rows as $row)
-			foreach($rows_to_keep as $key => $ignore)
-				if ($row[$key] != '')
-					$rows_to_keep[$key][] = $row[$key];
+		$rows_to_keep = array();
+		foreach( $rows as $row )
+			$rows_to_keep[] = $row['i_id'];
 		
-		$query = "DELETE FROM `".$this->wpdb->base_prefix."3wp_activity_monitor_index` WHERE i_id NOT IN ('".(implode("', '", $rows_to_keep['i_id']))."')";
+		$query = "DELETE FROM `".$this->wpdb->base_prefix."3wp_activity_monitor_index` WHERE i_id NOT IN ('".(implode("', '", $rows_to_keep))."')";
 		$this->query($query);
 	}
 	

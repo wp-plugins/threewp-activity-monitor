@@ -28,7 +28,11 @@ Unlike the wpmu.org "premium" plugins, Blog Activity and User Activity, this plu
 
 Has an uninstall option to completely remove itself from the database.
 
-Available in English and Swedish.
+Available in
+
+* English
+* Slovakian ( franci.humerca@fama.eu )
+* Swedish
 
 Since v1.2 other plugins can add new activities.
 
@@ -222,6 +226,89 @@ Return a complete post. The guid should be used as a link to the post or comment
 1. Settings tab
 1. Uninstall settings
 
+== Changelog ==
+
+= 2.9 2012-04-04 =
+* Cropping of user activity works
+* Saving of post types in the settings now works
+* Fixed saving of tried password
+* Fixed display of non-existent users trying to log in
+* First and last name profile updates are no longer saved because that functionality doesn't really exist
+* Wordpress trashing and untrashing posts should no longer be shown
+* Post deletions have the correct activity type
+
+= 2.8 2012-01-25 =
+* Filters return their values (wp_login blocked other plugins from working)
+
+= 2.7 =
+* Retrieve password activity is now correctly logged (wasn't logged at all)
+* Better check for REMOTE_HOST (isset)
+
+= 2.6 =
+* Post title is filtered through __()
+
+= 2.5 =
+* Post link uses get_permalink.
+* Remote host isn't displayed if it doesn't actually have a hostname.
+* Custom posts can be logged.
+* Passwords can be censored.
+
+= 2.4 =
+* Wordpress 3.3 compatability.
+* Page updates are tracked. Same as post updates.
+* First and last name changes are quoted.
+
+= 2.3 =
+* Comment tracking is back.
+
+= 2.2 =
+* Documentation fixes.
+* Password should actually be displayed in all cases now.
+* More language strings.
+
+= 2.1 =
+* Fixed make_input problem.
+* Uses Wordpress' check-column column for selecting activites.
+* Site-admin role visible in settings.
+* Form UI updated here and there.
+
+= 2.0 =
+* _login and _posts tables aren't used anymore.
+* Most activity collected until now is obsolete. The activity log will have to be cleared.
+* User's activity is now clearable again.
+* Stored actions are self-contained and static, no longer dynamic (that's a pretty big change right there).
+* Fixed column overwriting (thanks groucho75).
+
+= 1.4 =
+* Only posts and pages are counted as activity. Not menus or attachments.
+* Updated the framework
+
+= 1.3 =
+* WP 3.1 support
+* User's activities shown in profile (fixed)
+
+= 1.2 =
+* threewp_activity_monitor_new_activity action added.
+
+= 1.1 =
+* Wordpress deleting posts and comments isn't logged anymore.
+* Pagination added
+* Password tried info added for login failures
+
+= 1.0 =
+* Major overhaul.
+* Settings are kept when activating the plugin.
+
+= 0.3 =
+* WP3.0 compatability
+
+= 0.0.2 =
+* Backend link to each blog
+* Code cleanup (new base class, etc)
+
+= 0.0.1 =
+* Initial public release
+
 == Upgrade Notice ==
 
 = 2.0 =
@@ -233,52 +320,3 @@ Return a complete post. The guid should be used as a link to the post or comment
 Converts the data column to a base64encoded serialized string.
 = 1.0 =
 The old activity table is removed.
-
-== Changelog ==
-= 2.5 =
-* Post link uses get_permalink.
-* Remote host isn't displayed if it doesn't actually have a hostname.
-* Custom posts can be logged.
-= 2.4 =
-* Wordpress 3.3 compatability.
-* Page updates are tracked. Same as post updates.
-* First and last name changes are quoted.
-= 2.3 =
-* Comment tracking is back.
-= 2.2 =
-* Documentation fixes.
-* Password should actually be displayed in all cases now.
-* More language strings.
-= 2.1 =
-* Fixed make_input problem.
-* Uses Wordpress' check-column column for selecting activites.
-* Site-admin role visible in settings.
-* Form UI updated here and there.
-= 2.0 =
-* _login and _posts tables aren't used anymore.
-* Most activity collected until now is obsolete. The activity log will have to be cleared.
-* User's activity is now clearable again.
-* Stored actions are self-contained and static, no longer dynamic (that's a pretty big change right there).
-* Fixed column overwriting (thanks groucho75).
-= 1.4 =
-* Only posts and pages are counted as activity. Not menus or attachments.
-* Updated the framework
-= 1.3 =
-* WP 3.1 support
-* User's activities shown in profile (fixed)
-= 1.2 =
-* threewp_activity_monitor_new_activity action added.
-= 1.1 =
-* Wordpress deleting posts and comments isn't logged anymore.
-* Pagination added
-* Password tried info added for login failures
-= 1.0 =
-* Major overhaul.
-* Settings are kept when activating the plugin.
-= 0.3 =
-* WP3.0 compatability
-= 0.0.2 =
-* Backend link to each blog
-* Code cleanup (new base class, etc)
-= 0.0.1 =
-* Initial public release
