@@ -1,0 +1,353 @@
+# ThreeWP Activity Monitor
+# Copyright (C) 2011
+# This file is distributed under the GPL v3.
+# Mindre än Tre <info@mindreantre.se>, 2011.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ThreeWP Activity Monitor\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-05-14 14:24+0100\n"
+"PO-Revision-Date: 2012-05-14 14:40+0100\n"
+"Last-Translator: Seb giss <sgissinger@gmail.com>\n"
+"Language-Team: Mindre än Tre <info@mindreantre.se>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
+"X-Poedit-KeywordsList: _\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SearchPath-0: ..\n"
+
+#: ../SD_Activity_Monitor_Base.php:410
+msgid "Super admin"
+msgstr "Super admin"
+
+#: ../ThreeWP_Activity_Monitor.php:191
+#: ../ThreeWP_Activity_Monitor.php:213
+msgid "Activity Monitor"
+msgstr "Moniteur d'activité"
+
+#: ../ThreeWP_Activity_Monitor.php:226
+msgid "Overview"
+msgstr "Vue d'ensemble"
+
+#: ../ThreeWP_Activity_Monitor.php:231
+msgid "Settings"
+msgstr "Paramètres"
+
+#: ../ThreeWP_Activity_Monitor.php:234
+msgid "Activities"
+msgstr "Activités"
+
+#: ../ThreeWP_Activity_Monitor.php:237
+msgid "Uninstall"
+msgstr "Désinstaller"
+
+#: ../ThreeWP_Activity_Monitor.php:315
+msgid "Keep at most this amount of activities in the database"
+msgstr "Conserver cette quantité maximum d'activités dans la base de données"
+
+#: ../ThreeWP_Activity_Monitor.php:326
+msgid "Display this amount of activities per page"
+msgstr "Afficher ce nombre d'activités par page"
+
+#: ../ThreeWP_Activity_Monitor.php:337
+msgid "Password length"
+msgstr "Longueur de mot de passe"
+
+#: ../ThreeWP_Activity_Monitor.php:338
+msgid "Maximum length of passwords to show when logging failed logins. Set to 0 to disable logging of failed passwords."
+msgstr "Longueur maximum des mots de passe à afficher lorsque vous enregistrer les connexions échouées. Mettre à 0 pour désactiver la conservation des mots de passe incorrects."
+
+#: ../ThreeWP_Activity_Monitor.php:346
+msgid "Post types"
+msgstr "Types de Posts"
+
+#: ../ThreeWP_Activity_Monitor.php:347
+msgid "Which type of post types to log."
+msgstr "Quel type de post à enregistrer."
+
+#: ../ThreeWP_Activity_Monitor.php:393
+#: ../ThreeWP_Activity_Monitor.php:536
+#: ../ThreeWP_Activity_Monitor.php:1535
+msgid "Apply"
+msgstr "Appliquer"
+
+#: ../ThreeWP_Activity_Monitor.php:503
+msgid "Logs sensitive information."
+msgstr "Conserver les informations sensibles."
+
+#: ../ThreeWP_Activity_Monitor.php:506
+msgid "Can be converted to a post."
+msgstr "Peut être converti en un post."
+
+#: ../ThreeWP_Activity_Monitor.php:525
+msgid "Save marked activities"
+msgstr "Enregistrer les activités marquées"
+
+#: ../ThreeWP_Activity_Monitor.php:526
+msgid "Select all"
+msgstr "Tout sélectionner"
+
+#: ../ThreeWP_Activity_Monitor.php:527
+msgid "Deselect all"
+msgstr "Tout déselectionner"
+
+#: ../ThreeWP_Activity_Monitor.php:528
+msgid "Also select all activities that log sensitive information"
+msgstr "Sélectionner aussi toutes les activités conservant des informations sensibles"
+
+#: ../ThreeWP_Activity_Monitor.php:529
+msgid "Deselect all activities that log sensitive information"
+msgstr "Déselectionner toutes les activités conservant des informations sensibles"
+
+#: ../ThreeWP_Activity_Monitor.php:590
+msgid "%user_login_with_link% logged in to %blog_name_with_link%"
+msgstr "%user_login_with_link% s'est connecté à %blog_name_with_link%"
+
+#: ../ThreeWP_Activity_Monitor.php:591
+#: ../ThreeWP_Activity_Monitor.php:622
+#: ../ThreeWP_Activity_Monitor.php:661
+#: ../ThreeWP_Activity_Monitor.php:676
+msgid "IP"
+msgstr "IP"
+
+#: ../ThreeWP_Activity_Monitor.php:592
+#: ../ThreeWP_Activity_Monitor.php:623
+#: ../ThreeWP_Activity_Monitor.php:662
+#: ../ThreeWP_Activity_Monitor.php:677
+msgid "User agent"
+msgstr "User agent"
+
+#: ../ThreeWP_Activity_Monitor.php:619
+msgid "tried to log in to %blog_name_with_link%"
+msgstr "a essayé de se connecter à %blog_name_with_link%"
+
+#: ../ThreeWP_Activity_Monitor.php:621
+#: ../ThreeWP_Activity_Monitor.php:627
+#: ../ThreeWP_Activity_Monitor.php:628
+msgid "Password tried"
+msgstr "Mot de passe essayé"
+
+#: ../ThreeWP_Activity_Monitor.php:648
+msgid "%user_login_with_link% logged out from %blog_name_with_link%"
+msgstr "%user_login_with_link% s'est déconnecté de %blog_name_with_link%"
+
+#: ../ThreeWP_Activity_Monitor.php:660
+msgid "%user_login_with_link% wanted a new password from %blog_name_with_link%"
+msgstr "%user_login_with_link% a demandé un nouveau mot de passe pour %blog_name_with_link%"
+
+#: ../ThreeWP_Activity_Monitor.php:675
+msgid "%user_login_with_link% has reset the password on %blog_name_with_link%"
+msgstr "%user_login_with_link% a réinitialisé le mot de passe sur %blog_name_with_link%"
+
+#: ../ThreeWP_Activity_Monitor.php:691
+msgid "Password"
+msgstr "Mot de passe"
+
+#: ../ThreeWP_Activity_Monitor.php:691
+msgid "Password changed"
+msgstr "Mot de passe modifié"
+
+#: ../ThreeWP_Activity_Monitor.php:713
+msgid "%user_login_with_link% deleted"
+msgstr "%user_login_with_link% a été supprimé"
+
+#: ../ThreeWP_Activity_Monitor.php:728
+msgid "%user_login_with_link% created"
+msgstr "%user_login_with_link% a été créé"
+
+#: ../ThreeWP_Activity_Monitor.php:755
+msgid "%user_login_with_link% wrote %post_title_with_link% on %blog_name_with_link%"
+msgstr "%user_login_with_link% a écrit %post_title_with_link% sur %blog_name_with_link%"
+
+#: ../ThreeWP_Activity_Monitor.php:771
+msgid "%user_login_with_link% updated %post_title_with_link% on %blog_name_with_link%"
+msgstr "%user_login_with_link% a mis à jour %post_title_with_link% sur %blog_name_with_link%"
+
+#: ../ThreeWP_Activity_Monitor.php:787
+msgid "%user_login_with_link% trashed %post_title_with_link% on %blog_name_with_link%"
+msgstr "%user_login_with_link% a placé %post_title_with_link% dans la corbeille sur %blog_name_with_link%"
+
+#: ../ThreeWP_Activity_Monitor.php:803
+msgid "%user_login_with_link% untrashed %post_title_with_link% on %blog_name_with_link%"
+msgstr "%user_login_with_link% a enlevé %post_title_with_link% de la corbeille sur %blog_name_with_link%"
+
+#: ../ThreeWP_Activity_Monitor.php:819
+msgid "%user_login_with_link% deleted %post_title_with_link% on %blog_name_with_link%"
+msgstr "%user_login_with_link% a supprimé %post_title_with_link% sur %blog_name_with_link%"
+
+#: ../ThreeWP_Activity_Monitor.php:864
+msgid "%user_login_with_link% "
+msgstr "%user_login_with_link% "
+
+#: ../ThreeWP_Activity_Monitor.php:880
+msgid "User activity"
+msgstr "Activité de l'utilisateur"
+
+#: ../ThreeWP_Activity_Monitor.php:889
+#: ../ThreeWP_Activity_Monitor.php:1010
+msgid "Latest login"
+msgstr "Dernière connexion"
+
+#: ../ThreeWP_Activity_Monitor.php:890
+msgid "Successful logins"
+msgstr "Connexions réussies"
+
+#: ../ThreeWP_Activity_Monitor.php:891
+msgid "Failed logins"
+msgstr "Connexions échouées"
+
+#: ../ThreeWP_Activity_Monitor.php:892
+msgid "Retrieved passwords"
+msgstr "Mots de passes récupérés"
+
+#: ../ThreeWP_Activity_Monitor.php:893
+msgid "Reset passwords"
+msgstr "Mots de passes réinitialisés"
+
+#: ../ThreeWP_Activity_Monitor.php:925
+msgid "Crop the activity list down to this amount of rows"
+msgstr "Ne conserver que ce nombre d'activité dans la liste"
+
+#: ../ThreeWP_Activity_Monitor.php:937
+msgid "Clear the user's activity list completely"
+msgstr "Vider complètement la liste d'activité de cet utilisateur"
+
+#: ../ThreeWP_Activity_Monitor.php:967
+msgid "Various login statistics about the user"
+msgstr "Diverses statistiques de connexion de l'utilistateur"
+
+#: ../ThreeWP_Activity_Monitor.php:967
+msgid "Login statistics"
+msgstr "Statistiques de connexions"
+
+#: ../ThreeWP_Activity_Monitor.php:999
+msgid "No login data available"
+msgstr "Aucun information de connexion disponible"
+
+#: ../ThreeWP_Activity_Monitor.php:1097
+msgid "no title"
+msgstr "pas de titre"
+
+#: ../ThreeWP_Activity_Monitor.php:1168
+msgid "Comment was reset."
+msgstr "Le commentaire a été réinitialisé."
+
+#: ../ThreeWP_Activity_Monitor.php:1171
+msgid "Comment was reapproved."
+msgstr "Le commentaire a été ré-approuvé."
+
+#: ../ThreeWP_Activity_Monitor.php:1174
+msgid "Comment was held back."
+msgstr "Le commentaire a été mis en attente."
+
+#: ../ThreeWP_Activity_Monitor.php:1177
+msgid "Comment was spammed."
+msgstr "Le commentaire a été marqué en spam."
+
+#: ../ThreeWP_Activity_Monitor.php:1180
+msgid "Comment was trashed."
+msgstr "Le commentaire a été placé dans la corbeille."
+
+#: ../ThreeWP_Activity_Monitor.php:1183
+msgid "Comment was deleted."
+msgstr "Le commentaire a été supprimé."
+
+#: ../ThreeWP_Activity_Monitor.php:1186
+msgid "Comment was approved."
+msgstr "Le commentaire a été approuvé."
+
+#: ../ThreeWP_Activity_Monitor.php:1189
+msgid "User login"
+msgstr "Connexion de l'utilisateur"
+
+#: ../ThreeWP_Activity_Monitor.php:1192
+msgid "User login failed"
+msgstr "Connexion de l'utilisateur échouée"
+
+#: ../ThreeWP_Activity_Monitor.php:1193
+msgid "Logs the password the user tried to login with."
+msgstr "Enregistrer le mot de passe avec lequel l'utilisateur a essayé de se connecter."
+
+#: ../ThreeWP_Activity_Monitor.php:1197
+msgid "User logout"
+msgstr "Connexion de l'utilisateur"
+
+#: ../ThreeWP_Activity_Monitor.php:1200
+msgid "User registration"
+msgstr "Enregistrement de l'utilisateur"
+
+#: ../ThreeWP_Activity_Monitor.php:1203
+msgid "User profile updated"
+msgstr "Le profil de l'utilisateur a été mis à jour"
+
+#: ../ThreeWP_Activity_Monitor.php:1206
+msgid "User deleted (network)"
+msgstr "Utilisateur supprimé (réseau)"
+
+#: ../ThreeWP_Activity_Monitor.php:1209
+msgid "User deleted (single)"
+msgstr "Utilisateur supprimé (site)"
+
+#: ../ThreeWP_Activity_Monitor.php:1212
+msgid "New password was requested"
+msgstr "Un nouveau mot de passe a été demandé"
+
+#: ../ThreeWP_Activity_Monitor.php:1215
+msgid "Password was reset"
+msgstr "Le mot de passe a été réinitialisé"
+
+#: ../ThreeWP_Activity_Monitor.php:1218
+msgid "Post published"
+msgstr "Publication du post"
+
+#: ../ThreeWP_Activity_Monitor.php:1219
+msgid "A new page or post has been published."
+msgstr "Une nouvelle page/post a été publié(e)."
+
+#: ../ThreeWP_Activity_Monitor.php:1224
+msgid "Post was updated"
+msgstr "Le post a été mis à jour"
+
+#: ../ThreeWP_Activity_Monitor.php:1227
+msgid "Post was trashed"
+msgstr "Le post a été placé dans la corbeille"
+
+#: ../ThreeWP_Activity_Monitor.php:1230
+msgid "Post was untrashed"
+msgstr "Le post a été enlevé de la corbeille"
+
+#: ../ThreeWP_Activity_Monitor.php:1233
+msgid "Post was deleted"
+msgstr "Le post a été supprimé"
+
+#: ../ThreeWP_Activity_Monitor.php:1514
+msgid "The selected activities have been deleted! %sReload this page%s."
+msgstr "Les activités sélectionnées ont été supprimées  ! %sRecharger cette page%s."
+
+#: ../ThreeWP_Activity_Monitor.php:1525
+msgid "With the selected actions do:"
+msgstr "Exécuter la tâche suivante sur les actions sélectionnées :"
+
+#: ../ThreeWP_Activity_Monitor.php:1527
+msgid "Nothing"
+msgstr "Rien"
+
+#: ../ThreeWP_Activity_Monitor.php:1528
+msgid "Delete"
+msgstr "Supprimer"
+
+#: ../ThreeWP_Activity_Monitor.php:1554
+msgid "Selected"
+msgstr "Sélectionné"
+
+#: ../ThreeWP_Activity_Monitor.php:1642
+msgid "Time"
+msgstr "Temps"
+
+#: ../ThreeWP_Activity_Monitor.php:1643
+msgid "Activity"
+msgstr "Activité"
+

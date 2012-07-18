@@ -1,0 +1,367 @@
+# ThreeWP Activity Monitor
+# Copyright (C) 2011
+# This file is distributed under the GPL v3.
+# Mindre än Tre <info@mindreantre.se>, 2011.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ThreeWP Activity Monitor\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-10-10 07:44+0200\n"
+"PO-Revision-Date: 2012-01-28 16:15+0100\n"
+"Last-Translator: Frenk <franci.humerca@fama.eu>\n"
+"Language-Team: Frenk <franci.humerca@fama.eu>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: 3\n"
+"X-Poedit-Language: Slovenian\n"
+"X-Poedit-Country: SLOVENIA\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: ThreeWP_Activity_Monitor.php:848
+msgid "%user_login_with_link% "
+msgstr "%user_login_with_link% "
+
+#: ThreeWP_Activity_Monitor.php:719
+#, php-format
+msgid "%user_login_with_link% created"
+msgstr "%user_login_with_link%  narejen"
+
+#: ThreeWP_Activity_Monitor.php:705
+#, php-format
+msgid "%user_login_with_link% deleted"
+msgstr "%user_login_with_link% zbrisan"
+
+#: ThreeWP_Activity_Monitor.php:803
+msgid "%user_login_with_link% deleted %post_title_with_link% on %blog_name_with_link%"
+msgstr "%user_login_with_link% izbrisan %post_title_with_link% na %blog_name_with_link%"
+
+#: ThreeWP_Activity_Monitor.php:657
+msgid "%user_login_with_link% has reset the password on %blog_name_with_link%"
+msgstr "%user_login_with_link% je spremenil geslo na %blog_name_with_link%"
+
+#: ThreeWP_Activity_Monitor.php:587
+msgid "%user_login_with_link% logged in to %blog_name_with_link%"
+msgstr "%user_login_with_link% se je prijavil v %blog_name_with_link%"
+
+#: ThreeWP_Activity_Monitor.php:632
+msgid "%user_login_with_link% logged out from %blog_name_with_link%"
+msgstr "%user_login_with_link% se je odjavil iz %blog_name_with_link%"
+
+#: ThreeWP_Activity_Monitor.php:774
+msgid "%user_login_with_link% trashed %post_title_with_link% on %blog_name_with_link%"
+msgstr "%user_login_with_link% je prenesel v smeti %post_title_with_link% na %blog_name_with_link%"
+
+#: ThreeWP_Activity_Monitor.php:606
+msgid "%user_login_with_link% tried to log in to %blog_name_with_link%"
+msgstr "%user_login_with_link% se je poskusil prijaviti v %blog_name_with_link%"
+
+#: ThreeWP_Activity_Monitor.php:787
+msgid "%user_login_with_link% untrashed %post_title_with_link% on %blog_name_with_link%"
+msgstr "%user_login_with_link% je obnovil iz smeti %post_title_with_link% on %blog_name_with_link%"
+
+#: ThreeWP_Activity_Monitor.php:761
+msgid "%user_login_with_link% updated %post_title_with_link% on %blog_name_with_link%"
+msgstr "%user_login_with_link% popravil %post_title_with_link% na %blog_name_with_link%"
+
+#: ThreeWP_Activity_Monitor.php:643
+msgid "%user_login_with_link% wanted a new password from %blog_name_with_link%"
+msgstr "%user_login_with_link% je želel novo geslo iz %blog_name_with_link%"
+
+#: ThreeWP_Activity_Monitor.php:745
+msgid "%user_login_with_link% wrote %post_title_with_link% on %blog_name_with_link%"
+msgstr "%user_login_with_link% je napisal %post_title_with_link% na %blog_name_with_link%"
+
+#: ThreeWP_Activity_Monitor.php:1203
+msgid "A new page or post has been published."
+msgstr "Nova stran ali prispevek je bil objavljen."
+
+#: ThreeWP_Activity_Monitor.php:233
+msgid "Activities"
+msgstr "Aktivnosti"
+
+#: ThreeWP_Activity_Monitor.php:1623
+msgid "Activity"
+msgstr "Aktivnosti"
+
+#: ThreeWP_Activity_Monitor.php:190
+#: ThreeWP_Activity_Monitor.php:212
+msgid "Activity Monitor"
+msgstr "Opazovanje aktivnosti"
+
+#: ThreeWP_Activity_Monitor.php:525
+msgid "Also select all activities that log sensitive information"
+msgstr "Izberi tudi vse aktivnosti za beleženje občutljivih informacij"
+
+#: ThreeWP_Activity_Monitor.php:390
+#: ThreeWP_Activity_Monitor.php:533
+#: ThreeWP_Activity_Monitor.php:1515
+msgid "Apply"
+msgstr "Uporabi"
+
+#: ThreeWP_Activity_Monitor.php:503
+msgid "Can be converted to a post."
+msgstr "Je lahko spremenjen v prispevek."
+
+#: ThreeWP_Activity_Monitor.php:921
+msgid "Clear the user's activity list completely"
+msgstr "Povsem izbriši uporabikov spisek aktivniosti"
+
+#: ThreeWP_Activity_Monitor.php:1170
+msgid "Comment was approved."
+msgstr "Komentar je bil odobren."
+
+#: ThreeWP_Activity_Monitor.php:1167
+msgid "Comment was deleted."
+msgstr "Komentar je bil zbrisan."
+
+#: ThreeWP_Activity_Monitor.php:1158
+msgid "Comment was held back."
+msgstr "Komentar je bil zadržan."
+
+#: ThreeWP_Activity_Monitor.php:1155
+msgid "Comment was reapproved."
+msgstr "Komentar je bil ponovno odobren."
+
+#: ThreeWP_Activity_Monitor.php:1152
+msgid "Comment was reset."
+msgstr "Komentar je bil ponastavljen."
+
+#: ThreeWP_Activity_Monitor.php:1161
+msgid "Comment was spammed."
+msgstr "Komentar je bil prestavljen v spam."
+
+#: ThreeWP_Activity_Monitor.php:1164
+msgid "Comment was trashed."
+msgstr "Komentar je bil prestavljen v smeti."
+
+#: ThreeWP_Activity_Monitor.php:909
+msgid "Crop the activity list down to this amount of rows"
+msgstr "Zmanjšaj spisek aktivnosti na tole število vrstic"
+
+#: ThreeWP_Activity_Monitor.php:1508
+msgid "Delete"
+msgstr "Izbriši"
+
+#: ThreeWP_Activity_Monitor.php:524
+msgid "Deselect all"
+msgstr "Odznači vse"
+
+#: ThreeWP_Activity_Monitor.php:526
+msgid "Deselect all activities that log sensitive information"
+msgstr "Odznači vse aktivnosti za beleženje občutljivih informacij"
+
+#: ThreeWP_Activity_Monitor.php:323
+msgid "Display this amount of activities per page"
+msgstr "Prikaži število aktivnosti na stran"
+
+#: ThreeWP_Activity_Monitor.php:875
+msgid "Failed logins"
+msgstr "Spodletele prijave"
+
+#: ThreeWP_Activity_Monitor.php:675
+msgid "First name"
+msgstr "Ime"
+
+#: ThreeWP_Activity_Monitor.php:677
+#: ThreeWP_Activity_Monitor.php:685
+#, php-format
+msgid "From \"<em>%s</em>\" to \"<em>%s</em>\""
+msgstr "Iz \"<em>%s</em>\" na \"<em>%s</em>\""
+
+#: ThreeWP_Activity_Monitor.php:588
+#: ThreeWP_Activity_Monitor.php:608
+#: ThreeWP_Activity_Monitor.php:644
+#: ThreeWP_Activity_Monitor.php:658
+msgid "IP"
+msgstr "IP"
+
+#: ThreeWP_Activity_Monitor.php:312
+msgid "Keep at most this amount of activities in the database"
+msgstr "Obdrži najmanj toliko aktivnosti v podatkovni bazi"
+
+#: ThreeWP_Activity_Monitor.php:683
+msgid "Last name"
+msgstr "Priimek"
+
+#: ThreeWP_Activity_Monitor.php:873
+#: ThreeWP_Activity_Monitor.php:994
+msgid "Latest login"
+msgstr "Zadnja prijava"
+
+#: ThreeWP_Activity_Monitor.php:951
+msgid "Login statistics"
+msgstr "Statistika prijav"
+
+#: ThreeWP_Activity_Monitor.php:500
+msgid "Logs sensitive information."
+msgstr "Zabeleži občutljive informacije"
+
+#: ThreeWP_Activity_Monitor.php:1177
+msgid "Logs the password the user tried to login with."
+msgstr "Zabeleži geslo s katerim se je uporabnik poskušal prijavit."
+
+#: ThreeWP_Activity_Monitor.php:335
+msgid "Maximum length of passwords to show when logging failed logins. Set to 0 to disable logging of failed passwords."
+msgstr "največja dolžina prikazanega gesla za prikaz pri beleženju spodletelih prijav. Vnesi 0 za izklop beleženja spodletelih prijav."
+
+#: ThreeWP_Activity_Monitor.php:1196
+msgid "New password was requested"
+msgstr "Zahtevano novo geslo"
+
+#: ThreeWP_Activity_Monitor.php:983
+msgid "No login data available"
+msgstr "Ni podatkov o prijavah"
+
+#: ThreeWP_Activity_Monitor.php:1507
+msgid "Nothing"
+msgstr "Nič"
+
+#: ThreeWP_Activity_Monitor.php:225
+msgid "Overview"
+msgstr "Pregled"
+
+#: ThreeWP_Activity_Monitor.php:672
+msgid "Password"
+msgstr "Geslo"
+
+#: ThreeWP_Activity_Monitor.php:672
+msgid "Password changed"
+msgstr "Spremenjeno geslo"
+
+#: ThreeWP_Activity_Monitor.php:334
+msgid "Password length"
+msgstr "Dolžina gesla"
+
+#: ThreeWP_Activity_Monitor.php:607
+#: ThreeWP_Activity_Monitor.php:613
+#: ThreeWP_Activity_Monitor.php:614
+msgid "Password tried"
+msgstr "Preizkušenih gesel"
+
+#: ThreeWP_Activity_Monitor.php:1199
+msgid "Password was reset"
+msgstr "Geslo je bilo ponastavljeno"
+
+#: ThreeWP_Activity_Monitor.php:1202
+msgid "Post published"
+msgstr "Objavljenih prispevkov "
+
+#: ThreeWP_Activity_Monitor.php:343
+msgid "Post types"
+msgstr "Tipov prispevkov"
+
+#: ThreeWP_Activity_Monitor.php:1217
+msgid "Post was deleted"
+msgstr "Pripevek izbrisan"
+
+#: ThreeWP_Activity_Monitor.php:1211
+msgid "Post was trashed"
+msgstr "Prispevek izbrisan"
+
+#: ThreeWP_Activity_Monitor.php:1214
+msgid "Post was untrashed"
+msgstr "Prispevek obnovljen"
+
+#: ThreeWP_Activity_Monitor.php:1208
+msgid "Post was updated"
+msgstr "Prispevek popravljen"
+
+#: ThreeWP_Activity_Monitor.php:877
+msgid "Reset passwords"
+msgstr "Ponastavljena gesla"
+
+#: ThreeWP_Activity_Monitor.php:876
+msgid "Retrieved passwords"
+msgstr "Poslana gesla"
+
+#: ThreeWP_Activity_Monitor.php:522
+msgid "Save marked activities"
+msgstr "Shrani označene aktivnosti"
+
+#: ThreeWP_Activity_Monitor.php:523
+msgid "Select all"
+msgstr "Izberi vse"
+
+#: ThreeWP_Activity_Monitor.php:1534
+msgid "Selected"
+msgstr "Izbran"
+
+#: ThreeWP_Activity_Monitor.php:230
+msgid "Settings"
+msgstr "Nastavitve"
+
+#: ThreeWP_Activity_Monitor.php:874
+msgid "Successful logins"
+msgstr "Uspešnih prijav"
+
+#: ThreeWP_Activity_Monitor.php:1494
+#, php-format
+msgid "The selected activities have been deleted! %sReload this page%s."
+msgstr "Izbrane aktivnosti so bile izbrisane! %sPonovno naloži stran%s."
+
+#: ThreeWP_Activity_Monitor.php:1622
+msgid "Time"
+msgstr "Čas"
+
+#: ThreeWP_Activity_Monitor.php:236
+msgid "Uninstall"
+msgstr "Odinstaliraj"
+
+#: ThreeWP_Activity_Monitor.php:864
+msgid "User activity"
+msgstr "Uporabniška aktivnost"
+
+#: ThreeWP_Activity_Monitor.php:589
+#: ThreeWP_Activity_Monitor.php:609
+#: ThreeWP_Activity_Monitor.php:645
+#: ThreeWP_Activity_Monitor.php:659
+msgid "User agent"
+msgstr "Uporabniški agent"
+
+#: ThreeWP_Activity_Monitor.php:1190
+msgid "User deleted (network)"
+msgstr "Uporabnik zbrisan (omrežje)"
+
+#: ThreeWP_Activity_Monitor.php:1193
+msgid "User deleted (single)"
+msgstr "Uporabnik izbrisan (posamezno)"
+
+#: ThreeWP_Activity_Monitor.php:1173
+msgid "User login"
+msgstr "Uporabniška prijava"
+
+#: ThreeWP_Activity_Monitor.php:1176
+msgid "User login failed"
+msgstr "Uporabniška prijava spodletela"
+
+#: ThreeWP_Activity_Monitor.php:1181
+msgid "User logout"
+msgstr "Odjava"
+
+#: ThreeWP_Activity_Monitor.php:1187
+msgid "User profile updated"
+msgstr "Popravljen uporabniški profil"
+
+#: ThreeWP_Activity_Monitor.php:1184
+msgid "User registration"
+msgstr "Registracija uporabnika"
+
+#: ThreeWP_Activity_Monitor.php:951
+msgid "Various login statistics about the user"
+msgstr "Staistika zabeležk o uporabniku"
+
+#: ThreeWP_Activity_Monitor.php:344
+msgid "Which type of post types to log."
+msgstr "Katere tipe prispevkov beležim."
+
+#: ThreeWP_Activity_Monitor.php:1505
+msgid "With the selected actions do:"
+msgstr "Z izbranim naredi:"
+
+#: ThreeWP_Activity_Monitor.php:1079
+msgid "no title"
+msgstr "brez  naslova"
+

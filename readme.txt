@@ -1,7 +1,7 @@
 === ThreeWP Activity Monitor ===
 Tags: wp, wpms, network, threewp, activity, monitor, activity monitor, blog activity, user, comments, logins,
 Requires at least: 3.3
-Tested up to: 3.3
+Tested up to: 3.4.1
 Stable tag: trunk
 Contributors: edward mindreantre
 Track and display site or network-wide user activity.
@@ -31,7 +31,8 @@ Has an uninstall option to completely remove itself from the database.
 Available in
 
 * English
-* Slovakian ( franci.humerca@fama.eu )
+* French - Seb giss <sgissinger@gmail.com>
+* Slovakian - franci.humerca@fama.eu
 * Swedish
 
 Since v1.2 other plugins can add new activities.
@@ -227,6 +228,12 @@ Return a complete post. The guid should be used as a link to the post or comment
 1. Uninstall settings
 
 == Changelog ==
+
+= 2.10 2012-07-18 =
+* Fixed: Post title bug. http://wordpress.org/support/topic/no-title-bug-in-threewp-activity-monitor
+* Fixed: User register typo fixed
+* Fixed: Post trashing / untrashing now registered again
+* Code cleanup because of newer version of Base
 
 = 2.9 2012-04-04 =
 * Cropping of user activity works
