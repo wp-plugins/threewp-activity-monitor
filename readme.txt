@@ -229,6 +229,9 @@ Return a complete post. The guid should be used as a link to the post or comment
 
 == Changelog ==
 
+= 2.11 2012-07-23 =
+* Removed debug code
+
 = 2.10 2012-07-18 =
 * Fixed: Post title bug. http://wordpress.org/support/topic/no-title-bug-in-threewp-activity-monitor
 * Fixed: User register typo fixed

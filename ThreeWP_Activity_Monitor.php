@@ -3,7 +3,7 @@
 Plugin Name: ThreeWP Activity Monitor
 Plugin URI: http://mindreantre.se/threewp-activity-monitor/
 Description: Plugin to track user activity. Network aware.
-Version: 2.10
+Version: 2.11
 Author: edward mindreantre
 Author URI: http://www.mindreantre.se
 Author Email: edward@mindreantre.se
@@ -729,8 +729,6 @@ class ThreeWP_Activity_Monitor extends SD_Activity_Monitor_Base
 	
 	public function user_register($user_id)
 	{
-		dbg( $user_id );
-		dbg( $user_data ); exit;
 		$user_data = get_userdata($user_id);
 		do_action('threewp_activity_monitor_new_activity', array(
 			'activity_id' => 'user_register',
