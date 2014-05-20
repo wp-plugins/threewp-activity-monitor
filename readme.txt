@@ -8,6 +8,8 @@ Track and display site or network-wide user activity.
 
 == Description ==
 
+<strong>This plugin is obsolete! If your webhost has PHP v5.4, use <a href="http://wordpress.org/plugins/plainview-activity-monitor/">Plainview Activity Monitor</a> instead.</strong>
+
 Displays a multitude of user actions to keep the site administrator informed that all is well and that the blog or network is not being abused. Displays:
 
 * Logins (successful and failed)
@@ -123,7 +125,7 @@ public function list_activities($activities)
 			'can_be_converted_to_post' => true,		// In this example, it can.
 		),
 	);
-	
+
 	// Insert our module name in all the array values.
 	// You can do this once, here, or several times manually in the above array.
 	// After inserting the plugin name, insert the activity into the main $activities array.
@@ -132,7 +134,7 @@ public function list_activities($activities)
 		$activity['plugin'] = 'ThreeWP Activity Monitor';
 		$activities[ $index ] = $activity;
 	}
-	
+
 	// Return the complete array.
 	return $activities;
 }`
@@ -144,9 +146,9 @@ add_filter( 'threewp_activity_monitor_display_activity', array(&$this, 'display_
 
 /**
 	Inserts display info into the activity.
-	
+
 	The following options are available for display:
-	
+
 	Optional: a raw string.
 	$activity['display_string'] => 'Is a completely unfiltered string.';
 
@@ -157,10 +159,10 @@ add_filter( 'threewp_activity_monitor_display_activity', array(&$this, 'display_
 		'User ID' => 'The heading user id, and then this string',
 		'   ' => 'More (trimmed) spaces means another non-heading',
 	);
-	
+
 	If you want special classes appended to the activity's <tr>, append values to the display_tr_classes array.
 	$activity['display_tr_classes'] = array('class1', 'class2');
-	
+
 	@param		array		$activity		Activity to be filled in.
 	@return		array						Activity with a combination of display_string, display_strings and display_tr_classes keys set.
 **/
@@ -177,10 +179,10 @@ public function display_activity( $activity )
 				'Good heading' => 'Is a the second line, with a very good heading',
 			), $activity['data']['activity_strings'] );
 			$activity['display_string'] = 'This string is outputted without much ado. No filtering or anything.';
-			
+
 			$activity['display_strings']['Cows'] = 'The user has ' . $activity['data']['cow_count'] . ' cows available for purchase.';
 			break;
-			
+
 	}
 	return $activity;
 }
@@ -228,6 +230,9 @@ Return a complete post. The guid should be used as a link to the post or comment
 1. Uninstall settings
 
 == Changelog ==
+
+= 2.12 2014-05-21 =
+* Plugin is now obsolete. Use Plainview Activity Monitor instead.
 
 = 2.11 2012-07-23 =
 * Removed debug code
